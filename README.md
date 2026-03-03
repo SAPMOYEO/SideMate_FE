@@ -34,3 +34,31 @@ pnpm dev      # 개발 서버
 pnpm build    # 프로덕션 빌드
 pnpm lint     # 린트
 ```
+
+## 코드 품질 (ESLint + Husky)
+
+### ESLint 전략
+
+`typescript-eslint recommended` 기반, `any` 타입 사용 시 빌드 오류 처리.
+
+```js
+// eslint.config.js
+rules: {
+  '@typescript-eslint/no-explicit-any': 'error',
+}
+```
+
+### Husky + lint-staged
+
+`git commit` 시 staged 파일에만 자동으로 린트·포맷 실행.
+
+| 대상 | 실행 |
+|------|------|
+| `*.{ts,tsx}` | eslint --fix → prettier --write |
+| `*.{css,json,md}` | prettier --write |
+
+### 초기 세팅 (git init 후 1회)
+
+```bash
+pnpm prepare
+```
