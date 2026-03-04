@@ -13,6 +13,7 @@ import AdminStatCard from './components/AdminStatCard'
 import AdminUserDetailModal from './components/modal/AdminUserDetailModal'
 import { Input } from '@/components/ui/input'
 import { AdminTablePagination } from './components/AdminTablePagination'
+import { formatDate } from '@/utils/formatter'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -98,13 +99,6 @@ const DUMMY_USERS: User[] = [
     isActive: true,
   },
 ]
-
-const formatDate = (date: Date) =>
-  date.toLocaleDateString('ko-KR', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  })
 
 const USER_COLUMNS: TableColumn[] = [
   { key: 'name', label: '이름' },

@@ -3,6 +3,7 @@ import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { ShieldCheck, User, Mail, Calendar, Hash } from 'lucide-react'
+import { formatDate } from '@/utils/formatter'
 import {
   Dialog,
   DialogContent,
@@ -54,13 +55,6 @@ const DUMMY_USER: User = {
   role: 'USER',
   isActive: true,
 }
-
-const formatDate = (date: Date) =>
-  date.toLocaleDateString('ko-KR', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  })
 
 // 읽기 전용 정보 한 줄
 const InfoRow = ({

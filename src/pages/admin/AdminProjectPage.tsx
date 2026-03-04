@@ -15,6 +15,7 @@ import AdminProjectDetailModal from './components/modal/AdminProjectDetailModal'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { formatDate } from '@/utils/formatter'
 
 interface Project {
   _id: string
@@ -61,13 +62,6 @@ const DUMMY_PROJECTS: Project[] = [
     isVisible: false,
   },
 ]
-
-const formatDate = (date: Date) =>
-  date.toLocaleDateString('ko-KR', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  })
 
 const PROJECT_COLUMNS: TableColumn[] = [
   { key: 'title', label: '프로젝트 제목' },

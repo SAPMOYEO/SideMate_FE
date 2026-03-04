@@ -4,6 +4,7 @@ import AdminPageCommonLayout from './components/AdminPageCommonLayout'
 import AdminTable, { type TableColumn } from './components/AdminTable'
 import { Input } from '@/components/ui/input'
 import { AdminTablePagination } from './components/AdminTablePagination'
+import { formatDate } from '@/utils/formatter'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import AdminBannerFormModal from './components/modal/AdminBannerFormModal'
@@ -59,13 +60,6 @@ const DUMMY_BANNERS: Banner[] = [
     updatedAt: new Date('2024-11-15'),
   },
 ]
-
-const formatDate = (date: Date) =>
-  date.toLocaleDateString('ko-KR', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  })
 
 const BANNER_COLUMNS: TableColumn[] = [
   { key: 'preview', label: '미리보기' },

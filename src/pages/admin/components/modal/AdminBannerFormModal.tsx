@@ -4,6 +4,7 @@ import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { ImageIcon, Hash } from 'lucide-react'
+import { formatDate } from '@/utils/formatter'
 import {
   Dialog,
   DialogContent,
@@ -59,13 +60,6 @@ const Label = ({
 
 const FieldError = ({ message }: { message?: string }) =>
   message ? <p className="text-destructive mt-1 text-xs">{message}</p> : null
-
-const formatDate = (date: Date) =>
-  date.toLocaleDateString('ko-KR', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  })
 
 // ── Component ────────────────────────────────────────────────────
 const AdminBannerFormModal = ({ open, onOpenChange, banner = null }: Props) => {

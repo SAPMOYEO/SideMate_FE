@@ -7,6 +7,7 @@ import {
 } from '@/components/ui/dialog'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { formatDate, formatDateTime } from '@/utils/formatter'
 import {
   Calendar,
   Github,
@@ -128,22 +129,6 @@ const COMM_MAP: Record<CommunicationMethod, string> = {
   OPEN_CHAT: '오픈채팅',
   OFFLINE: '오프라인',
 }
-
-const formatDate = (date: Date) =>
-  date.toLocaleDateString('ko-KR', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  })
-
-const formatDateTime = (date: Date) =>
-  date.toLocaleString('ko-KR', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
 
 // ────────────────────────────────────────────────────────────────
 // Sub-components
