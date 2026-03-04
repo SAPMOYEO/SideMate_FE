@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input'
 import { AdminTablePagination } from './components/AdminTablePagination'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
-import AdminBannerFormModal from './components/AdminBannerFormModal'
+import AdminBannerFormModal from './components/modal/AdminBannerFormModal'
 
 interface Banner {
   _id: string

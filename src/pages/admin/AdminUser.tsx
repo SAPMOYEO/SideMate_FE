@@ -10,7 +10,7 @@ import {
 import AdminPageCommonLayout from './components/AdminPageCommonLayout'
 import AdminTable, { type TableColumn } from './components/AdminTable'
 import AdminStatCard from './components/AdminStatCard'
-import AdminUserDetailModal from './components/AdminUserDetailModal'
+import AdminUserDetailModal from './components/modal/AdminUserDetailModal'
 import { Input } from '@/components/ui/input'
 import { AdminTablePagination } from './components/AdminTablePagination'
 import { Button } from '@/components/ui/button'
