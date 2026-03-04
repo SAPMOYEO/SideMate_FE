@@ -21,10 +21,18 @@ pnpm dev
 
 ```
 src/
-├── components/ui/   # shadcn 컴포넌트
-├── lib/utils.ts     # cn() 유틸
+├── components/
+│   ├── ui/          # shadcn 컴포넌트
+│   ├── shared/      # 공통 컴포넌트 (Header 등)
+│   └── icons/       # 아이콘 컴포넌트
+├── features/        # Redux slice, store
+├── hooks/           # 커스텀 훅
+├── layout/          # 레이아웃 컴포넌트 (AppLayout 등)
+├── lib/             # 유틸리티 (cn 등)
+├── pages/           # 페이지 컴포넌트
+├── routes/          # 라우트 설정
 ├── index.css        # Tailwind + 테마 변수
-└── main.tsx         # 전역 프로바이더
+└── main.tsx         # 전역 프로바이더 (BrowserRouter > QueryClientProvider > Redux)
 ```
 
 ## 스크립트
