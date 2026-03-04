@@ -1,10 +1,11 @@
-import { Button } from './components/ui/button'
+import AppLayout from './layout/AppLayout'
+import AppRouter from './routes/AppRouter'
 
 function App() {
   return (
-    <div className="w-full bg-green-50">
-      <Button>Click me</Button>
-    </div>
+    <AppLayout>
+      <AppRouter />
+    </AppLayout>
   )
 }
 
