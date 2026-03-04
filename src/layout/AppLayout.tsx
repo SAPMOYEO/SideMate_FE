@@ -1,11 +1,14 @@
+import { Outlet } from 'react-router-dom'
 import { Header } from '@/components/shared/Header'
 
-const AppLayout = ({ children }: { children: React.ReactNode }) => {
+const AppLayout = () => {
   return (
     <div>
       <Header />
       <div className="flex">
-        <main>{children}</main>
+        <main>
+          <Outlet />
+        </main>
       </div>
     </div>
   )
