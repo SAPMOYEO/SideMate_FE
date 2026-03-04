@@ -8,7 +8,7 @@ const AuthLayout: React.FC = () => {
 
   return (
     <div className="bg-background-light dark:bg-background-dark flex min-h-screen w-full flex-row font-sans text-slate-900 dark:text-slate-100">
-      <div className="bg-primary relative hidden w-1/2 flex-col justify-between overflow-hidden p-12 text-white lg:flex">
+      <div className="relative hidden w-1/2 flex-col justify-between overflow-hidden bg-zinc-800 p-12 text-white lg:flex">
         <div className="pointer-events-none absolute inset-0 opacity-10">
           <svg height="100%" width="100%" xmlns="http://www.w3.org/2000/svg">
             <defs>

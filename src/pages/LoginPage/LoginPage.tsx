@@ -138,7 +138,7 @@ const LoginPage: React.FC = () => {
 
         <Button
           type="submit"
-          className="bg-primary shadow-primary/20 mt-2 h-12 w-full font-bold shadow-lg"
+          className="shadow-primary/20 mt-2 h-12 w-full bg-zinc-800 font-bold shadow-lg"
           disabled={isSubmitting}
         >
           {isSubmitting ? (

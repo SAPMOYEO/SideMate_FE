@@ -282,7 +282,7 @@ const SignUpPage: React.FC = () => {
 
         <Button
           type="submit"
-          className="bg-primary mt-4 h-12 w-full font-bold"
+          className="mt-4 h-12 w-full bg-zinc-800 font-bold"
           disabled={isSubmitting}
         >
           {isSubmitting ? (
