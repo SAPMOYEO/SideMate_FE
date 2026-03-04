@@ -11,6 +11,7 @@ import AdminPageCommonLayout from './components/AdminPageCommonLayout'
 import AdminTable, { type TableColumn } from './components/AdminTable'
 import { AdminTablePagination } from './components/AdminTablePagination'
 import AdminStatCard from './components/AdminStatCard'
+import AdminProjectDetailModal from './components/AdminProjectDetailModal'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -79,6 +80,7 @@ const PROJECT_COLUMNS: TableColumn[] = [
 const AdminProjectPage = () => {
   const [projects, setProjects] = useState(DUMMY_PROJECTS)
   const [search, setSearch] = useState('')
+  const [detailOpen, setDetailOpen] = useState(false)
   // const [currentPage, setCurrentPage] = useState(1)
 
   const filteredProjects = projects.filter(
@@ -112,12 +114,20 @@ const AdminProjectPage = () => {
       <Badge variant="secondary">숨김 처리</Badge>
     ),
     actions: (
-      <button
-        onClick={() => toggleVisibility(project._id)}
-        className="text-primary text-sm font-medium hover:underline"
-      >
-        {project.isVisible ? '숨기기' : '숨김 해제'}
-      </button>
+      <div className="flex items-center gap-3">
+        <button
+          onClick={() => setDetailOpen(true)}
+          className="text-muted-foreground text-sm hover:underline"
+        >
+          상세보기
+        </button>
+        <button
+          onClick={() => toggleVisibility(project._id)}
+          className="text-primary text-sm font-medium hover:underline"
+        >
+          {project.isVisible ? '숨기기' : '숨김 해제'}
+        </button>
+      </div>
     ),
   }))
 
@@ -219,6 +229,7 @@ const AdminProjectPage = () => {
           </div>
         </div>
       </div>
+      <AdminProjectDetailModal open={detailOpen} onOpenChange={setDetailOpen} />
     </AdminPageCommonLayout>
   )
 }

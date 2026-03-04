@@ -10,6 +10,7 @@ import {
 import AdminPageCommonLayout from './components/AdminPageCommonLayout'
 import AdminTable, { type TableColumn } from './components/AdminTable'
 import AdminStatCard from './components/AdminStatCard'
+import AdminUserDetailModal from './components/AdminUserDetailModal'
 import { Input } from '@/components/ui/input'
 import { AdminTablePagination } from './components/AdminTablePagination'
 import { Button } from '@/components/ui/button'
@@ -33,7 +34,7 @@ interface User {
 
 const DUMMY_USERS: User[] = [
   {
-    _id: '1',
+    _id: '507f1f77bcf86cd799439001',
     name: '김민준',
     email: 'minjun@example.com',
     joinedAt: new Date('2024-01-15'),
@@ -41,7 +42,7 @@ const DUMMY_USERS: User[] = [
     isActive: true,
   },
   {
-    _id: '2',
+    _id: '507f1f77bcf86cd799439002',
     name: '이서연',
     email: 'seoyeon@example.com',
     joinedAt: new Date('2024-02-20'),
@@ -49,7 +50,7 @@ const DUMMY_USERS: User[] = [
     isActive: true,
   },
   {
-    _id: '3',
+    _id: '507f1f77bcf86cd799439003',
     name: '박지호',
     email: 'jiho@example.com',
     joinedAt: new Date('2024-03-10'),
@@ -57,7 +58,7 @@ const DUMMY_USERS: User[] = [
     isActive: false,
   },
   {
-    _id: '4',
+    _id: '507f1f77bcf86cd799439004',
     name: '최수아',
     email: 'sua@example.com',
     joinedAt: new Date('2024-04-05'),
@@ -65,7 +66,7 @@ const DUMMY_USERS: User[] = [
     isActive: true,
   },
   {
-    _id: '5',
+    _id: '507f1f77bcf86cd799439005',
     name: '정우진',
     email: 'woojin@example.com',
     joinedAt: new Date('2024-05-22'),
@@ -73,7 +74,7 @@ const DUMMY_USERS: User[] = [
     isActive: true,
   },
   {
-    _id: '6',
+    _id: '507f1f77bcf86cd799439006',
     name: '강예린',
     email: 'yerin@example.com',
     joinedAt: new Date('2024-06-18'),
@@ -81,7 +82,7 @@ const DUMMY_USERS: User[] = [
     isActive: false,
   },
   {
-    _id: '7',
+    _id: '507f1f77bcf86cd799439007',
     name: '윤도현',
     email: 'dohyun@example.com',
     joinedAt: new Date('2024-07-30'),
@@ -89,7 +90,7 @@ const DUMMY_USERS: User[] = [
     isActive: true,
   },
   {
-    _id: '8',
+    _id: '507f1f77bcf86cd799439008',
     name: '임하늘',
     email: 'haneul@example.com',
     joinedAt: new Date('2024-08-14'),
@@ -118,6 +119,8 @@ const AdminUserPage = () => {
   const [users] = useState(DUMMY_USERS)
   const [search, setSearch] = useState('')
   const [roleFilter, setRoleFilter] = useState('ALL')
+  const [selectedUser, setSelectedUser] = useState<User | null>(null)
+  const [detailOpen, setDetailOpen] = useState(false)
 
   const filteredUsers = users.filter((user) => {
     const matchSearch =
@@ -128,6 +131,11 @@ const AdminUserPage = () => {
 
   const activeCount = users.filter((u) => u.isActive).length
   const inactiveCount = users.length - activeCount
+
+  const handleEditClick = (user: User) => {
+    setSelectedUser(user)
+    setDetailOpen(true)
+  }
 
   const rows = filteredUsers.map((user) => ({
     name: <span className="font-medium">{user.name}</span>,
@@ -151,7 +159,10 @@ const AdminUserPage = () => {
     ),
     actions: (
       <div className="flex items-center gap-2">
-        <button className="text-muted-foreground hover:text-primary transition-colors">
+        <button
+          onClick={() => handleEditClick(user)}
+          className="text-muted-foreground hover:text-primary transition-colors"
+        >
           <Pencil size={16} />
         </button>
         <button className="text-muted-foreground hover:text-destructive transition-colors">
@@ -210,7 +221,6 @@ const AdminUserPage = () => {
       <div className="border-border rounded-3xl border bg-white">
         {/* 현황 + 검색/필터 */}
         <div className="flex items-center border-b-2 p-4">
-          {/* 현황 */}
           <div className="flex items-center gap-3 text-sm">
             <span className="font-medium">전체 사용자 ({users.length})</span>
             <div className="bg-border h-4 w-px"></div>
@@ -225,7 +235,6 @@ const AdminUserPage = () => {
               </span>
             </div>
           </div>
-          {/* 검색 + 필터 + 다운로드 */}
           <div className="ml-auto flex items-center gap-2">
             <Input
               placeholder="이름 또는 이메일 검색"
@@ -260,6 +269,16 @@ const AdminUserPage = () => {
           <AdminTablePagination />
         </div>
       </div>
+
+      {/* 사용자 상세/수정 모달 */}
+      <AdminUserDetailModal
+        open={detailOpen}
+        onOpenChange={(v) => {
+          setDetailOpen(v)
+          if (!v) setSelectedUser(null)
+        }}
+        user={selectedUser ?? undefined}
+      />
     </AdminPageCommonLayout>
   )
 }

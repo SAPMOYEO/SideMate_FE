@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input'
 import { AdminTablePagination } from './components/AdminTablePagination'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
+import AdminBannerFormModal from './components/AdminBannerFormModal'
 
 interface Banner {
   _id: string
@@ -77,6 +78,8 @@ const BANNER_COLUMNS: TableColumn[] = [
 
 const AdminBanner = () => {
   const [banners, setBanners] = useState(DUMMY_BANNERS)
+  const [formOpen, setFormOpen] = useState(false)
+  const [selectedBanner, setSelectedBanner] = useState<Banner | null>(null)
 
   const handleToggle = (_id: string, checked: boolean) => {
     setBanners((prev) =>
@@ -84,6 +87,16 @@ const AdminBanner = () => {
         banner._id === _id ? { ...banner, isActive: checked } : banner
       )
     )
+  }
+
+  const handleEditClick = (banner: Banner) => {
+    setSelectedBanner(banner)
+    setFormOpen(true)
+  }
+
+  const handleCreateClick = () => {
+    setSelectedBanner(null)
+    setFormOpen(true)
   }
 
   const activeCount = banners.filter((b) => b.isActive).length
@@ -118,7 +131,10 @@ const AdminBanner = () => {
     ),
     actions: (
       <div className="flex items-center gap-2">
-        <button className="text-muted-foreground hover:text-primary transition-colors">
+        <button
+          onClick={() => handleEditClick(banner)}
+          className="text-muted-foreground hover:text-primary transition-colors"
+        >
           <Pencil size={16} />
         </button>
         <button className="text-muted-foreground hover:text-destructive transition-colors">
@@ -135,9 +151,8 @@ const AdminBanner = () => {
     >
       {/* 배너 리스트 */}
       <div className="border-border rounded-3xl border bg-white">
-        {/* 검색 및 현황 */}
+        {/* 현황 + 검색바 */}
         <div className="flex border-b-2 p-4">
-          {/* 현황 */}
           <div className="flex items-center gap-3 text-sm">
             <span className="font-medium">전체 배너 ({banners.length})</span>
             <div className="bg-border h-4 w-px"></div>
@@ -152,7 +167,6 @@ const AdminBanner = () => {
               </span>
             </div>
           </div>
-          {/* 검색바 */}
           <div className="ml-auto">
             <Input
               placeholder="배너 이름 검색"
@@ -160,17 +174,32 @@ const AdminBanner = () => {
             />
           </div>
         </div>
+
         <div className="rounded-2xl">
           <AdminTable columns={BANNER_COLUMNS} rows={rows} />
         </div>
+
         <div className="flex items-center justify-end gap-4 rounded-b-3xl bg-[#f8fafc] px-4 py-3">
-          {/* 페이지네이션 */}
           <AdminTablePagination />
         </div>
       </div>
+
+      {/* 배너 등록 버튼 */}
       <div className="mt-8 flex justify-end">
-        <Button size="lg">배너 등록</Button>
+        <Button size="lg" onClick={handleCreateClick}>
+          배너 등록
+        </Button>
       </div>
+
+      {/* 배너 등록/수정 모달 */}
+      <AdminBannerFormModal
+        open={formOpen}
+        onOpenChange={(v) => {
+          setFormOpen(v)
+          if (!v) setSelectedBanner(null)
+        }}
+        banner={selectedBanner}
+      />
     </AdminPageCommonLayout>
   )
 }
