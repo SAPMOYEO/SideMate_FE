@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { Pencil, Trash2 } from 'lucide-react'
 import AdminPageCommonLayout from './components/AdminPageCommonLayout'
 import AdminTable, { type TableColumn } from './components/AdminTable'
-import { Input } from '@/components/ui/input'
 import { AdminTablePagination } from './components/AdminTablePagination'
 import { formatDate } from '@/utils/formatter'
 import { Button } from '@/components/ui/button'
@@ -145,27 +144,19 @@ const AdminBanner = () => {
     >
       {/* 배너 리스트 */}
       <div className="border-border rounded-3xl border bg-white">
-        {/* 현황 + 검색바 */}
-        <div className="flex border-b-2 p-4">
-          <div className="flex items-center gap-3 text-sm">
-            <span className="font-medium">전체 배너 ({banners.length})</span>
-            <div className="bg-border h-4 w-px"></div>
-            <div className="flex items-center gap-1.5">
-              <span className="h-2 w-2 rounded-full bg-green-500"></span>
-              <span className="text-muted-foreground">활성 {activeCount}</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <span className="bg-muted-foreground h-2 w-2 rounded-full"></span>
-              <span className="text-muted-foreground">
-                대기/만료 {inactiveCount}
-              </span>
-            </div>
+        {/* 현황 */}
+        <div className="flex items-center gap-3 border-b-2 p-4 text-sm">
+          <span className="font-medium">전체 배너 ({banners.length})</span>
+          <div className="bg-border h-4 w-px" />
+          <div className="flex items-center gap-1.5">
+            <span className="h-2 w-2 rounded-full bg-green-500" />
+            <span className="text-muted-foreground">활성 {activeCount}</span>
           </div>
-          <div className="ml-auto">
-            <Input
-              placeholder="배너 이름 검색"
-              className="bg-input/40 placeholder:text-color-text-muted w-64 border-none outline-none"
-            />
+          <div className="flex items-center gap-1.5">
+            <span className="bg-muted-foreground h-2 w-2 rounded-full" />
+            <span className="text-muted-foreground">
+              대기/만료 {inactiveCount}
+            </span>
           </div>
         </div>
 

@@ -1,5 +1,5 @@
 import { Link, NavLink, Outlet } from 'react-router-dom'
-import { Briefcase, LayoutDashboard, Megaphone, Users } from 'lucide-react'
+import { Briefcase, Megaphone, Users } from 'lucide-react'
 import { SideMateLogo } from '@/components/icons'
 
 const AdminHeader = () => {
@@ -49,19 +49,6 @@ const AdminLayout = () => {
               Menu
             </h3>
             <nav className="flex flex-col gap-1">
-              <NavLink
-                className={({ isActive }) =>
-                  `flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors ${
-                    isActive
-                      ? 'bg-primary/10 text-primary font-bold'
-                      : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground font-medium'
-                  }`
-                }
-                to="/admin/dashboard"
-              >
-                <LayoutDashboard size={22} />
-                <span className="text-sm">대시보드 홈</span>
-              </NavLink>
               <NavLink
                 className={({ isActive }) =>
                   `flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors ${
