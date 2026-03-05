@@ -1,9 +1,5 @@
-import { useEffect, useState } from 'react'
-import type { ReactNode } from 'react'
-import { useForm, Controller } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
-import { ImageIcon, Hash } from 'lucide-react'
+import { Controller } from 'react-hook-form'
+import { Hash } from 'lucide-react'
 import { formatDate } from '@/utils/formatter'
 import {
   Dialog,
@@ -15,9 +11,12 @@ import {
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
+import { Label, FieldError } from '@/components/shared/FormField'
+import BannerImageUploader from '@/pages/admin/components/BannerImageUploader'
+import useBannerForm from '@/pages/admin/hooks/useBannerForm'
 
 // ── Types ────────────────────────────────────────────────────────
-interface Banner {
+export interface Banner {
   _id: string
   imageUrl: string
   isActive: boolean
@@ -32,76 +31,26 @@ interface Props {
   banner?: Banner | null
 }
 
-// ── Schema ───────────────────────────────────────────────────────
-const schema = z.object({
-  imageUrl: z
-    .string()
-    .min(1, '이미지 URL을 입력해주세요')
-    .url('올바른 URL 형식이 아닙니다'),
-  order: z.number().min(1, '1 이상이어야 합니다'),
-  isActive: z.boolean(),
-})
-
-type FormValues = z.infer<typeof schema>
-
-// ── Helpers ──────────────────────────────────────────────────────
-const Label = ({
-  children,
-  required,
-}: {
-  children: ReactNode
-  required?: boolean
-}) => (
-  <label className="mb-1.5 block text-sm font-medium">
-    {children}
-    {required && <span className="text-destructive ml-0.5">*</span>}
-  </label>
-)
-
-const FieldError = ({ message }: { message?: string }) =>
-  message ? <p className="text-destructive mt-1 text-xs">{message}</p> : null
-
 // ── Component ────────────────────────────────────────────────────
 const AdminBannerFormModal = ({ open, onOpenChange, banner = null }: Props) => {
   const isEdit = banner !== null
-  const [imageLoadError, setImageLoadError] = useState(false)
+
+  const { form, onSubmit } = useBannerForm({
+    banner,
+    open,
+    onSuccess: () => onOpenChange(false),
+  })
 
   const {
     register,
     control,
     handleSubmit,
-    reset,
-    watch,
+    setValue,
     formState: { errors },
-  } = useForm<FormValues>({
-    resolver: zodResolver(schema),
-    defaultValues: { imageUrl: '', order: 1, isActive: true },
-  })
-
-  // 폼 값 초기화
-  useEffect(() => {
-    reset({
-      imageUrl: banner?.imageUrl ?? '',
-      order: banner?.order ?? 1,
-      isActive: banner?.isActive ?? true,
-    })
-  }, [banner, open, reset])
-
-  // 이미지 에러 상태 초기화 (별도 effect로 분리)
-  useEffect(() => {
-    setImageLoadError(false)
-  }, [open])
-
-  const watchedImageUrl = watch('imageUrl')
-  const showPreview = watchedImageUrl.trim().length > 0 && !imageLoadError
-
-  const onSubmit = (data: FormValues) => {
-    console.log('submit', data) // TODO: API 연동
-    onOpenChange(false)
-  }
+  } = form
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange} modal>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         className="flex w-[45vw] max-w-[45vw] flex-col gap-0 p-0"
         showCloseButton={false}
@@ -113,55 +62,28 @@ const AdminBannerFormModal = ({ open, onOpenChange, banner = null }: Props) => {
           <p className="text-muted-foreground text-sm">
             {isEdit
               ? '배너 정보를 수정합니다.'
-              : '이미지 URL, 순서, 활성 여부를 설정하세요.'}
+              : '이미지를 업로드하고 순서, 활성 여부를 설정하세요.'}
           </p>
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="flex flex-col gap-6 px-6 py-6">
-            {/* 이미지 URL + 미리보기 */}
+            {/* 배너 이미지 업로드 */}
             <div>
-              <Label required>배너 이미지 URL</Label>
+              <Label required>배너 이미지</Label>
               <Controller
                 name="imageUrl"
                 control={control}
                 render={({ field }) => (
-                  <Input
-                    placeholder="https://example.com/banner.png"
+                  <BannerImageUploader
                     value={field.value}
-                    onBlur={field.onBlur}
-                    onChange={(e) => {
-                      field.onChange(e)
-                      setImageLoadError(false)
-                    }}
+                    onChange={(url) =>
+                      setValue('imageUrl', url, { shouldValidate: true })
+                    }
                   />
                 )}
               />
               <FieldError message={errors.imageUrl?.message} />
-
-              {/* 미리보기 */}
-              <div className="bg-muted mt-3 flex h-28 w-full items-center justify-center overflow-hidden rounded-xl border">
-                {showPreview ? (
-                  <img
-                    src={watchedImageUrl}
-                    alt="배너 미리보기"
-                    className="h-full w-full object-contain"
-                    onError={() => setImageLoadError(true)}
-                  />
-                ) : (
-                  <div className="flex flex-col items-center gap-1.5">
-                    <ImageIcon
-                      size={28}
-                      className="text-muted-foreground opacity-40"
-                    />
-                    <span className="text-muted-foreground text-xs">
-                      {imageLoadError
-                        ? '이미지를 불러올 수 없습니다'
-                        : '미리보기'}
-                    </span>
-                  </div>
-                )}
-              </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">

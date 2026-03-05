@@ -43,6 +43,7 @@ const CloudinaryUploadWidget = <T extends UwConfig>({
 
         // Add click event to open widget
         const handleUploadClick = () => {
+          console.log('Upload button clicked')
           if (uploadWidgetRef.current) {
             uploadWidgetRef.current.open()
           }
@@ -69,9 +70,9 @@ const CloudinaryUploadWidget = <T extends UwConfig>({
       }}
       ref={uploadButtonRef}
       id="upload_widget"
-      className="cloudinary-button z-50 bg-black text-white"
+      className="cloudinary-button z-50 w-full cursor-pointer rounded-3xl bg-zinc-600 p-4 text-white"
     >
-      상품이미지 업로드
+      배너등록
     </button>
   )
 }
