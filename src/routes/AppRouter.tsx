@@ -4,6 +4,10 @@ import AppLayout from '@/layout/AppLayout'
 import AdminRoute from '@/routes/AdminRoute'
 import PrivateRoute from '@/routes/PrivateRoute'
 import PublicOnlyRoute from '@/routes/PublicOnlyRoute'
+import AdminLayout from '@/layout/AdminLayout'
+import AdminProjectPage from '@/pages/admin/AdminProjectPage'
+import AdminBanner from '@/pages/admin/AdminBanner'
+import AdminUserPage from '@/pages/admin/AdminUser'
 import PaymentPage from '@/pages/PaymentPage/PaymentPage'
 
 export default function AppRouter() {
@@ -36,8 +40,11 @@ export default function AppRouter() {
 
       {/* Admin - 관리자만 접근 (아니면 / 로 리다이렉트) */}
       <Route element={<AdminRoute />}>
-        <Route path="/admin/banner" element={<div>AdminBanner</div>} />
-        <Route path="/admin/projects" element={<div>AdminProjects</div>} />
+        <Route element={<AdminLayout />}>
+          <Route path="/admin/banner" element={<AdminBanner />} />
+          <Route path="/admin/projects" element={<AdminProjectPage />} />
+          <Route path="/admin/users" element={<AdminUserPage />} />
+        </Route>
       </Route>
 
       {/* 404 */}
