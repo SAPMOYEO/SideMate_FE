@@ -4,7 +4,6 @@ import {
   CalendarPlus,
   Flag,
   TrendingUp,
-  Download,
   SlidersHorizontal,
 } from 'lucide-react'
 import AdminPageCommonLayout from './components/AdminPageCommonLayout'
@@ -203,10 +202,6 @@ const AdminProjectPage = () => {
             <Button variant="outline" size="sm" className="gap-1.5">
               <SlidersHorizontal size={14} />
               필터
-            </Button>
-            <Button variant="outline" size="sm" className="gap-1.5">
-              <Download size={14} />
-              엑셀 다운로드
             </Button>
           </div>
         </div>

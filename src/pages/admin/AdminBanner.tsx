@@ -7,62 +7,17 @@ import { formatDate } from '@/utils/formatter'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import AdminBannerFormModal from './components/modal/AdminBannerFormModal'
+import {
+  useBanners,
+  useUpdateBanner,
+  useDeleteBanner,
+} from '@/hooks/admin/useBanners'
+import type { Banner } from '@/utils/api/banner'
 
-interface Banner {
-  _id: string
-  imageUrl: string
-  isActive: boolean
-  order: number
-  createdAt: Date
-  updatedAt: Date
-}
-
-const DUMMY_BANNERS: Banner[] = [
-  {
-    _id: '507f1f77bcf86cd799439011',
-    imageUrl: 'https://placehold.co/160x60/6366f1/ffffff?text=Banner+1',
-    isActive: true,
-    order: 1,
-    createdAt: new Date('2025-01-10'),
-    updatedAt: new Date('2025-08-31'),
-  },
-  {
-    _id: '507f1f77bcf86cd799439012',
-    imageUrl: 'https://placehold.co/160x60/6366f1/ffffff?text=Banner+2',
-    isActive: true,
-    order: 2,
-    createdAt: new Date('2025-02-14'),
-    updatedAt: new Date('2025-09-14'),
-  },
-  {
-    _id: '507f1f77bcf86cd799439013',
-    imageUrl: 'https://placehold.co/160x60/94a3b8/ffffff?text=Banner+3',
-    isActive: false,
-    order: 3,
-    createdAt: new Date('2024-11-01'),
-    updatedAt: new Date('2024-12-31'),
-  },
-  {
-    _id: '507f1f77bcf86cd799439014',
-    imageUrl: 'https://placehold.co/160x60/6366f1/ffffff?text=Banner+4',
-    isActive: true,
-    order: 4,
-    createdAt: new Date('2025-03-01'),
-    updatedAt: new Date('2025-06-30'),
-  },
-  {
-    _id: '507f1f77bcf86cd799439015',
-    imageUrl: 'https://placehold.co/160x60/94a3b8/ffffff?text=Banner+5',
-    isActive: false,
-    order: 5,
-    createdAt: new Date('2024-09-15'),
-    updatedAt: new Date('2024-11-15'),
-  },
-]
+const LIMIT = 5
 
 const BANNER_COLUMNS: TableColumn[] = [
   { key: 'preview', label: '미리보기' },
-  { key: 'order', label: '순서' },
   { key: 'isActive', label: '활성' },
   { key: 'createdAt', label: '등록일' },
   { key: 'updatedAt', label: '수정일' },
@@ -70,16 +25,26 @@ const BANNER_COLUMNS: TableColumn[] = [
 ]
 
 const AdminBanner = () => {
-  const [banners, setBanners] = useState(DUMMY_BANNERS)
+  const [page, setPage] = useState(1)
   const [formOpen, setFormOpen] = useState(false)
   const [selectedBanner, setSelectedBanner] = useState<Banner | null>(null)
 
-  const handleToggle = (_id: string, checked: boolean) => {
-    setBanners((prev) =>
-      prev.map((banner) =>
-        banner._id === _id ? { ...banner, isActive: checked } : banner
-      )
-    )
+  // ── React Query ───────────────────────────────────────────────
+  const { data, isLoading, isError } = useBanners({ page, limit: LIMIT })
+  const { mutate: updateBanner } = useUpdateBanner()
+  const { mutate: deleteBanner } = useDeleteBanner()
+
+  // ── 파생 데이터 ───────────────────────────────────────────────
+  const banners = data?.data ?? []
+  const totalCount = data?.totalCount ?? 0
+  const totalPages = data?.totalPages ?? 1
+
+  const activeCount = banners.filter((b) => b.isActive).length
+  const inactiveCount = totalCount - activeCount
+
+  // ── 핸들러 ───────────────────────────────────────────────────
+  const handleToggle = (id: string, isActive: boolean) => {
+    updateBanner({ id, payload: { isActive } })
   }
 
   const handleEditClick = (banner: Banner) => {
@@ -92,19 +57,20 @@ const AdminBanner = () => {
     setFormOpen(true)
   }
 
-  const activeCount = banners.filter((b) => b.isActive).length
-  const inactiveCount = banners.length - activeCount
+  const handleDeleteClick = (id: string) => {
+    if (confirm('배너를 삭제하시겠습니까?')) {
+      deleteBanner(id)
+    }
+  }
 
+  // ── 테이블 rows ───────────────────────────────────────────────
   const rows = banners.map((banner) => ({
     preview: (
       <img
         src={banner.imageUrl}
-        alt={`배너 ${banner.order}`}
+        alt={`배너 ${banner._id} 이미지`}
         className="h-12 w-auto rounded-md object-cover"
       />
-    ),
-    order: (
-      <span className="text-muted-foreground text-sm">{banner.order}</span>
     ),
     isActive: (
       <Switch
@@ -114,12 +80,12 @@ const AdminBanner = () => {
     ),
     createdAt: (
       <span className="text-muted-foreground text-sm">
-        {formatDate(banner.createdAt)}
+        {formatDate(new Date(banner.createdAt))}
       </span>
     ),
     updatedAt: (
       <span className="text-muted-foreground text-sm">
-        {formatDate(banner.updatedAt)}
+        {formatDate(new Date(banner.updatedAt))}
       </span>
     ),
     actions: (
@@ -130,23 +96,36 @@ const AdminBanner = () => {
         >
           <Pencil size={16} />
         </button>
-        <button className="text-muted-foreground hover:text-destructive transition-colors">
+        <button
+          onClick={() => handleDeleteClick(banner._id)}
+          className="text-muted-foreground hover:text-destructive transition-colors"
+        >
           <Trash2 size={16} />
         </button>
       </div>
     ),
   }))
 
+  // ── 로딩 / 에러 ───────────────────────────────────────────────
+  if (isLoading)
+    return <div className="p-10 text-center text-sm">불러오는 중...</div>
+  if (isError)
+    return (
+      <div className="p-10 text-center text-sm text-red-500">
+        데이터를 불러오지 못했습니다.
+      </div>
+    )
+
+  console.log(totalPages)
   return (
     <AdminPageCommonLayout
       title="배너 관리"
       description="메인 페이지의 홍보 배너를 관리합니다."
     >
-      {/* 배너 리스트 */}
       <div className="border-border rounded-3xl border bg-white">
         {/* 현황 */}
         <div className="flex items-center gap-3 border-b-2 p-4 text-sm">
-          <span className="font-medium">전체 배너 ({banners.length})</span>
+          <span className="font-medium">전체 배너 ({totalCount})</span>
           <div className="bg-border h-4 w-px" />
           <div className="flex items-center gap-1.5">
             <span className="h-2 w-2 rounded-full bg-green-500" />
@@ -165,7 +144,11 @@ const AdminBanner = () => {
         </div>
 
         <div className="flex items-center justify-end gap-4 rounded-b-3xl bg-[#f8fafc] px-4 py-3">
-          <AdminTablePagination />
+          <AdminTablePagination
+            page={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+          />
         </div>
       </div>
 

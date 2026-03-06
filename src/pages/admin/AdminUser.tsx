@@ -1,12 +1,5 @@
 import { useState } from 'react'
-import {
-  Pencil,
-  Trash2,
-  Users,
-  UserPlus,
-  AlertTriangle,
-  Download,
-} from 'lucide-react'
+import { Pencil, Trash2, Users, UserPlus, AlertTriangle } from 'lucide-react'
 import AdminPageCommonLayout from './components/AdminPageCommonLayout'
 import AdminTable, { type TableColumn } from './components/AdminTable'
 import AdminStatCard from './components/AdminStatCard'
@@ -14,7 +7,6 @@ import AdminUserDetailModal from './components/modal/AdminUserDetailModal'
 import { Input } from '@/components/ui/input'
 import { AdminTablePagination } from './components/AdminTablePagination'
 import { formatDate } from '@/utils/formatter'
-import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import {
   Select,
@@ -246,10 +238,6 @@ const AdminUserPage = () => {
                 <SelectItem value="ADMIN">관리자</SelectItem>
               </SelectContent>
             </Select>
-            <Button variant="outline" size="sm" className="gap-1.5">
-              <Download size={14} />
-              엑셀 다운로드
-            </Button>
           </div>
         </div>
 
@@ -260,7 +248,11 @@ const AdminUserPage = () => {
 
         {/* 페이지네이션 */}
         <div className="flex items-center justify-end gap-4 rounded-b-3xl bg-[#f8fafc] px-4 py-3">
-          <AdminTablePagination />
+          <AdminTablePagination
+            page={1}
+            totalPages={1}
+            onPageChange={(page) => console.log('페이지 변경:', page)}
+          />
         </div>
       </div>
 

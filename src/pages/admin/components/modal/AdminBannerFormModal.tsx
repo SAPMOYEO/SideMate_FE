@@ -1,5 +1,5 @@
 import { Controller } from 'react-hook-form'
-import { Hash } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
 import { formatDate } from '@/utils/formatter'
 import {
   Dialog,
@@ -8,22 +8,12 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import { Label, FieldError } from '@/components/shared/FormField'
 import BannerImageUploader from '@/pages/admin/components/BannerImageUploader'
-import useBannerForm from '@/pages/admin/hooks/useBannerForm'
-
-// ── Types ────────────────────────────────────────────────────────
-export interface Banner {
-  _id: string
-  imageUrl: string
-  isActive: boolean
-  order: number
-  createdAt: Date
-  updatedAt: Date
-}
+import useBannerForm from '@/hooks/admin/useBannerForm'
+import type { Banner } from '@/utils/api/banner'
 
 interface Props {
   open: boolean
@@ -34,15 +24,13 @@ interface Props {
 // ── Component ────────────────────────────────────────────────────
 const AdminBannerFormModal = ({ open, onOpenChange, banner = null }: Props) => {
   const isEdit = banner !== null
-
-  const { form, onSubmit } = useBannerForm({
+  const { form, onSubmit, isPending } = useBannerForm({
     banner,
     open,
     onSuccess: () => onOpenChange(false),
   })
 
   const {
-    register,
     control,
     handleSubmit,
     setValue,
@@ -87,27 +75,6 @@ const AdminBannerFormModal = ({ open, onOpenChange, banner = null }: Props) => {
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              {/* 노출 순서 */}
-              <div>
-                <Label required>노출 순서</Label>
-                <div className="relative">
-                  <Hash
-                    size={15}
-                    className="text-muted-foreground absolute top-1/2 left-3 -translate-y-1/2"
-                  />
-                  <Input
-                    type="number"
-                    min={1}
-                    className="pl-8"
-                    {...register('order', { valueAsNumber: true })}
-                  />
-                </div>
-                <FieldError message={errors.order?.message} />
-                <p className="text-muted-foreground mt-1 text-xs">
-                  숫자가 낮을수록 먼저 표시됩니다
-                </p>
-              </div>
-
               {/* 활성 여부 */}
               <div>
                 <Label>활성 여부</Label>
@@ -144,10 +111,10 @@ const AdminBannerFormModal = ({ open, onOpenChange, banner = null }: Props) => {
             {isEdit && banner && (
               <div className="bg-muted/40 flex justify-between rounded-xl px-4 py-3 text-xs">
                 <span className="text-muted-foreground">
-                  등록일: {formatDate(banner.createdAt)}
+                  등록일: {formatDate(new Date(banner.createdAt))}
                 </span>
                 <span className="text-muted-foreground">
-                  최종 수정: {formatDate(banner.updatedAt)}
+                  최종 수정: {formatDate(new Date(banner.updatedAt))}
                 </span>
               </div>
             )}
@@ -162,8 +129,17 @@ const AdminBannerFormModal = ({ open, onOpenChange, banner = null }: Props) => {
             >
               취소
             </Button>
-            <Button type="submit" size="sm">
-              {isEdit ? '수정 완료' : '배너 등록'}
+            <Button type="submit" size="sm" disabled={isPending}>
+              {isPending ? (
+                <>
+                  <Loader2 size={14} className="mr-1.5 animate-spin" />
+                  저장 중...
+                </>
+              ) : isEdit ? (
+                '수정 완료'
+              ) : (
+                '배너 등록'
+              )}
             </Button>
           </DialogFooter>
         </form>
