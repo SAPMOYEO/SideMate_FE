@@ -33,7 +33,14 @@ export default function PlanCarousel() {
     if (!api) return
 
     const updateCurrent = () => {
-      setCurrent(api.selectedScrollSnap() % plans.length)
+      const index = api.selectedScrollSnap() % plans.length
+      setCurrent(index)
+
+      const activePlan = plans[index]
+      if (activePlan) {
+        setSelectedPlanKey(activePlan.key)
+        setIsAgreed(false)
+      }
     }
 
     api.scrollTo(1, true)
@@ -45,14 +52,6 @@ export default function PlanCarousel() {
       api.off('select', updateCurrent)
     }
   }, [api])
-
-  React.useEffect(() => {
-    const activePlan = plans[current]
-    if (activePlan) {
-      setSelectedPlanKey(activePlan.key)
-      setIsAgreed(false)
-    }
-  }, [current])
 
   const selectedPlan =
     plans.find((plan) => plan.key === selectedPlanKey) ?? plans[0]
@@ -98,25 +97,37 @@ export default function PlanCarousel() {
             className="w-full"
           >
             <CarouselContent className="-ml-3 md:-ml-4">
-              {plans.map((plan, index) => (
-                <CarouselItem
-                  key={plan.key}
-                  className="basis-full pl-3 md:basis-1/2 md:pl-4 lg:basis-1/3"
-                >
-                  <div className="h-full">
-                    <PlanCard
-                      plan={plan}
-                      active={index === current}
-                      onSelect={() => {
-                        setSelectedPlanKey(plan.key)
-                        setIsAgreed(false)
-                        api?.scrollTo(index)
-                      }}
-                      onOpenPolicy={() => handleOpenPolicy(plan)}
-                    />
-                  </div>
-                </CarouselItem>
-              ))}
+              {plans.map((plan, index) => {
+                const isActive = plan.key === selectedPlanKey
+
+                return (
+                  <CarouselItem
+                    key={plan.key}
+                    className="basis-full pl-3 md:basis-1/2 md:pl-4 lg:basis-1/3"
+                  >
+                    <div
+                      className={[
+                        'h-full transition-all duration-300',
+                        isActive
+                          ? 'scale-100 opacity-100'
+                          : 'scale-[0.97] opacity-60',
+                      ].join(' ')}
+                    >
+                      <PlanCard
+                        plan={plan}
+                        active={isActive}
+                        onSelect={() => {
+                          setSelectedPlanKey(plan.key)
+                          setIsAgreed(false)
+                          setCurrent(index)
+                          api?.scrollTo(index)
+                        }}
+                        onOpenPolicy={() => handleOpenPolicy(plan)}
+                      />
+                    </div>
+                  </CarouselItem>
+                )
+              })}
             </CarouselContent>
 
             <CarouselPrevious className="top-1/2 left-2 hidden h-10 w-10 -translate-x-1/2 -translate-y-1/2 cursor-pointer border-zinc-200 bg-white text-zinc-900 md:flex" />
@@ -140,7 +151,7 @@ export default function PlanCarousel() {
                 paymentMethod === 'card'
                   ? 'border-[#6366F1] bg-indigo-50/40'
                   : 'border-zinc-200 bg-white hover:border-[#6366F1]',
-              ].join()}
+              ].join(' ')}
             >
               <div className="flex items-start gap-3">
                 <CreditCard className="mt-0.5 h-5 w-5 shrink-0 text-[#6366F1]" />
@@ -163,7 +174,7 @@ export default function PlanCarousel() {
                 paymentMethod === 'cash'
                   ? 'border-[#6366F1] bg-indigo-50/40'
                   : 'border-zinc-200 bg-white hover:border-[#6366F1]',
-              ].join()}
+              ].join(' ')}
             >
               <div className="flex items-start gap-3">
                 <Landmark className="mt-0.5 h-5 w-5 shrink-0 text-[#6366F1]" />
@@ -244,7 +255,7 @@ export default function PlanCarousel() {
                     isAgreed
                       ? 'cursor-pointer bg-[#6366F1] text-white hover:bg-[#5558e8]'
                       : 'cursor-not-allowed bg-zinc-200 text-zinc-400',
-                  ].join()}
+                  ].join(' ')}
                 >
                   지금 결제하기
                 </button>

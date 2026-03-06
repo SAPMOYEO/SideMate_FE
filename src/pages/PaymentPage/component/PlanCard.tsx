@@ -22,8 +22,8 @@ export default function PlanCard({
         'h-full rounded-[28px] border bg-white transition-all duration-300',
         active
           ? 'border-[#6366F1] shadow-[0_0_0_4px_rgba(99,102,241,0.12)]'
-          : 'border-zinc-200',
-      ].join()}
+          : 'border-zinc-200 shadow-none',
+      ].join(' ')}
     >
       <CardContent className="flex h-full flex-col p-6 md:p-8">
         <div className="mb-4 min-h-[28px]">
@@ -36,9 +36,9 @@ export default function PlanCard({
 
         <h3
           className={[
-            'text-2xl font-bold',
+            'text-2xl font-bold transition-colors duration-300',
             active ? 'text-[#6366F1]' : 'text-zinc-900',
-          ].join()}
+          ].join(' ')}
         >
           {plan.label}
         </h3>
@@ -83,11 +83,11 @@ export default function PlanCard({
           type="button"
           onClick={onSelect}
           className={[
-            'mt-3 h-12 cursor-pointer rounded-xl text-sm font-semibold',
+            'mt-3 h-12 cursor-pointer rounded-xl text-sm font-semibold transition-colors duration-300',
             active
               ? 'bg-[#6366F1] text-white hover:bg-[#5558e8]'
               : 'bg-zinc-100 text-zinc-900 hover:bg-zinc-200',
-          ].join()}
+          ].join(' ')}
         >
           {plan.oneTime ? '추가 구매하기' : '플랜 구독하기'}
         </Button>
