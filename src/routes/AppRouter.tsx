@@ -4,6 +4,11 @@ import AppLayout from '@/layout/AppLayout'
 import AdminRoute from '@/routes/AdminRoute'
 import PrivateRoute from '@/routes/PrivateRoute'
 import PublicOnlyRoute from '@/routes/PublicOnlyRoute'
+import AuthLayout from '@/layout/AuthLayout'
+import SignUpPage from '@/pages/SignUpPage/SignUpPage'
+import LoginPage from '@/pages/LoginPage/LoginPage'
+import NotFoundPage from '@/pages/NotFoundPage'
+import MyPage from '@/pages/MyPage/MyPage'
 import AdminLayout from '@/layout/AdminLayout'
 import AdminProjectPage from '@/pages/admin/AdminProjectPage'
 import AdminBanner from '@/pages/admin/AdminBanner'
@@ -22,10 +27,9 @@ export default function AppRouter() {
 
       {/* PublicOnly - 비로그인만 접근 (로그인 상태면 / 로 리다이렉트) */}
       <Route element={<PublicOnlyRoute />}>
-        <Route element={<AppLayout />}>
-          <Route path="/login" element={<div>Login</div>} />
-          <Route path="/register" element={<div>Register</div>} />
-          <Route path="/register/survey" element={<div>Survey</div>} />
+        <Route element={<AuthLayout />}>
+          <Route path="/signup" element={<SignUpPage />} />
+          <Route path="/login" element={<LoginPage />} />
         </Route>
       </Route>
 
@@ -34,7 +38,7 @@ export default function AppRouter() {
         <Route element={<AppLayout />}>
           <Route path="/projects/create" element={<div>ProjectCreate</div>} />
           <Route path="/projects/:id/edit" element={<div>ProjectEdit</div>} />
-          <Route path="/my" element={<div>MyPage</div>} />
+          <Route path="/my" element={<MyPage />} />
         </Route>
       </Route>
 
@@ -48,7 +52,7 @@ export default function AppRouter() {
       </Route>
 
       {/* 404 */}
-      <Route path="*" element={<div>NotFound</div>} />
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   )
 }
