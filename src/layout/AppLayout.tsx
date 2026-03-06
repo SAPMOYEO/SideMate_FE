@@ -6,7 +6,7 @@ const AppLayout = () => {
     <div>
       <Header />
       <div className="flex">
-        <main>
+        <main className="w-full">
           <Outlet />
         </main>
       </div>

@@ -8,6 +8,8 @@ import AdminLayout from '@/layout/AdminLayout'
 import AdminProjectPage from '@/pages/admin/AdminProjectPage'
 import AdminBanner from '@/pages/admin/AdminBanner'
 import AdminUserPage from '@/pages/admin/AdminUser'
+import PaymentPage from '@/pages/PaymentPage/PaymentPage'
+
 export default function AppRouter() {
   return (
     <Routes>
@@ -15,6 +17,7 @@ export default function AppRouter() {
       <Route element={<AppLayout />}>
         <Route path="/" element={<div>Home</div>} />
         <Route path="/projects/:id" element={<div>ProjectDetail</div>} />
+        <Route path="/payment" element={<PaymentPage />} />
       </Route>
 
       {/* PublicOnly - 비로그인만 접근 (로그인 상태면 / 로 리다이렉트) */}
