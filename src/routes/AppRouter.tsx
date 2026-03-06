@@ -8,6 +8,7 @@ import AuthLayout from '@/layout/AuthLayout'
 import SignUpPage from '@/pages/SignUpPage/SignUpPage'
 import LoginPage from '@/pages/LoginPage/LoginPage'
 import NotFoundPage from '@/pages/NotFoundPage'
+import MyPage from '@/pages/MyPage/MyPage'
 
 export default function AppRouter() {
   return (
@@ -31,7 +32,7 @@ export default function AppRouter() {
         <Route element={<AppLayout />}>
           <Route path="/projects/create" element={<div>ProjectCreate</div>} />
           <Route path="/projects/:id/edit" element={<div>ProjectEdit</div>} />
-          <Route path="/my" element={<div>MyPage</div>} />
+          <Route path="/my" element={<MyPage />} />
         </Route>
       </Route>
 

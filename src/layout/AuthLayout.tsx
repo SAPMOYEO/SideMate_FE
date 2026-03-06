@@ -4,11 +4,11 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 
 const AuthLayout: React.FC = () => {
   const location = useLocation()
-  // const isLoginPage = location.pathname.includes('login')
+  const isLoginPage = location.pathname.includes('login')
 
   return (
-    <div className="bg-background-light dark:bg-background-dark flex min-h-screen w-full flex-row font-sans text-slate-900 dark:text-slate-100">
-      <div className="relative hidden w-1/2 flex-col justify-between overflow-hidden bg-zinc-800 p-12 text-white lg:flex">
+    <div className="bg-background-light dark:bg-background-dark flex h-screen w-full flex-row overflow-hidden font-sans text-slate-900 dark:text-slate-100">
+      <div className="relative hidden h-full w-1/2 flex-col justify-between overflow-hidden bg-zinc-900 p-12 text-white lg:flex">
         <div className="pointer-events-none absolute inset-0 opacity-10">
           <svg height="100%" width="100%" xmlns="http://www.w3.org/2000/svg">
             <defs>
@@ -39,18 +39,28 @@ const AuthLayout: React.FC = () => {
         </Link>
 
         <div className="relative z-10 max-w-lg">
-          <h1 className="mb-6 text-5xl leading-tight font-black">
-            기획부터 평가까지, <br />
-            프로젝트의 모든 여정을 <br />
-            <span className="bg-gradient-to-r from-violet-600 via-teal-400 to-blue-500 bg-clip-text text-transparent">
-              SideMate
+          <h1 className="mb-6 text-[clamp(1.5rem,4.5vw,3.8rem)] leading-[1.15] font-black tracking-tight">
+            <span className="block whitespace-nowrap">기획부터 평가까지,</span>
+            <span className="block whitespace-nowrap">
+              프로젝트의 모든 여정을
             </span>
-            함께
+            <span className="block whitespace-nowrap">
+              <span className="bg-gradient-to-r from-violet-600 via-teal-400 to-blue-500 bg-clip-text text-transparent">
+                SideMate
+              </span>
+              와 함께
+            </span>
           </h1>
-          <p className="text-lg leading-relaxed font-medium text-white/80">
-            AI가 설계하는 최적의 기획부터 검증된 팀 빌딩까지. <br />
-            시작과 끝을 잇는 데이터 기반 평가 시스템으로 <br />
-            당신의 프로젝트를 압도적인 포트폴리오로 만드세요.
+          <p className="text-[clamp(1rem,2vw,1.25rem)] leading-relaxed font-medium text-white/80">
+            <span className="block whitespace-nowrap">
+              AI가 설계하는 최적의 기획부터 검증된 팀 빌딩까지.
+            </span>
+            <span className="block whitespace-nowrap">
+              시작과 끝을 잇는 데이터 기반 평가 시스템으로
+            </span>
+            <span className="block whitespace-nowrap">
+              당신의 프로젝트를 압도적인 포트폴리오로 만드세요.
+            </span>
           </p>
 
           <div className="mt-12 flex items-center gap-4">
@@ -86,16 +96,18 @@ const AuthLayout: React.FC = () => {
         </div>
       </div>
 
-      <div className="flex w-full flex-col bg-white lg:w-1/2 dark:bg-slate-900">
-        <main className="flex flex-grow items-center justify-center overflow-y-auto p-8">
+      <main className="relative flex h-full w-full flex-col overflow-y-auto bg-white lg:w-1/2 dark:bg-slate-900">
+        <div
+          className={`flex min-h-full w-full flex-col items-center p-8 md:p-12 ${isLoginPage ? 'justify-center' : 'justify-start'}`}
+        >
           <div
             key={location.pathname}
-            className="animate-in fade-in slide-in-from-bottom-4 w-full max-w-md duration-500 ease-out"
+            className="animate-in fade-in slide-in-from-bottom-4 flex w-full max-w-md flex-col py-12 duration-500 ease-out"
           >
             <Outlet />
           </div>
-        </main>
-      </div>
+        </div>
+      </main>
     </div>
   )
 }

@@ -1,27 +1,36 @@
 import React, { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { useAppDispatch } from '@/hooks'
+import { loginUser } from '@/features/slices/userSlice'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
-import { Eye, EyeOff, Loader2 } from 'lucide-react'
-import { Link } from 'react-router-dom'
-
+import { Eye, EyeOff, Loader2, TriangleAlert } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { toast } from 'sonner'
 
 const loginSchema = z.object({
-  email: z.string().email({ message: '올바른 이메일 형식이 아닙니다.' }),
+  email: z
+    .string()
+    .min(1, { message: '이메일을 입력해주세요.' })
+    .email({ message: '올바른 이메일 형식이 아닙니다.' }),
   password: z.string().min(1, { message: '비밀번호를 입력해주세요.' }),
 })
 
 type LoginFormValues = z.infer<typeof loginSchema>
 
 const LoginPage: React.FC = () => {
+  const dispatch = useAppDispatch()
+  const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false)
+  const [loginError, setLoginError] = useState<string | null>(null)
 
   const {
     register,
     handleSubmit,
+    setValue,
+    setFocus,
     formState: { errors, isSubmitting },
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -29,17 +38,28 @@ const LoginPage: React.FC = () => {
   })
 
   const onSubmit = async (data: LoginFormValues) => {
+    setLoginError(null)
     try {
-      console.log('로그인 데이터:', data)
-      toast.success('성공적으로 로그인되었습니다.')
-    } catch (error) {
-      console.log('error', error)
-      toast.error('이메일 또는 비밀번호가 일치하지 않습니다.')
+      const resultAction = await dispatch(loginUser(data))
+
+      if (loginUser.fulfilled.match(resultAction)) {
+        navigate('/')
+      } else {
+        const errorMessage = resultAction.payload as string
+        setLoginError(
+          errorMessage || '이메일 또는 비밀번호가 일치하지 않습니다.'
+        )
+        setValue('password', '', { shouldValidate: false })
+        setFocus('password')
+      }
+    } catch (err) {
+      console.error(err)
+      toast.error('로그인 중 오류가 발생했습니다.')
     }
   }
 
   return (
-    <div className="animate-in fade-in mx-auto w-full max-w-md duration-500">
+    <div className="mx-auto w-full max-w-md">
       <div className="mb-8 flex flex-col items-center lg:hidden">
         <Link to="/" className="mb-4 flex items-center gap-2">
           <img
@@ -57,7 +77,7 @@ const LoginPage: React.FC = () => {
         <h2 className="mb-2 text-3xl font-black text-slate-900 dark:text-white">
           환영합니다
         </h2>
-        <p className="font-medium text-slate-500 dark:text-slate-400">
+        <p className="text-sm font-medium text-slate-500 sm:text-base dark:text-slate-400">
           AI와 동료들이 기다리고 있는 대시보드로 이동합니다.
         </p>
       </div>
@@ -87,15 +107,29 @@ const LoginPage: React.FC = () => {
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 text-left">
+        {loginError && (
+          <div className="animate-in fade-in slide-in-from-top-1 flex items-center gap-2 rounded-lg bg-red-50 p-3 text-sm font-medium text-red-600 dark:bg-red-950/30 dark:text-red-400">
+            <TriangleAlert className="size-4 shrink-0" />
+            {loginError}
+          </div>
+        )}
         <div className="grid gap-1.5">
-          <label className="ml-1 text-sm font-bold text-slate-700 dark:text-slate-200">
-            이메일 주소
-          </label>
+          <div className="flex items-center justify-between px-1">
+            <label className="text-sm font-bold text-slate-700 dark:text-slate-200">
+              이메일 주소
+            </label>
+            <Link
+              to="/forgot-email"
+              className="text-primary mb-[-4px] text-xs font-bold hover:underline"
+            >
+              이메일 찾기
+            </Link>
+          </div>
           <Input
             {...register('email')}
             type="email"
-            placeholder="name@company.com"
-            className={`h-12 ${errors.email ? 'border-red-500' : ''}`}
+            placeholder="example@email.com"
+            className={`h-12 ${errors.email ? 'border-red-500 focus-visible:ring-red-500/20' : ''}`}
           />
           {errors.email && (
             <p className="ml-1 text-xs text-red-500">{errors.email.message}</p>
@@ -109,7 +143,7 @@ const LoginPage: React.FC = () => {
             </label>
             <Link
               to="/forgot-password"
-              className="text-primary mb-[2px] text-xs font-bold hover:underline"
+              className="text-primary mb-[-4px] text-xs font-bold hover:underline"
             >
               비밀번호 찾기
             </Link>
@@ -118,8 +152,7 @@ const LoginPage: React.FC = () => {
             <Input
               {...register('password')}
               type={showPassword ? 'text' : 'password'}
-              placeholder="••••••••"
-              className={`h-12 pr-10 ${errors.password ? 'border-red-500' : ''}`}
+              className={`h-12 pr-10 ${errors.password ? 'border-red-500 focus-visible:ring-red-500/20' : ''}`}
             />
             <button
               type="button"
@@ -138,7 +171,7 @@ const LoginPage: React.FC = () => {
 
         <Button
           type="submit"
-          className="shadow-primary/20 mt-2 h-12 w-full bg-zinc-800 font-bold shadow-lg"
+          className="shadow-primary/20 mt-2 h-12 w-full bg-zinc-900 font-bold shadow-lg"
           disabled={isSubmitting}
         >
           {isSubmitting ? (
