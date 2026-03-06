@@ -9,6 +9,11 @@ import SignUpPage from '@/pages/SignUpPage/SignUpPage'
 import LoginPage from '@/pages/LoginPage/LoginPage'
 import NotFoundPage from '@/pages/NotFoundPage'
 import MyPage from '@/pages/MyPage/MyPage'
+import AdminLayout from '@/layout/AdminLayout'
+import AdminProjectPage from '@/pages/admin/AdminProjectPage'
+import AdminBanner from '@/pages/admin/AdminBanner'
+import AdminUserPage from '@/pages/admin/AdminUser'
+import PaymentPage from '@/pages/PaymentPage/PaymentPage'
 
 export default function AppRouter() {
   return (
@@ -17,6 +22,7 @@ export default function AppRouter() {
       <Route element={<AppLayout />}>
         <Route path="/" element={<div>Home</div>} />
         <Route path="/projects/:id" element={<div>ProjectDetail</div>} />
+        <Route path="/payment" element={<PaymentPage />} />
       </Route>
 
       {/* PublicOnly - 비로그인만 접근 (로그인 상태면 / 로 리다이렉트) */}
@@ -38,8 +44,11 @@ export default function AppRouter() {
 
       {/* Admin - 관리자만 접근 (아니면 / 로 리다이렉트) */}
       <Route element={<AdminRoute />}>
-        <Route path="/admin/banner" element={<div>AdminBanner</div>} />
-        <Route path="/admin/projects" element={<div>AdminProjects</div>} />
+        <Route element={<AdminLayout />}>
+          <Route path="/admin/banner" element={<AdminBanner />} />
+          <Route path="/admin/projects" element={<AdminProjectPage />} />
+          <Route path="/admin/users" element={<AdminUserPage />} />
+        </Route>
       </Route>
 
       {/* 404 */}
