@@ -214,7 +214,11 @@ const AdminProjectPage = () => {
         {/* 푸터: 정보 + 페이지네이션 */}
         <div className="flex items-center rounded-b-3xl bg-[#f8fafc] px-4 py-3">
           <div className="flex flex-1 justify-center">
-            <AdminTablePagination />
+            <AdminTablePagination
+              page={1}
+              totalPages={1}
+              onPageChange={() => {}}
+            />
           </div>
         </div>
       </div>
