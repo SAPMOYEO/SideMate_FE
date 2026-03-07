@@ -3,7 +3,7 @@ import {
   createAsyncThunk,
   type PayloadAction,
 } from '@reduxjs/toolkit'
-import api from '../../utils/api/index'
+import api from '../../utils/api/api.instance'
 import type { SignUpFormValues } from '@/pages/SignUpPage/components/signUp.schema'
 
 interface User {
@@ -25,6 +25,7 @@ interface UserState {
   loginError: string | null
   registerLoading: boolean
   registerError: string | null
+  isInitializing: boolean
 }
 
 const initialState: UserState = {
@@ -33,6 +34,7 @@ const initialState: UserState = {
   loginError: null,
   registerLoading: false,
   registerError: null,
+  isInitializing: true,
 }
 
 export const registerUser = createAsyncThunk(
@@ -97,6 +99,9 @@ const userSlice = createSlice({
       state.registerError = null
       state.loginError = null
     },
+    setInitialized(state) {
+      state.isInitializing = false
+    },
     stopLoading: (state) => {
       state.loginLoading = false
     },
@@ -152,10 +157,12 @@ const userSlice = createSlice({
         state.loginLoading = false
         state.user = action.payload
         state.loginError = null
+        state.isInitializing = false
       })
       .addCase(loginWithToken.rejected, (state) => {
         state.loginLoading = false
         state.user = null
+        state.isInitializing = false
       })
   },
 })
@@ -167,5 +174,6 @@ export const {
   updateUserImage,
   updateUserProfile,
   stopLoading,
+  setInitialized,
 } = userSlice.actions
 export default userSlice.reducer

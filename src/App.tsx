@@ -1,7 +1,11 @@
 import { useEffect } from 'react'
 import AppRouter from './routes/AppRouter'
 import { useAppDispatch } from '@/hooks'
-import { loginWithToken, stopLoading } from '@/features/slices/userSlice'
+import {
+  loginWithToken,
+  setInitialized,
+  stopLoading,
+} from '@/features/slices/userSlice'
 import { Toaster } from '@/components/ui/sonner'
 
 function App() {
@@ -12,6 +16,7 @@ function App() {
     if (token) {
       dispatch(loginWithToken())
     } else {
+      dispatch(setInitialized())
       dispatch(stopLoading())
     }
   }, [dispatch])
