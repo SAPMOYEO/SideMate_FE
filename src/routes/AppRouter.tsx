@@ -14,6 +14,7 @@ import AdminProjectPage from '@/pages/admin/AdminProjectPage'
 import AdminBanner from '@/pages/admin/AdminBanner'
 import AdminUserPage from '@/pages/admin/AdminUser'
 import PaymentPage from '@/pages/PaymentPage/PaymentPage'
+import PaymentSuccessPage from '@/pages/PaymentSuccessPage/PaymentSuccessPage'
 
 export default function AppRouter() {
   return (
@@ -23,6 +24,7 @@ export default function AppRouter() {
         <Route path="/" element={<div>Home</div>} />
         <Route path="/projects/:id" element={<div>ProjectDetail</div>} />
         <Route path="/payment" element={<PaymentPage />} />
+        <Route path="/payment-success" element={<PaymentSuccessPage />} />
       </Route>
 
       {/* PublicOnly - 비로그인만 접근 (로그인 상태면 / 로 리다이렉트) */}
