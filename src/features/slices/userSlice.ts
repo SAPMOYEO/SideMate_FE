@@ -3,7 +3,7 @@ import {
   createAsyncThunk,
   type PayloadAction,
 } from '@reduxjs/toolkit'
-import api from '../../utils/api'
+import api from '../../utils/api/index'
 import type { SignUpFormValues } from '@/pages/SignUpPage/components/signUp.schema'
 
 interface User {
