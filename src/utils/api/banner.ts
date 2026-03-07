@@ -8,10 +8,7 @@ export interface Banner {
   updatedAt: string
 }
 
-export interface BannerPayload {
-  imageUrl: string
-  isActive: boolean
-}
+export type BannerPayload = Pick<Banner, 'imageUrl' | 'isActive'>
 
 export interface BannersResponse {
   data: Banner[]
@@ -34,7 +31,7 @@ export const fetchBanners = async ({
 /** 배너 등록 */
 export const createBanner = async (payload: BannerPayload): Promise<Banner> => {
   const { data } = await api.post('/admin/banners', payload)
-  return data
+  return data.data
 }
 
 /** 배너 수정 */
@@ -43,7 +40,7 @@ export const updateBanner = async (
   payload: Partial<BannerPayload>
 ): Promise<Banner> => {
   const { data } = await api.patch(`/admin/banners/${id}`, payload)
-  return data
+  return data.data
 }
 
 /** 배너 삭제 */

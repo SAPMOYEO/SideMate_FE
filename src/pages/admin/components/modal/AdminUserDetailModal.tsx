@@ -3,7 +3,6 @@ import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { ShieldCheck, User, Mail, Calendar, Hash } from 'lucide-react'
-import { formatDate } from '@/utils/formatter'
 import {
   Dialog,
   DialogContent,
@@ -21,40 +20,25 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import type { UserResponse, UserRole } from '@/types/user'
+import { useUpdateUser } from '@/hooks/admin/useAdminUser'
 
 // ── Types ────────────────────────────────────────────────────────
-interface User {
-  _id: string
-  name: string
-  email: string
-  joinedAt: Date
-  role: 'USER' | 'ADMIN'
-  isActive: boolean
-}
-
 interface Props {
   open: boolean
   onOpenChange: (open: boolean) => void
-  user?: User
+  user?: UserResponse
 }
 
 // ── Schema ───────────────────────────────────────────────────────
 const schema = z.object({
-  role: z.enum(['USER', 'ADMIN']),
+  role: z.enum(['user', 'admin'] as const),
   isActive: z.boolean(),
 })
 
 type FormValues = z.infer<typeof schema>
 
 // ── Helpers ──────────────────────────────────────────────────────
-const DUMMY_USER: User = {
-  _id: '507f1f77bcf86cd799439001',
-  name: '김민준',
-  email: 'minjun@example.com',
-  joinedAt: new Date('2024-01-15'),
-  role: 'USER',
-  isActive: true,
-}
 
 // 읽기 전용 정보 한 줄
 const InfoRow = ({
@@ -76,27 +60,27 @@ const InfoRow = ({
 )
 
 // ── Component ────────────────────────────────────────────────────
-const AdminUserDetailModal = ({
-  open,
-  onOpenChange,
-  user = DUMMY_USER,
-}: Props) => {
+const AdminUserDetailModal = ({ open, onOpenChange, user }: Props) => {
   const { control, handleSubmit, reset, watch } = useForm<FormValues>({
     resolver: zodResolver(schema),
-    defaultValues: { role: user.role, isActive: user.isActive },
+    defaultValues: {
+      role: user?.role ?? 'user',
+      isActive: user?.isActive ?? true,
+    },
   })
 
-  // user/open 변경 시 폼 초기화
   useEffect(() => {
-    reset({ role: user.role, isActive: user.isActive })
+    reset({ role: user?.role ?? 'user', isActive: user?.isActive ?? true })
   }, [user, open, reset])
 
   const isActive = watch('isActive')
 
+  const { mutate: updateUser, isPending } = useUpdateUser(user?._id ?? '')
+
   const onSubmit = (data: FormValues) => {
-    console.log('submit', data) // TODO: API 연동
-    onOpenChange(false)
+    updateUser(data, { onSuccess: () => onOpenChange(false) })
   }
+  if (!user) return null
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange} modal>
@@ -106,8 +90,8 @@ const AdminUserDetailModal = ({
       >
         <DialogHeader className="border-b px-6 py-5">
           <div className="mb-1.5 flex items-center gap-2">
-            <Badge variant={user.role === 'ADMIN' ? 'default' : 'secondary'}>
-              {user.role === 'ADMIN' ? '관리자' : '일반 회원'}
+            <Badge variant={user.role === 'admin' ? 'default' : 'secondary'}>
+              {user.role === 'admin' ? '관리자' : '일반 회원'}
             </Badge>
             {user.isActive ? (
               <Badge className="bg-green-100 text-green-700 hover:bg-green-100">
@@ -140,7 +124,10 @@ const AdminUserDetailModal = ({
                 {user.email}
               </InfoRow>
               <InfoRow icon={Calendar} label="가입일">
-                {formatDate(user.joinedAt)}
+                {user.createdAt
+                  ? user.createdAt.split('T')[0]
+                  : '날짜 정보 없음'}
+                {/* {formatDate(user.createdAt as string)} */}
               </InfoRow>
             </div>
 
@@ -161,13 +148,16 @@ const AdminUserDetailModal = ({
                   name="role"
                   control={control}
                   render={({ field }) => (
-                    <Select value={field.value} onValueChange={field.onChange}>
+                    <Select
+                      value={field.value}
+                      onValueChange={(v) => field.onChange(v as UserRole)}
+                    >
                       <SelectTrigger className="h-8 w-32 text-sm">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="USER">일반 회원</SelectItem>
-                        <SelectItem value="ADMIN">관리자</SelectItem>
+                        <SelectItem value="user">일반 회원</SelectItem>
+                        <SelectItem value="admin">관리자</SelectItem>
                       </SelectContent>
                     </Select>
                   )}
@@ -212,8 +202,8 @@ const AdminUserDetailModal = ({
             >
               취소
             </Button>
-            <Button type="submit" size="sm">
-              저장
+            <Button type="submit" size="sm" disabled={isPending}>
+              {isPending ? '저장 중...' : '저장'}
             </Button>
           </DialogFooter>
         </form>
