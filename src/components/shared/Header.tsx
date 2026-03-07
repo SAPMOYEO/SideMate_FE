@@ -68,7 +68,10 @@ export const Header = () => {
               <DropdownMenuTrigger asChild>
                 <div className="h-9 w-9 cursor-pointer overflow-hidden rounded-full bg-gray-200 ring-offset-2 transition-all duration-500 hover:ring-2 hover:ring-slate-300">
                   <img
-                    src="https://github.com/shadcn.png"
+                    src={
+                      user?.profile?.profileImage ||
+                      'https://github.com/shadcn.png'
+                    }
                     alt="프로필"
                     className="h-full w-full object-cover"
                   />
