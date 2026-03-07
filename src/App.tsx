@@ -1,7 +1,12 @@
 import { useEffect } from 'react'
 import AppRouter from './routes/AppRouter'
 import { useAppDispatch } from '@/hooks'
-import { loginWithToken, setInitialized } from '@/features/slices/userSlice'
+import {
+  loginWithToken,
+  setInitialized,
+  stopLoading,
+} from '@/features/slices/userSlice'
+import { Toaster } from '@/components/ui/sonner'
 
 function App() {
   const dispatch = useAppDispatch()
@@ -12,9 +17,15 @@ function App() {
       dispatch(loginWithToken())
     } else {
       dispatch(setInitialized())
+      dispatch(stopLoading())
     }
   }, [dispatch])
-  return <AppRouter />
+  return (
+    <>
+      <AppRouter />
+      <Toaster richColors position="top-center" />
+    </>
+  )
 }
 
 export default App
