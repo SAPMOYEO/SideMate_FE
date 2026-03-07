@@ -2,8 +2,12 @@ import { Navigate, Outlet } from 'react-router-dom'
 import { useAppSelector } from '@/hooks'
 
 const AdminRoute = () => {
-  const { user } = useAppSelector((state) => state.user)
+  const { user, isInitializing } = useAppSelector((state) => state.user)
 
+  console.log('AdminRoute - user:', user?.role)
+  if (isInitializing) {
+    return <div>로딩 중...</div>
+  }
   if (!user || user.role !== 'admin') {
     return <Navigate to="/" replace />
   }
