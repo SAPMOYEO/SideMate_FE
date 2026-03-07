@@ -1,5 +1,9 @@
 import * as React from 'react'
 import { CreditCard, Landmark } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { toast } from 'sonner'
+import { useDispatch, useSelector } from 'react-redux'
+import type { RootState, AppDispatch } from '@/features/store'
 
 import type { CarouselApi } from '@/components/ui/carousel'
 import {
@@ -12,13 +16,49 @@ import {
 
 import PlanCard from './PlanCard'
 import PolicyDialog from './PolicyDialog'
+import CardPaymentForm, { type CardValue } from './CardPaymentForm'
+import CashPaymentForm from './CashPaymentForm'
 import { plans, type Plan } from '../plans'
 
-type PaymentMethod = 'card' | 'cash'
+import {
+  createPayment,
+  changeSubscriptionPlan,
+  setPaymentSuccess,
+  type PaymentMethod,
+} from '@/features/slices/paymentSlice'
+import { createRandomAccountNumber } from '@/utils/randomAccountNumber'
+
+function createOrderId() {
+  return `TXN-${Date.now()}`
+}
+
+function createIdempotencyKey(prefix: string) {
+  return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`
+}
+
+function formatPaymentMethodLabel(method: PaymentMethod, cardNumber?: string) {
+  if (method === 'card') {
+    const lastFour = cardNumber?.slice(-4) || '0000'
+    return `카드 결제 · ${lastFour}`
+  }
+
+  return '현금 결제'
+}
 
 export default function PlanCarousel() {
+  const dispatch = useDispatch<AppDispatch>()
+  const navigate = useNavigate()
+
+  const subscription = useSelector(
+    (state: RootState) => state.payment.subscription
+  )
+  const paymentLoading = useSelector(
+    (state: RootState) => state.payment.submitLoading
+  )
+
   const [api, setApi] = React.useState<CarouselApi>()
   const [, setCurrent] = React.useState(1)
+
   const [selectedPlanKey, setSelectedPlanKey] = React.useState<Plan['key']>(
     plans[1]?.key ?? plans[0].key
   )
@@ -28,6 +68,16 @@ export default function PlanCarousel() {
   const [isPolicyOpen, setIsPolicyOpen] = React.useState(false)
   const [policyPlan, setPolicyPlan] = React.useState<Plan | null>(null)
   const [isAgreed, setIsAgreed] = React.useState(false)
+
+  const [cardValue, setCardValue] = React.useState<CardValue>({
+    number: '',
+    name: '',
+    expiry: '',
+    cvc: '',
+    focus: '',
+  })
+
+  const [bankName, setBankName] = React.useState('')
 
   React.useEffect(() => {
     if (!api) return
@@ -40,6 +90,14 @@ export default function PlanCarousel() {
       if (activePlan) {
         setSelectedPlanKey(activePlan.key)
         setIsAgreed(false)
+        setCardValue({
+          number: '',
+          name: '',
+          expiry: '',
+          cvc: '',
+          focus: '',
+        })
+        setBankName('')
       }
     }
 
@@ -57,10 +115,20 @@ export default function PlanCarousel() {
     plans.find((plan) => plan.key === selectedPlanKey) ?? plans[0]
 
   const isTopUpPlan = selectedPlan.key === 'topUp'
+  const isFreePlan = selectedPlan.key === 'free'
+  const isSubscriptionPlan =
+    selectedPlan.key === 'basic' || selectedPlan.key === 'premium'
+
+  const subscriptionPlan =
+    selectedPlan.key === 'basic' || selectedPlan.key === 'premium'
+      ? selectedPlan.key
+      : null
 
   const totalPrice = isTopUpPlan
     ? selectedPlan.price * topUpCount
     : selectedPlan.price
+
+  const canShowPaymentForm = isAgreed && !isFreePlan
 
   const handleDecrease = () => {
     setTopUpCount((prev) => Math.max(1, prev - 1))
@@ -73,6 +141,112 @@ export default function PlanCarousel() {
   const handleOpenPolicy = (plan: Plan) => {
     setPolicyPlan(plan)
     setIsPolicyOpen(true)
+  }
+
+  const getAddedCount = () => {
+    if (selectedPlan.key === 'topUp') return topUpCount
+    if (selectedPlan.key === 'basic') return 2
+    if (selectedPlan.key === 'premium') return 5
+    return 0
+  }
+
+  const getEstimatedTotalAvailableCount = () => {
+    if (selectedPlan.key === 'topUp') return topUpCount
+    if (selectedPlan.key === 'basic') return 5
+    if (selectedPlan.key === 'premium') return 8
+    return 3
+  }
+
+  const saveSuccessAndNavigate = (accountNumber?: string) => {
+    dispatch(
+      setPaymentSuccess({
+        addedCount: getAddedCount(),
+        totalAvailableCount: getEstimatedTotalAvailableCount(),
+        amountPaid: totalPrice,
+        orderId: createOrderId(),
+        paidAt: new Date().toISOString(),
+        paymentMethodLabel: formatPaymentMethodLabel(
+          paymentMethod,
+          cardValue.number
+        ),
+        planLabel: selectedPlan.label,
+        bankName: paymentMethod === 'cash' ? bankName : undefined,
+        accountNumber: paymentMethod === 'cash' ? accountNumber : undefined,
+      })
+    )
+
+    toast.success('결제가 완료되었습니다.')
+    navigate('/payment-success')
+  }
+
+  const submitPayment = async () => {
+    try {
+      if (isFreePlan) return
+
+      const apiMethod = paymentMethod === 'card' ? 'CARD' : 'CASH'
+
+      if (isTopUpPlan) {
+        await dispatch(
+          createPayment({
+            idempotencyKey: createIdempotencyKey('topup'),
+            method: apiMethod,
+            type: 'TOPUP',
+            quantity: topUpCount,
+          })
+        ).unwrap()
+
+        const accountNumber =
+          paymentMethod === 'cash' ? createRandomAccountNumber() : undefined
+
+        saveSuccessAndNavigate(accountNumber)
+        return
+      }
+
+      if (isSubscriptionPlan) {
+        if (!subscriptionPlan) {
+          toast.error('잘못된 구독 플랜입니다.')
+          return
+        }
+
+        const hasActiveSubscription = subscription?.status === 'active'
+        const isChangingPlan =
+          hasActiveSubscription && subscription?.plan !== subscriptionPlan
+        const isSamePlan =
+          hasActiveSubscription && subscription?.plan === subscriptionPlan
+
+        if (isSamePlan) {
+          toast.error('이미 이용 중인 플랜입니다.')
+          return
+        }
+
+        if (isChangingPlan) {
+          await dispatch(
+            changeSubscriptionPlan({
+              idempotencyKey: createIdempotencyKey('sub-change'),
+              method: apiMethod,
+              plan: subscriptionPlan,
+            })
+          ).unwrap()
+        } else {
+          await dispatch(
+            createPayment({
+              idempotencyKey: createIdempotencyKey('sub'),
+              method: apiMethod,
+              type: 'SUBSCRIPTION',
+              plan: subscriptionPlan,
+            })
+          ).unwrap()
+        }
+
+        const accountNumber =
+          paymentMethod === 'cash' ? createRandomAccountNumber() : undefined
+
+        saveSuccessAndNavigate(accountNumber)
+      }
+    } catch (error) {
+      console.error(error)
+      toast.error('결제 처리에 실패했습니다.')
+    }
   }
 
   return (
@@ -120,6 +294,14 @@ export default function PlanCarousel() {
                           setSelectedPlanKey(plan.key)
                           setIsAgreed(false)
                           setCurrent(index)
+                          setCardValue({
+                            number: '',
+                            name: '',
+                            expiry: '',
+                            cvc: '',
+                            focus: '',
+                          })
+                          setBankName('')
                           api?.scrollTo(index)
                         }}
                         onOpenPolicy={() => handleOpenPolicy(plan)}
@@ -135,6 +317,26 @@ export default function PlanCarousel() {
           </Carousel>
         </div>
 
+        {canShowPaymentForm && paymentMethod === 'card' && (
+          <CardPaymentForm
+            cardValue={cardValue}
+            onChange={setCardValue}
+            onSubmit={submitPayment}
+            totalPrice={totalPrice}
+            disabled={paymentLoading}
+          />
+        )}
+
+        {canShowPaymentForm && paymentMethod === 'cash' && (
+          <CashPaymentForm
+            bankName={bankName}
+            onChangeBank={setBankName}
+            onSubmit={submitPayment}
+            totalPrice={totalPrice}
+            disabled={paymentLoading}
+          />
+        )}
+
         <div className="mt-10 rounded-[24px] border border-zinc-200 bg-white p-4 shadow-sm sm:p-5 md:mt-14 md:rounded-[28px] md:p-8">
           <div className="mb-5 flex items-center justify-between">
             <h2 className="text-lg font-bold text-zinc-900 sm:text-xl">
@@ -145,7 +347,10 @@ export default function PlanCarousel() {
           <div className="grid grid-cols-1 gap-3 md:grid-cols-2 md:gap-4">
             <button
               type="button"
-              onClick={() => setPaymentMethod('card')}
+              onClick={() => {
+                setPaymentMethod('card')
+                setBankName('')
+              }}
               className={[
                 'cursor-pointer rounded-2xl border p-4 text-left transition sm:p-5',
                 paymentMethod === 'card'
@@ -168,7 +373,16 @@ export default function PlanCarousel() {
 
             <button
               type="button"
-              onClick={() => setPaymentMethod('cash')}
+              onClick={() => {
+                setPaymentMethod('cash')
+                setCardValue({
+                  number: '',
+                  name: '',
+                  expiry: '',
+                  cvc: '',
+                  focus: '',
+                })
+              }}
               className={[
                 'cursor-pointer rounded-2xl border p-4 text-left transition sm:p-5',
                 paymentMethod === 'cash'
@@ -232,33 +446,26 @@ export default function PlanCarousel() {
               </div>
             )}
 
+            {isFreePlan && (
+              <div className="mt-4 rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm text-zinc-600">
+                무료 플랜은 별도 결제가 필요하지 않습니다.
+              </div>
+            )}
+
             <div className="mt-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
               <div className="text-sm text-zinc-500">
-                {isTopUpPlan
-                  ? `추가 AI 사용 ${topUpCount}회 선택`
-                  : `${selectedPlan.label} 플랜 선택`}
+                {isFreePlan
+                  ? '무료 플랜은 결제 없이 바로 사용할 수 있어요.'
+                  : isTopUpPlan
+                    ? `추가 AI 사용 ${topUpCount}회 선택`
+                    : `${selectedPlan.label} 플랜 선택`}
               </div>
 
-              <div className="flex w-full flex-col gap-3 sm:flex-row sm:items-center sm:justify-between lg:w-auto lg:justify-end">
-                <div>
-                  <div className="text-xs text-zinc-500">총 결제 금액</div>
-                  <div className="mt-1 text-2xl font-extrabold tracking-tight text-zinc-900 sm:text-3xl">
-                    ₩{totalPrice.toLocaleString()}
-                  </div>
+              <div>
+                <div className="text-xs text-zinc-500">총 결제 금액</div>
+                <div className="mt-1 text-2xl font-extrabold tracking-tight text-zinc-900 sm:text-3xl">
+                  ₩{totalPrice.toLocaleString()}
                 </div>
-
-                <button
-                  type="button"
-                  disabled={!isAgreed}
-                  className={[
-                    'inline-flex h-12 w-full items-center justify-center rounded-xl px-6 text-sm font-semibold transition sm:w-auto',
-                    isAgreed
-                      ? 'cursor-pointer bg-[#6366F1] text-white hover:bg-[#5558e8]'
-                      : 'cursor-not-allowed bg-zinc-200 text-zinc-400',
-                  ].join(' ')}
-                >
-                  지금 결제하기
-                </button>
               </div>
             </div>
 
