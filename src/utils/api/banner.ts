@@ -1,4 +1,4 @@
-import api from '.'
+import api from './index'
 
 export interface Banner {
   _id: string

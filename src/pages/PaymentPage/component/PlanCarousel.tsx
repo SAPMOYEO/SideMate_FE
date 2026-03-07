@@ -18,7 +18,7 @@ type PaymentMethod = 'card' | 'cash'
 
 export default function PlanCarousel() {
   const [api, setApi] = React.useState<CarouselApi>()
-  const [current, setCurrent] = React.useState(1)
+  const [, setCurrent] = React.useState(1)
   const [selectedPlanKey, setSelectedPlanKey] = React.useState<Plan['key']>(
     plans[1]?.key ?? plans[0].key
   )

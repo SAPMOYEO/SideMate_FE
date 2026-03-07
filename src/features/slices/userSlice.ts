@@ -3,7 +3,7 @@ import {
   createAsyncThunk,
   type PayloadAction,
 } from '@reduxjs/toolkit'
-import api from '../../utils/api'
+import api from '../../utils/api/index'
 import type { SignUpFormValues } from '@/pages/SignUpPage/components/signUp.schema'
 
 interface User {
@@ -11,6 +11,12 @@ interface User {
   name: string
   email?: string
   role?: 'user' | 'admin'
+  profile?: {
+    techStack?: string[]
+    gitUrl?: string
+    bio?: string
+    profileImage?: string
+  }
 }
 
 interface UserState {
@@ -23,7 +29,7 @@ interface UserState {
 
 const initialState: UserState = {
   user: null,
-  loginLoading: false,
+  loginLoading: true,
   loginError: null,
   registerLoading: false,
   registerError: null,
@@ -91,6 +97,26 @@ const userSlice = createSlice({
       state.registerError = null
       state.loginError = null
     },
+    stopLoading: (state) => {
+      state.loginLoading = false
+    },
+    updateUserImage: (state, action: PayloadAction<string>) => {
+      if (state.user) {
+        if (!state.user.profile) {
+          state.user.profile = {}
+        }
+        state.user.profile.profileImage = action.payload
+      }
+    },
+    updateUserProfile: (state, action: PayloadAction<Partial<User>>) => {
+      if (state.user && action.payload.profile) {
+        state.user.name = action.payload.name || state.user.name
+        state.user.profile = {
+          ...state.user.profile,
+          ...action.payload.profile,
+        }
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -134,5 +160,12 @@ const userSlice = createSlice({
   },
 })
 
-export const { setUser, clearUser, resetError } = userSlice.actions
+export const {
+  setUser,
+  clearUser,
+  resetError,
+  updateUserImage,
+  updateUserProfile,
+  stopLoading,
+} = userSlice.actions
 export default userSlice.reducer
