@@ -18,90 +18,12 @@ import {
   BookOpen,
   Target,
 } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
+import type { ProjectResponse } from '@/types/project.type'
+import { useAdminProjectChangeHidden } from '@/hooks/admin/useAdminProject'
 
-// ────────────────────────────────────────────────────────────────
-// Types
-// ────────────────────────────────────────────────────────────────
-type Level = 'BEGINNER' | 'INTERMEDIATE' | 'ALL'
-type Role = 'FULLSTACK' | 'BACKEND' | 'FRONTEND' | 'DESIGNER' | 'ETC'
-type Status = 'RECRUITING' | 'CLOSED' | 'COMPLETED'
-type CommunicationMethod = 'DISCORD' | 'OPEN_CHAT' | 'OFFLINE'
-
-interface RecruitRole {
-  role: Role
-  count: number
-}
-
-interface Project {
-  _id: string
-  title: string
-  category: string
-  description: string
-  goal?: string
-  expectedPeriodStart?: string
-  expectedPeriodEnd?: string
-  requiredTechStack: string[]
-  mandatoryTechStack: string[]
-  level: Level
-  recruitRoles: RecruitRole[]
-  totalRecruitCount: number
-  deadline?: Date
-  communicationMethod: CommunicationMethod
-  status: Status
-  author: string
-  githubUrl?: string
-  hiddenYn: boolean
-  createdAt: Date
-  updatedAt: Date
-}
-
-interface AdminProjectDetailModalProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  project?: Project
-}
-
-// ────────────────────────────────────────────────────────────────
-// Dummy data
-// ────────────────────────────────────────────────────────────────
-const DUMMY_PROJECT: Project = {
-  _id: '507f1f77bcf86cd799439011',
-  title: 'AI 기반 인재 매칭 시스템 구축',
-  category: '인공지능 / AI',
-  description:
-    '채용 시장의 비효율을 해소하기 위해 AI로 지원자와 포지션을 자동 매칭하는 플랫폼을 개발합니다. NLP 기반 이력서 분석과 직무 요건 벡터화를 활용하여 정밀한 매칭 스코어를 제공합니다.',
-  goal: '6개월 내 MVP 완성 후 실제 스타트업 채용 파일럿 적용. 매칭 정확도 80% 이상 달성.',
-  expectedPeriodStart: '2024-01-01',
-  expectedPeriodEnd: '2024-06-30',
-  requiredTechStack: ['Python', 'FastAPI', 'React', 'TypeScript', 'PostgreSQL'],
-  mandatoryTechStack: ['Docker', 'AWS', 'Redis'],
-  level: 'INTERMEDIATE',
-  recruitRoles: [
-    { role: 'BACKEND', count: 2 },
-    { role: 'FRONTEND', count: 1 },
-    { role: 'DESIGNER', count: 1 },
-  ],
-  totalRecruitCount: 4,
-  deadline: new Date('2024-01-15'),
-  communicationMethod: 'DISCORD',
-  status: 'RECRUITING',
-  author: '507f1f77bcf86cd799439099',
-  githubUrl: 'https://github.com/example/ai-matching',
-  hiddenYn: false,
-  createdAt: new Date('2023-11-20T09:32:00'),
-  updatedAt: new Date('2023-11-24T14:10:00'),
-}
-
-// ────────────────────────────────────────────────────────────────
-// Label maps
-// ────────────────────────────────────────────────────────────────
-const LEVEL_MAP: Record<Level, string> = {
-  BEGINNER: '입문자',
-  INTERMEDIATE: '중급자',
-  ALL: '누구나',
-}
-
-const STATUS_MAP: Record<Status, { label: string; className: string }> = {
+// ── Label maps ──────────────────────────────────────────────────
+const STATUS_MAP: Record<string, { label: string; className: string }> = {
   RECRUITING: {
     label: '모집 중',
     className: 'bg-green-100 text-green-700 hover:bg-green-100',
@@ -116,7 +38,7 @@ const STATUS_MAP: Record<Status, { label: string; className: string }> = {
   },
 }
 
-const ROLE_MAP: Record<Role, string> = {
+const ROLE_MAP: Record<string, string> = {
   FULLSTACK: '풀스택',
   BACKEND: '백엔드',
   FRONTEND: '프론트엔드',
@@ -124,15 +46,13 @@ const ROLE_MAP: Record<Role, string> = {
   ETC: '기타',
 }
 
-const COMM_MAP: Record<CommunicationMethod, string> = {
+const COMM_MAP: Record<string, string> = {
   DISCORD: 'Discord',
   OPEN_CHAT: '오픈채팅',
   OFFLINE: '오프라인',
 }
 
-// ────────────────────────────────────────────────────────────────
-// Sub-components
-// ────────────────────────────────────────────────────────────────
+// ── Sub-components ──────────────────────────────────────────────
 const SectionTitle = ({
   icon: Icon,
   title,
@@ -161,28 +81,50 @@ const InfoRow = ({
   </div>
 )
 
-// ────────────────────────────────────────────────────────────────
-// Main Component
-// ────────────────────────────────────────────────────────────────
+// ── Types ────────────────────────────────────────────────────────
+interface AdminProjectDetailModalProps {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  project?: ProjectResponse | null
+}
+
+// ── Main Component ───────────────────────────────────────────────
 const AdminProjectDetailModal = ({
   open,
   onOpenChange,
-  project = DUMMY_PROJECT,
+  project,
 }: AdminProjectDetailModalProps) => {
-  const status = STATUS_MAP[project.status]
+  // 훅은 조건부 return 전에 호출해야 함 (React 규칙)
+  const { mutate: toggleHidden, isPending } = useAdminProjectChangeHidden({
+    id: project?._id ?? '',
+    hiddenYn: !project?.hiddenYn,
+  })
+
+  if (!project) return null
+
+  const handleToggleHidden = () => {
+    toggleHidden(undefined, { onSuccess: () => onOpenChange(false) })
+  }
+
+  const statusInfo = STATUS_MAP[project.status] ?? {
+    label: project.status,
+    className: '',
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange} modal={true}>
       <DialogContent
-        className="flex max-h-[88vh] w-[80vw] max-w-[80vw] flex-col gap-0 p-0"
+        className="flex max-h-[88vh] max-w-4xl min-w-[60vw] flex-col gap-0 p-0"
         showCloseButton={false}
       >
         {/* ── Header ── */}
         <DialogHeader className="border-b px-6 py-5">
           <div className="mb-2 flex items-center gap-2">
-            <Badge className={status.className}>{status.label}</Badge>
+            <Badge className={statusInfo.className}>{statusInfo.label}</Badge>
             <Badge variant="outline">{project.category}</Badge>
-            {project.hiddenYn && <Badge variant="secondary">숨김 처리</Badge>}
+            <Badge variant={project.hiddenYn ? 'destructive' : 'secondary'}>
+              {project.hiddenYn ? '숨김' : '노출 중'}
+            </Badge>
           </div>
           <DialogTitle className="text-xl leading-tight">
             {project.title}
@@ -197,19 +139,14 @@ const AdminProjectDetailModal = ({
             <section>
               <SectionTitle icon={Layers} title="기본 정보" />
               <div className="grid grid-cols-2 gap-3">
-                <InfoRow label="레벨">{LEVEL_MAP[project.level]}</InfoRow>
                 <InfoRow label="소통 방식">
-                  {COMM_MAP[project.communicationMethod]}
+                  {COMM_MAP[project.communicationMethod] ??
+                    project.communicationMethod}
                 </InfoRow>
                 <InfoRow label="마감일">
-                  {project.deadline ? formatDate(project.deadline) : '—'}
-                </InfoRow>
-                <InfoRow label="공개 여부">
-                  {project.hiddenYn ? (
-                    <span className="text-muted-foreground">숨김</span>
-                  ) : (
-                    <span className="text-green-600">공개</span>
-                  )}
+                  {project.deadline
+                    ? formatDate(new Date(project.deadline))
+                    : '—'}
                 </InfoRow>
               </div>
             </section>
@@ -241,8 +178,8 @@ const AdminProjectDetailModal = ({
             <section>
               <SectionTitle icon={Calendar} title="예상 진행 기간" />
               <InfoRow label="기간">
-                {project.expectedPeriodStart && project.expectedPeriodEnd
-                  ? `${project.expectedPeriodStart} ~ ${project.expectedPeriodEnd}`
+                {project.startDate && project.endDate
+                  ? `${project.startDate} ~ ${project.endDate}`
                   : '—'}
               </InfoRow>
             </section>
@@ -281,17 +218,19 @@ const AdminProjectDetailModal = ({
               <SectionTitle icon={Users} title="모집 포지션" />
               <div className="flex flex-col gap-3">
                 <InfoRow label="총 모집 인원">
-                  <span>{project.totalRecruitCount}명</span>
+                  <span>{project.totalCnt}명</span>
                 </InfoRow>
                 <InfoRow label="역할별 인원">
                   <div className="flex flex-wrap gap-2">
-                    {project.recruitRoles.map(({ role, count }) => (
+                    {project.recruitRoles.map(({ _id, role, cnt }) => (
                       <div
-                        key={role}
+                        key={_id}
                         className="bg-muted flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs"
                       >
-                        <span className="font-medium">{ROLE_MAP[role]}</span>
-                        <span className="text-muted-foreground">{count}명</span>
+                        <span className="font-medium">
+                          {ROLE_MAP[role] ?? role}
+                        </span>
+                        <span className="text-muted-foreground">{cnt}명</span>
                       </div>
                     ))}
                   </div>
@@ -305,24 +244,25 @@ const AdminProjectDetailModal = ({
             <section>
               <SectionTitle icon={MessageSquare} title="소통 방식" />
               <InfoRow label="채널">
-                {COMM_MAP[project.communicationMethod]}
+                {COMM_MAP[project.communicationMethod] ??
+                  project.communicationMethod}
               </InfoRow>
             </section>
 
             {/* GitHub */}
-            {project.githubUrl && (
+            {project.gitUrl && (
               <>
                 <hr />
                 <section>
                   <SectionTitle icon={Github} title="GitHub" />
                   <InfoRow label="저장소">
                     <a
-                      href={project.githubUrl}
+                      href={project.gitUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-primary break-all hover:underline"
                     >
-                      {project.githubUrl}
+                      {project.gitUrl}
                     </a>
                   </InfoRow>
                 </section>
@@ -341,10 +281,10 @@ const AdminProjectDetailModal = ({
                   </span>
                 </InfoRow>
                 <InfoRow label="등록일">
-                  {formatDateTime(project.createdAt)}
+                  {formatDateTime(new Date(project.createdAt))}
                 </InfoRow>
                 <InfoRow label="수정일">
-                  {formatDateTime(project.updatedAt)}
+                  {formatDateTime(new Date(project.updatedAt))}
                 </InfoRow>
               </div>
             </section>
@@ -356,8 +296,19 @@ const AdminProjectDetailModal = ({
           <Button
             variant={project.hiddenYn ? 'outline' : 'destructive'}
             size="sm"
+            disabled={isPending}
+            onClick={handleToggleHidden}
           >
-            {project.hiddenYn ? '숨김 해제' : '숨김 처리'}
+            {isPending ? (
+              <>
+                <Loader2 size={14} className="mr-1.5 animate-spin" />
+                처리 중...
+              </>
+            ) : project.hiddenYn ? (
+              '숨김 해제'
+            ) : (
+              '숨김 처리'
+            )}
           </Button>
           <Button
             variant="outline"

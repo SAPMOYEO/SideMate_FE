@@ -1,147 +1,83 @@
 import { useState } from 'react'
 import { Pencil, Trash2, Users, UserPlus, AlertTriangle } from 'lucide-react'
-import { AdminTablePagination } from '@/components/shared/AdminTablePagination'
 import AdminPageCommonLayout from './components/AdminPageCommonLayout'
-import AdminTable, { type TableColumn } from './components/AdminTable'
 import AdminStatCard from './components/AdminStatCard'
+import AdminTableCard from './components/AdminTableCard'
+import AdminSearchInput from './components/AdminSearchInput'
+import AdminSortSelect from './components/AdminSortSelect'
 import AdminUserDetailModal from './components/modal/AdminUserDetailModal'
-import { Input } from '@/components/ui/input'
-import { formatDate } from '@/utils/formatter'
 import { Badge } from '@/components/ui/badge'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+import { useUserList } from '@/hooks/admin/useAdminUser'
+import type { TableColumn } from './components/AdminTable'
+import type { UserResponse } from '@/types/user.type'
 
-interface User {
-  _id: string
-  name: string
-  email: string
-  joinedAt: Date
-  role: 'USER' | 'ADMIN'
-  isActive: boolean
-}
-
-const DUMMY_USERS: User[] = [
-  {
-    _id: '507f1f77bcf86cd799439001',
-    name: '김민준',
-    email: 'minjun@example.com',
-    joinedAt: new Date('2024-01-15'),
-    role: 'USER',
-    isActive: true,
-  },
-  {
-    _id: '507f1f77bcf86cd799439002',
-    name: '이서연',
-    email: 'seoyeon@example.com',
-    joinedAt: new Date('2024-02-20'),
-    role: 'ADMIN',
-    isActive: true,
-  },
-  {
-    _id: '507f1f77bcf86cd799439003',
-    name: '박지호',
-    email: 'jiho@example.com',
-    joinedAt: new Date('2024-03-10'),
-    role: 'USER',
-    isActive: false,
-  },
-  {
-    _id: '507f1f77bcf86cd799439004',
-    name: '최수아',
-    email: 'sua@example.com',
-    joinedAt: new Date('2024-04-05'),
-    role: 'USER',
-    isActive: true,
-  },
-  {
-    _id: '507f1f77bcf86cd799439005',
-    name: '정우진',
-    email: 'woojin@example.com',
-    joinedAt: new Date('2024-05-22'),
-    role: 'USER',
-    isActive: true,
-  },
-  {
-    _id: '507f1f77bcf86cd799439006',
-    name: '강예린',
-    email: 'yerin@example.com',
-    joinedAt: new Date('2024-06-18'),
-    role: 'USER',
-    isActive: false,
-  },
-  {
-    _id: '507f1f77bcf86cd799439007',
-    name: '윤도현',
-    email: 'dohyun@example.com',
-    joinedAt: new Date('2024-07-30'),
-    role: 'USER',
-    isActive: true,
-  },
-  {
-    _id: '507f1f77bcf86cd799439008',
-    name: '임하늘',
-    email: 'haneul@example.com',
-    joinedAt: new Date('2024-08-14'),
-    role: 'ADMIN',
-    isActive: true,
-  },
-]
+type SortOrder = '-createdAt' | 'createdAt'
 
 const USER_COLUMNS: TableColumn[] = [
   { key: 'name', label: '이름' },
   { key: 'email', label: '이메일' },
-  { key: 'joinedAt', label: '가입일' },
-  { key: 'role', label: '역할' },
+  { key: 'createdAt', label: '가입일' },
   { key: 'isActive', label: '상태' },
+  { key: 'role', label: '역할' },
+  { key: 'tier', label: '등급' },
   { key: 'actions', label: '관리' },
 ]
 
 const AdminUserPage = () => {
-  const [users] = useState(DUMMY_USERS)
-  const [search, setSearch] = useState('')
-  const [roleFilter, setRoleFilter] = useState('ALL')
-  const [selectedUser, setSelectedUser] = useState<User | null>(null)
+  const [selectedUser, setSelectedUser] = useState<UserResponse | null>(null)
   const [detailOpen, setDetailOpen] = useState(false)
+  const [page, setPage] = useState(1)
+  const [inputSearch, setInputSearch] = useState('')
+  const [search, setSearch] = useState('')
+  const [sort, setSort] = useState<SortOrder>('-createdAt')
 
-  const filteredUsers = users.filter((user) => {
-    const matchSearch =
-      user.name.includes(search) || user.email.includes(search)
-    const matchRole = roleFilter === 'ALL' ? true : user.role === roleFilter
-    return matchSearch && matchRole
+  const { data, isLoading, isError } = useUserList({
+    page,
+    limit: 10,
+    search,
+    sort,
   })
 
-  const activeCount = users.filter((u) => u.isActive).length
-  const inactiveCount = users.length - activeCount
+  const users = data?.data ?? []
+  const totalCount = data?.totalCount ?? 0
+  const totalPages = data?.totalPages ?? 1
+  const todayCount = data?.todayCount ?? 0
 
-  const handleEditClick = (user: User) => {
+  const handleSearchCommit = () => {
+    setSearch(inputSearch)
+    setPage(1)
+  }
+  const handleSortChange = (value: string) => {
+    setSort(value as SortOrder)
+    setPage(1)
+  }
+  const handleEditClick = (user: UserResponse) => {
     setSelectedUser(user)
     setDetailOpen(true)
   }
 
-  const rows = filteredUsers.map((user) => ({
+  const rows = users.map((user) => ({
     name: <span className="font-medium">{user.name}</span>,
     email: <span className="text-muted-foreground text-sm">{user.email}</span>,
-    joinedAt: (
+    createdAt: (
       <span className="text-muted-foreground text-sm">
-        {formatDate(user.joinedAt)}
+        {user.createdAt.split('T')[0]}
       </span>
     ),
-    role: (
-      <Badge variant={user.role === 'ADMIN' ? 'default' : 'secondary'}>
-        {user.role === 'ADMIN' ? '관리자' : '일반'}
+    isActive: (
+      <Badge variant={user.isActive ? 'default' : 'destructive'}>
+        {user.isActive ? '활성' : '정지'}
       </Badge>
     ),
-    isActive: user.isActive ? (
-      <Badge className="bg-green-100 text-green-700 hover:bg-green-100">
-        활성
+    role: (
+      <Badge variant={user.role === 'admin' ? 'default' : 'secondary'}>
+        {user.role === 'admin' ? '관리자' : '일반'}
       </Badge>
-    ) : (
-      <Badge variant="destructive">정지</Badge>
+    ),
+    tier: (
+      <Badge variant={user.tier === 'PRO' ? 'default' : 'outline'}>
+        {user.tier}
+      </Badge>
     ),
     actions: (
       <div className="flex items-center gap-2">
@@ -170,7 +106,7 @@ const AdminUserPage = () => {
           iconColor="text-primary"
           iconBg="bg-primary/10"
           label="전체 사용자"
-          value="1,247"
+          value={totalCount.toLocaleString()}
           sub={
             <span className="text-muted-foreground text-xs">
               전체 가입 회원 수
@@ -181,11 +117,11 @@ const AdminUserPage = () => {
           icon={UserPlus}
           iconColor="text-green-500"
           iconBg="bg-green-50"
-          label="신규 가입"
-          value="83"
+          label="오늘 신규 가입"
+          value={todayCount.toString()}
           sub={
             <span className="text-muted-foreground text-xs">
-              이번 달 신규 가입
+              최근 24시간 기준
             </span>
           }
         />
@@ -194,7 +130,7 @@ const AdminUserPage = () => {
           iconColor="text-destructive"
           iconBg="bg-destructive/10"
           label="신고된 사용자"
-          value="12"
+          value="0"
           sub={
             <span className="text-muted-foreground text-xs">
               처리 필요 신고 건
@@ -203,58 +139,30 @@ const AdminUserPage = () => {
         />
       </div>
 
-      {/* 유저 테이블 */}
-      <div className="border-border rounded-3xl border bg-white">
-        {/* 현황 + 검색/필터 */}
-        <div className="flex items-center border-b-2 p-4">
-          <div className="flex items-center gap-3 text-sm">
-            <span className="font-medium">전체 사용자 ({users.length})</span>
-            <div className="bg-border h-4 w-px"></div>
-            <div className="flex items-center gap-1.5">
-              <span className="h-2 w-2 rounded-full bg-green-500"></span>
-              <span className="text-muted-foreground">활성 {activeCount}</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <span className="bg-muted-foreground h-2 w-2 rounded-full"></span>
-              <span className="text-muted-foreground">
-                비활성 {inactiveCount}
-              </span>
-            </div>
-          </div>
-          <div className="ml-auto flex items-center gap-2">
-            <Input
-              placeholder="이름 또는 이메일 검색"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="bg-input/40 w-52 border-none outline-none"
+      {/* 테이블 */}
+      <AdminTableCard
+        label="전체 사용자"
+        totalCount={totalCount}
+        search={search}
+        toolbar={
+          <>
+            <AdminSearchInput
+              value={inputSearch}
+              onChange={setInputSearch}
+              onCommit={handleSearchCommit}
+              placeholder="이름 또는 이메일 검색 후 Enter"
             />
-            <Select value={roleFilter} onValueChange={setRoleFilter}>
-              <SelectTrigger className="bg-input/40 w-28 border-none">
-                <SelectValue placeholder="역할" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="ALL">전체</SelectItem>
-                <SelectItem value="USER">일반</SelectItem>
-                <SelectItem value="ADMIN">관리자</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-
-        {/* 테이블 */}
-        <div className="rounded-2xl">
-          <AdminTable columns={USER_COLUMNS} rows={rows} />
-        </div>
-
-        {/* 페이지네이션 */}
-        <div className="flex items-center justify-end gap-4 rounded-b-3xl bg-[#f8fafc] px-4 py-3">
-          <AdminTablePagination
-            page={1}
-            totalPages={1}
-            onPageChange={(page) => console.log('페이지 변경:', page)}
-          />
-        </div>
-      </div>
+            <AdminSortSelect value={sort} onChange={handleSortChange} />
+          </>
+        }
+        isLoading={isLoading}
+        isError={isError}
+        columns={USER_COLUMNS}
+        rows={rows}
+        page={page}
+        totalPages={totalPages}
+        onPageChange={setPage}
+      />
 
       {/* 사용자 상세/수정 모달 */}
       <AdminUserDetailModal
