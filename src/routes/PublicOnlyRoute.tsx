@@ -1,12 +1,11 @@
 import { Navigate, Outlet } from 'react-router-dom'
-import { useAppSelector } from '@/hooks'
+
+// TODO: redux userSlice 연결 후 실제 인증 상태로 교체
+const isLoggedIn = false
 
 const PublicOnlyRoute = () => {
-  const { user, loginLoading } = useAppSelector((state) => state.user)
-  if (loginLoading) return null
-  if (user) {
-    return <Navigate to="/" replace />
-  }
+  if (isLoggedIn) return <Navigate to="/" replace />
+
   return <Outlet />
 }
 
