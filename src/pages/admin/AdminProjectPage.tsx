@@ -6,9 +6,9 @@ import {
   TrendingUp,
   SlidersHorizontal,
 } from 'lucide-react'
+import { AdminTablePagination } from '@/components/shared/AdminTablePagination'
 import AdminPageCommonLayout from './components/AdminPageCommonLayout'
 import AdminTable, { type TableColumn } from './components/AdminTable'
-import { AdminTablePagination } from './components/AdminTablePagination'
 import AdminStatCard from './components/AdminStatCard'
 import AdminProjectDetailModal from './components/modal/AdminProjectDetailModal'
 import { Input } from '@/components/ui/input'

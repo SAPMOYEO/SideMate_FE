@@ -1,11 +1,11 @@
 import { useState } from 'react'
 import { Pencil, Trash2, Users, UserPlus, AlertTriangle } from 'lucide-react'
+import { AdminTablePagination } from '@/components/shared/AdminTablePagination'
 import AdminPageCommonLayout from './components/AdminPageCommonLayout'
 import AdminTable, { type TableColumn } from './components/AdminTable'
 import AdminStatCard from './components/AdminStatCard'
 import AdminUserDetailModal from './components/modal/AdminUserDetailModal'
 import { Input } from '@/components/ui/input'
-import { AdminTablePagination } from './components/AdminTablePagination'
 import { formatDate } from '@/utils/formatter'
 import { Badge } from '@/components/ui/badge'
 import {

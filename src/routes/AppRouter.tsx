@@ -14,6 +14,9 @@ import AdminProjectPage from '@/pages/admin/AdminProjectPage'
 import AdminBanner from '@/pages/admin/AdminBanner'
 import AdminUserPage from '@/pages/admin/AdminUser'
 import PaymentPage from '@/pages/PaymentPage/PaymentPage'
+import ProjectPage from '@/pages/ProjectPage/ProjectPage'
+import ProjectDetailPage from '@/pages/ProjectDetailPage/ProjectDetailPage'
+import ProjectCreatePage from '@/pages/ProjectCreatePage/ProjectCreatePage'
 
 export default function AppRouter() {
   return (
@@ -21,7 +24,8 @@ export default function AppRouter() {
       {/* Public - 누구나 접근 가능 */}
       <Route element={<AppLayout />}>
         <Route path="/" element={<div>Home</div>} />
-        <Route path="/projects/:id" element={<div>ProjectDetail</div>} />
+        <Route path="/projects" element={<ProjectPage />} />
+        <Route path="/projects/:id" element={<ProjectDetailPage />} />
         <Route path="/payment" element={<PaymentPage />} />
       </Route>
 
@@ -36,8 +40,8 @@ export default function AppRouter() {
       {/* Private - 로그인 필요 (비로그인이면 /login 으로 리다이렉트) */}
       <Route element={<PrivateRoute />}>
         <Route element={<AppLayout />}>
-          <Route path="/projects/create" element={<div>ProjectCreate</div>} />
-          <Route path="/projects/:id/edit" element={<div>ProjectEdit</div>} />
+          <Route path="/projects/create" element={<ProjectCreatePage />} />
+          <Route path="/projects/:id/edit" element={<ProjectCreatePage />} />
           <Route path="/my" element={<MyPage />} />
         </Route>
       </Route>
