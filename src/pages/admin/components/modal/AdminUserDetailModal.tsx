@@ -20,7 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import type { UserResponse, UserRole } from '@/types/user'
+import type { UserResponse, UserRole } from '@/types/user.type'
 import { useUpdateUser } from '@/hooks/admin/useAdminUser'
 
 // ── Types ────────────────────────────────────────────────────────
