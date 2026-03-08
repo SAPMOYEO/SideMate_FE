@@ -7,16 +7,20 @@ import { store } from './features/store.ts'
 import { BrowserRouter } from 'react-router-dom'
 import './index.css'
 import App from './App.tsx'
+import { GoogleOAuthProvider } from '@react-oauth/google'
 
 const queryClient = new QueryClient()
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
       <QueryClientProvider client={queryClient}>
-        <Provider store={store}>
-          <App />
-        </Provider>
+        <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+          <Provider store={store}>
+            <App />
+          </Provider>
+        </GoogleOAuthProvider>
         <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
     </BrowserRouter>

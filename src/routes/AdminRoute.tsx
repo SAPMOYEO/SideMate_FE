@@ -1,10 +1,16 @@
 import { Navigate, Outlet } from 'react-router-dom'
-
-// TODO: redux userSlice 연결 후 실제 role 상태로 교체
-const isAdmin = false
+import { useAppSelector } from '@/hooks'
 
 const AdminRoute = () => {
-  if (!isAdmin) return <Navigate to="/" replace />
+  const { user, isInitializing } = useAppSelector((state) => state.user)
+
+  console.log('AdminRoute - user:', user?.role)
+  if (isInitializing) {
+    return <div>로딩 중...</div>
+  }
+  if (!user || user.role !== 'admin') {
+    return <Navigate to="/" replace />
+  }
 
   return <Outlet />
 }
