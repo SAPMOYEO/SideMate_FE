@@ -1,13 +1,4 @@
-export type Plan = {
-  key: 'free' | 'basic' | 'premium' | 'topUp'
-  label: string
-  price: number
-  tokens?: number
-  desc: string
-  features: string[]
-  popular?: boolean
-  oneTime?: boolean
-}
+import type { Plan } from '@/types/payment.type'
 
 export const plans: Plan[] = [
   {
