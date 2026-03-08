@@ -1,4 +1,4 @@
-import api from './index'
+import api from './api.instance'
 
 export type PaymentApiMethod = 'CARD' | 'CASH'
 export type PaymentApiType = 'TOPUP' | 'SUBSCRIPTION'

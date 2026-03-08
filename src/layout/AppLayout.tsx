@@ -1,5 +1,6 @@
 import { Outlet } from 'react-router-dom'
 import { Header } from '@/components/shared/Header'
+import { OnboardingModal } from '@/components/shared/OnboardingModal'
 
 const AppLayout = () => {
   return (
@@ -10,6 +11,7 @@ const AppLayout = () => {
           <Outlet />
         </main>
       </div>
+      <OnboardingModal />
     </div>
   )
 }
