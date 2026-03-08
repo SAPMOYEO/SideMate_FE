@@ -4,14 +4,8 @@ import 'react-credit-cards-2/dist/es/styles-compiled.css'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-
-export interface CardValue {
-  number: string
-  name: string
-  expiry: string
-  cvc: string
-  focus: 'number' | 'name' | 'expiry' | 'cvc' | ''
-}
+import { formatCardNumber, formatCvc, formatExpiry } from '@/utils/paymentForm'
+import type { CardValue } from '@/types/payment.type'
 
 interface CardPaymentFormProps {
   cardValue: CardValue
@@ -19,21 +13,6 @@ interface CardPaymentFormProps {
   onSubmit: () => void
   disabled?: boolean
   totalPrice: number
-}
-
-function formatCardNumber(value: string) {
-  return value.replace(/\D/g, '').slice(0, 16)
-}
-
-function formatExpiry(value: string) {
-  const onlyNumber = value.replace(/\D/g, '').slice(0, 4)
-
-  if (onlyNumber.length < 3) return onlyNumber
-  return `${onlyNumber.slice(0, 2)}/${onlyNumber.slice(2)}`
-}
-
-function formatCvc(value: string) {
-  return value.replace(/\D/g, '').slice(0, 3)
 }
 
 export default function CardPaymentForm({
@@ -91,7 +70,7 @@ export default function CardPaymentForm({
   }
 
   const isCardValid =
-    cardValue.number.length === 16 &&
+    cardValue.number.replace(/\D/g, '').length === 16 &&
     cardValue.name.trim().length > 0 &&
     cardValue.expiry.length === 5 &&
     cardValue.cvc.length === 3
