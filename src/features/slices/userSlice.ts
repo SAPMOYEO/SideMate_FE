@@ -6,7 +6,7 @@ import {
 import api from '../../utils/api/api.instance'
 import type { SignUpFormValues } from '@/pages/SignUpPage/components/signUp.schema'
 
-interface User {
+export interface User {
   _id?: string
   name: string
   email?: string

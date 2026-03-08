@@ -2,6 +2,7 @@ import React from 'react'
 import { User, Rocket, Plus, LineChart, Clock, FolderCog } from 'lucide-react'
 import ProfileSection from './components/ProfileSection'
 import ProfileEditModal from './components/ProfileEditModal'
+import { Link } from 'react-router-dom'
 
 const MyPage: React.FC = () => {
   const sectionTitleClasses =
@@ -66,9 +67,12 @@ const MyPage: React.FC = () => {
               <FolderCog className="text-primary" size={28} strokeWidth={2.5} />
               생성 프로젝트 & AI 분석
             </h2>
-            <button className="bg-primary flex cursor-pointer items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-bold text-white shadow-md shadow-indigo-100 transition-all hover:bg-indigo-600">
+            <Link
+              to="/projects/create"
+              className="bg-primary flex cursor-pointer items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-bold text-white shadow-md shadow-indigo-100 transition-all hover:bg-indigo-600"
+            >
               <Plus size={16} strokeWidth={3} />새 프로젝트
-            </button>
+            </Link>
           </div>
 
           <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-all hover:shadow-md dark:border-slate-800 dark:bg-slate-900">
