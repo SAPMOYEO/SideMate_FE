@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import AdminTable, { type TableColumn } from './AdminTable'
-import { AdminTablePagination } from './AdminTablePagination'
+import { AdminTablePagination } from '@/components/shared/AdminTablePagination'
 
 interface AdminTableCardProps {
   label: string
