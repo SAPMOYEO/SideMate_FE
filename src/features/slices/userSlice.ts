@@ -11,6 +11,7 @@ interface User {
   name: string
   email?: string
   role?: 'user' | 'admin'
+  tier?: 'FREE' | 'BASIC' | 'PREMIUM'
   profile?: {
     techStack?: string[]
     gitUrl?: string
