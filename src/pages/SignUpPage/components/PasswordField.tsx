@@ -27,13 +27,16 @@ export const PasswordField: React.FC = () => {
   }, [passwordValue, confirmPasswordValue, trigger])
 
   const passwordRules = [
-    { label: '최소 6자 이상', test: (val: string) => val.length >= 6 },
+    { label: '최소 6자 이상', test: (val: string) => val.trim().length >= 6 },
     {
       label: '대문자 및 소문자 포함',
       test: (val: string) => /[a-z]/.test(val) && /[A-Z]/.test(val),
     },
     { label: '숫자 포함', test: (val: string) => /[0-9]/.test(val) },
-    { label: '특수문자 포함', test: (val: string) => /[^a-zA-Z0-9]/.test(val) },
+    {
+      label: '특수문자 포함',
+      test: (val: string) => /[!@#$%^&*(),.?":{}|<>]/.test(val),
+    },
     {
       label: '공백 제외',
       test: (val: string) => val.length > 0 && !val.includes(' '),

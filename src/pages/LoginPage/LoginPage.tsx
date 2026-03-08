@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAppDispatch } from '@/hooks'
-import { loginUser } from '@/features/slices/userSlice'
+import { loginUser, loginWithGoogle } from '@/features/slices/userSlice'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
@@ -9,6 +9,8 @@ import { Eye, EyeOff, Loader2, TriangleAlert } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { toast } from 'sonner'
+import { GoogleLogin } from '@react-oauth/google'
+import type { CredentialResponse } from '@react-oauth/google'
 
 const loginSchema = z.object({
   email: z
@@ -36,6 +38,14 @@ const LoginPage: React.FC = () => {
     resolver: zodResolver(loginSchema),
     defaultValues: { email: '', password: '' },
   })
+
+  const handleGoogleLogin = async (googleData: CredentialResponse) => {
+    if (googleData.credential) {
+      dispatch(loginWithGoogle(googleData.credential))
+    } else {
+      console.error('구글 토큰이 없습니다.')
+    }
+  }
 
   const onSubmit = async (data: LoginFormValues) => {
     setLoginError(null)
@@ -83,18 +93,28 @@ const LoginPage: React.FC = () => {
       </div>
 
       <div className="mb-8 grid grid-cols-1 gap-4">
-        <Button
-          variant="outline"
-          type="button"
-          className="h-11 border-slate-200 font-semibold dark:border-slate-700"
-        >
-          <img
-            src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
-            alt="G"
-            className="mr-2 size-4"
-          />
-          Google 계정으로 로그인
-        </Button>
+        <div className="relative h-11 w-full">
+          <Button
+            variant="outline"
+            type="button"
+            className="pointer-events-none h-11 w-full border-slate-200 font-semibold dark:border-slate-700"
+          >
+            <img
+              src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+              alt="G"
+              className="mr-2 size-4"
+            />
+            Google 계정으로 로그인
+          </Button>
+
+          <div className="absolute inset-0 overflow-hidden opacity-0">
+            <GoogleLogin
+              onSuccess={handleGoogleLogin}
+              onError={() => console.log('Login Failed')}
+              width="400px"
+            />
+          </div>
+        </div>
       </div>
 
       <div className="relative mb-8 text-center">

@@ -47,7 +47,7 @@ export const Header = () => {
           </Link>
           <Link
             className="text-text-main hover:text-primary text-sm font-semibold transition-colors"
-            to="/"
+            to="/projects"
           >
             프로젝트
           </Link>
