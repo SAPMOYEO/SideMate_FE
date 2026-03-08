@@ -10,8 +10,10 @@ import { PasswordField } from './components/PasswordField'
 import { TechStackField } from './components/TechStackField'
 import { TermsSection } from './components/TermsSection'
 import { signUpSchema, type SignUpFormValues } from './components/signUp.schema'
-import { registerUser } from '@/features/slices/userSlice'
+import { registerUser, loginWithGoogle } from '@/features/slices/userSlice'
 import { useAppDispatch } from '@/hooks'
+import { GoogleLogin } from '@react-oauth/google'
+import type { CredentialResponse } from '@react-oauth/google'
 
 const SignUpPage: React.FC = () => {
   const dispatch = useAppDispatch()
@@ -40,6 +42,17 @@ const SignUpPage: React.FC = () => {
     formState: { isSubmitting },
   } = methods
 
+  const handleGoogleLogin = async (googleData: CredentialResponse) => {
+    if (googleData.credential) {
+      const resultAction = await dispatch(
+        loginWithGoogle(googleData.credential)
+      )
+      if (loginWithGoogle.fulfilled.match(resultAction)) {
+        navigate('/')
+      }
+    }
+  }
+
   const onSubmit = async (data: SignUpFormValues) => {
     const userData = {
       email: data.email,
@@ -58,11 +71,28 @@ const SignUpPage: React.FC = () => {
       )
 
       if (registerUser.fulfilled.match(resultAction)) {
-        toast.success('회원가입이 완료되었습니다! 로그인해 주세요.')
+        toast.success('회원가입이 완료되었습니다!')
         navigate('/login')
       } else {
         const errorMessage = resultAction.payload as string
-        toast.error(errorMessage || '회원가입 중 오류가 발생했습니다.')
+        if (
+          errorMessage.includes('이메일') ||
+          errorMessage.includes('존재') ||
+          errorMessage.includes('Email')
+        ) {
+          methods.setError(
+            'email',
+            {
+              type: 'manual',
+              message: '이미 사용 중인 이메일입니다.',
+            },
+            { shouldFocus: true }
+          )
+
+          methods.setFocus('email')
+        } else {
+          toast.error(errorMessage || '회원가입 중 오류가 발생했습니다.')
+        }
       }
     } catch (err) {
       console.error(err)
@@ -77,7 +107,7 @@ const SignUpPage: React.FC = () => {
           <img
             src="/favicon.svg"
             alt="SideMate Logo"
-            className="size-5 sm:size-7"
+            className="size-7 sm:size-8"
           />
           <span className="text-xl font-black tracking-tight text-slate-900 sm:text-2xl dark:text-white">
             SideMate
@@ -86,28 +116,38 @@ const SignUpPage: React.FC = () => {
       </div>
 
       <div className="mb-8 text-center lg:text-left">
-        <h2 className="mb-3 text-[clamp(1.75rem,3.5vw,2.5rem)] leading-tight font-black tracking-tight text-slate-900 dark:text-white">
+        <h2 className="mb-2 text-3xl font-black text-slate-900 dark:text-white">
           당신의 여정을 시작하세요
         </h2>
-
-        <p className="text-[clamp(0.85rem,1.5vw,1.1rem)] font-medium break-keep text-slate-500 dark:text-slate-400">
+        <p className="text-sm font-medium text-slate-500 sm:text-base dark:text-slate-400">
           AI 기획부터 팀 빌딩까지, 프로젝트 성공을 향한 첫걸음
         </p>
       </div>
 
       <div className="mb-8 grid grid-cols-1 gap-4">
-        <Button
-          variant="outline"
-          type="button"
-          className="h-11 border-slate-200 font-semibold dark:border-slate-700"
-        >
-          <img
-            src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
-            alt="G"
-            className="mr-2 size-4"
-          />
-          Google 계정으로 시작
-        </Button>
+        <div className="relative h-11 w-full">
+          <Button
+            variant="outline"
+            type="button"
+            className="pointer-events-none absolute inset-0 flex h-full w-full items-center justify-center border-slate-200 font-semibold dark:border-slate-700"
+          >
+            <img
+              src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+              alt="G"
+              className="mr-2 size-4"
+            />
+            Google 계정으로 시작하기
+          </Button>
+
+          {/* 실제 투명 버튼 */}
+          <div className="absolute inset-0 z-10 cursor-pointer overflow-hidden opacity-0">
+            <GoogleLogin
+              onSuccess={handleGoogleLogin}
+              onError={() => console.log('Login Failed')}
+              width="400px"
+            />
+          </div>
+        </div>
       </div>
 
       <div className="relative mb-8 text-center">
@@ -128,7 +168,7 @@ const SignUpPage: React.FC = () => {
 
           <Button
             type="submit"
-            className="mt-4 h-12 w-full bg-zinc-800 font-bold"
+            className="shadow-primary/20 mt-2 h-12 w-full bg-zinc-900 font-bold shadow-lg"
             disabled={isSubmitting}
           >
             {isSubmitting ? (
@@ -140,7 +180,7 @@ const SignUpPage: React.FC = () => {
         </form>
       </FormProvider>
 
-      <p className="mt-8 text-center text-sm text-slate-500">
+      <p className="mt-8 pb-12 text-center text-sm text-slate-500">
         이미 회원이신가요?
         <Link
           to="/login"
