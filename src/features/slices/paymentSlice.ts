@@ -11,74 +11,11 @@ import {
   type CreatePaymentPayload,
   type ChangeSubscriptionPlanPayload,
 } from '@/utils/api/payment'
-
-export type PaymentMethod = 'card' | 'cash'
-export type PaymentPlanKey = 'free' | 'basic' | 'premium' | 'topUp'
-export type PaymentApiMethod = 'CARD' | 'CASH'
-export type PaymentApiType = 'TOPUP' | 'SUBSCRIPTION'
-
-export interface PaymentItem {
-  _id: string
-  userId: string
-  idempotencyKey: string
-  method: PaymentApiMethod
-  type: PaymentApiType
-  plan?: 'basic' | 'premium'
-  quantity: number
-  payAmount: number
-  status: 'PAID' | 'CANCELED'
-  createdAt: string
-  updatedAt: string
-}
-
-export interface Subscription {
-  _id: string
-  userId: string
-  plan: 'basic' | 'premium'
-  status: 'active' | 'canceled'
-  canceledAt: string | null
-  currentPeriodStart: string
-  currentPeriodEnd: string
-  createdAt: string
-  updatedAt: string
-}
-
-export interface CheckoutDraft {
-  planKey: PaymentPlanKey
-  paymentMethod: PaymentMethod
-  topUpCount: number
-  totalPrice: number
-  agreed: boolean
-  isTopUp: boolean
-}
-
-export interface PaymentSuccessData {
-  addedCount: number
-  totalAvailableCount: number
-  amountPaid: number
-  orderId: string
-  paidAt: string
-  paymentMethodLabel: string
-  planLabel: string
-  bankName?: string
-  accountNumber?: string
-}
-
-interface PaymentState {
-  payments: PaymentItem[]
-  subscription: Subscription | null
-  checkoutDraft: CheckoutDraft | null
-  paymentSuccess: PaymentSuccessData | null
-
-  paymentsLoading: boolean
-  paymentsError: string | null
-
-  cancelLoading: boolean
-  cancelError: string | null
-
-  submitLoading: boolean
-  submitError: string | null
-}
+import type {
+  CheckoutDraft,
+  PaymentState,
+  PaymentSuccessData,
+} from '@/types/payment.type'
 
 const initialState: PaymentState = {
   payments: [],
@@ -96,6 +33,7 @@ const initialState: PaymentState = {
   submitError: null,
 }
 
+// 결제 정보 불러오기
 export const fetchPayments = createAsyncThunk(
   'payment/fetchPayments',
   async (_, { rejectWithValue }) => {
@@ -113,6 +51,7 @@ export const fetchPayments = createAsyncThunk(
   }
 )
 
+// 결제 생성하기
 export const createPayment = createAsyncThunk(
   'payment/createPayment',
   async (payload: CreatePaymentPayload, { rejectWithValue }) => {
@@ -125,6 +64,7 @@ export const createPayment = createAsyncThunk(
   }
 )
 
+// 구독 플랜 변경하기
 export const changeSubscriptionPlan = createAsyncThunk(
   'payment/changeSubscriptionPlan',
   async (payload: ChangeSubscriptionPlanPayload, { rejectWithValue }) => {
@@ -137,6 +77,7 @@ export const changeSubscriptionPlan = createAsyncThunk(
   }
 )
 
+// 구독 해지하기
 export const cancelSubscription = createAsyncThunk(
   'payment/cancelSubscription',
   async (_, { rejectWithValue }) => {
@@ -158,28 +99,34 @@ const paymentSlice = createSlice({
   name: 'payment',
   initialState,
   reducers: {
+    // 결제 임시 정보 저장하기
     setCheckoutDraft(state, action: PayloadAction<CheckoutDraft>) {
       state.checkoutDraft = action.payload
     },
 
+    // 결제 임시 정보 초기화하기
     clearCheckoutDraft(state) {
       state.checkoutDraft = null
     },
 
+    // 결제 완료 정보 저장하기
     setPaymentSuccess(state, action: PayloadAction<PaymentSuccessData>) {
       state.paymentSuccess = action.payload
     },
 
+    // 결제 완료 정보 초기화하기
     clearPaymentSuccess(state) {
       state.paymentSuccess = null
     },
 
+    // 결제 관련 에러 초기화하기
     resetPaymentError(state) {
       state.paymentsError = null
       state.cancelError = null
       state.submitError = null
     },
 
+    // 결제 상태 전체 초기화하기
     clearPaymentState(state) {
       state.payments = []
       state.subscription = null

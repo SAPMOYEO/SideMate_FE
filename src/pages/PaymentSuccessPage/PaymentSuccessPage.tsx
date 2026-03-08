@@ -5,18 +5,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import type { RootState, AppDispatch } from '@/features/store'
 import { clearPaymentSuccess } from '@/features/slices/paymentSlice'
 import { toast } from 'sonner'
-
-function formatDateTime(value: string) {
-  const date = new Date(value)
-
-  return new Intl.DateTimeFormat('ko-KR', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit',
-  }).format(date)
-}
+import { paymentFormatDateTime } from '@/utils/paymentForm'
 
 export default function PaymentSuccessPage() {
   const navigate = useNavigate()
@@ -88,7 +77,10 @@ export default function PaymentSuccessPage() {
         </h1>
 
         <p className="mt-4 text-center text-base leading-7 text-zinc-500">
-          {paymentSuccess.planLabel} 결제가 정상적으로 처리되었어요.
+          <span className="font-semibold text-[#6366F1]">
+            {paymentSuccess.planLabel}
+          </span>
+          결제가 정상적으로 처리되었어요.
         </p>
 
         <div className="mt-12 w-full overflow-hidden rounded-[28px] border border-zinc-200 bg-white shadow-sm">
@@ -126,7 +118,7 @@ export default function PaymentSuccessPage() {
               결제 상세 정보
             </h2>
 
-            <div className="mt-6 grid grid-cols-1 gap-y-4 sm:grid-cols-[160px_1fr] sm:gap-x-6">
+            <div className="mt-6 grid grid-cols-1 items-center gap-y-4 sm:grid-cols-[160px_1fr] sm:gap-x-6">
               <div className="text-sm text-zinc-400">결제 번호</div>
               <div className="text-sm font-semibold text-zinc-900">
                 #{paymentSuccess.orderId}
@@ -134,7 +126,7 @@ export default function PaymentSuccessPage() {
 
               <div className="text-sm text-zinc-400">결제 일시</div>
               <div className="text-sm font-medium text-zinc-900">
-                {formatDateTime(paymentSuccess.paidAt)}
+                {paymentFormatDateTime(paymentSuccess.paidAt)}
               </div>
 
               <div className="text-sm text-zinc-400">결제 수단</div>
