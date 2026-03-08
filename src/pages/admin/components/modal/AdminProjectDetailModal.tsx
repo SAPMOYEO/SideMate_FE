@@ -18,7 +18,9 @@ import {
   BookOpen,
   Target,
 } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
 import type { ProjectResponse } from '@/types/project.type'
+import { useAdminProjectChangeHidden } from '@/hooks/admin/useAdminProject'
 
 // ── Label maps ──────────────────────────────────────────────────
 const STATUS_MAP: Record<string, { label: string; className: string }> = {
@@ -92,7 +94,17 @@ const AdminProjectDetailModal = ({
   onOpenChange,
   project,
 }: AdminProjectDetailModalProps) => {
+  // 훅은 조건부 return 전에 호출해야 함 (React 규칙)
+  const { mutate: toggleHidden, isPending } = useAdminProjectChangeHidden({
+    id: project?._id ?? '',
+    hiddenYn: !project?.hiddenYn,
+  })
+
   if (!project) return null
+
+  const handleToggleHidden = () => {
+    toggleHidden(undefined, { onSuccess: () => onOpenChange(false) })
+  }
 
   const statusInfo = STATUS_MAP[project.status] ?? {
     label: project.status,
@@ -110,6 +122,9 @@ const AdminProjectDetailModal = ({
           <div className="mb-2 flex items-center gap-2">
             <Badge className={statusInfo.className}>{statusInfo.label}</Badge>
             <Badge variant="outline">{project.category}</Badge>
+            <Badge variant={project.hiddenYn ? 'destructive' : 'secondary'}>
+              {project.hiddenYn ? '숨김' : '노출 중'}
+            </Badge>
           </div>
           <DialogTitle className="text-xl leading-tight">
             {project.title}
@@ -278,6 +293,23 @@ const AdminProjectDetailModal = ({
 
         {/* ── Footer ── */}
         <DialogFooter className="border-t px-6 py-4">
+          <Button
+            variant={project.hiddenYn ? 'outline' : 'destructive'}
+            size="sm"
+            disabled={isPending}
+            onClick={handleToggleHidden}
+          >
+            {isPending ? (
+              <>
+                <Loader2 size={14} className="mr-1.5 animate-spin" />
+                처리 중...
+              </>
+            ) : project.hiddenYn ? (
+              '숨김 해제'
+            ) : (
+              '숨김 처리'
+            )}
+          </Button>
           <Button
             variant="outline"
             size="sm"

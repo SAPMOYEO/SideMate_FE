@@ -33,6 +33,7 @@ const PROJECT_COLUMNS: TableColumn[] = [
   { key: 'author', label: '작성자' },
   { key: 'createdAt', label: '생성 일자' },
   { key: 'status', label: '상태' },
+  { key: 'hidden', label: '숨김 여부' },
   { key: 'actions', label: '관리' },
 ]
 
@@ -47,11 +48,10 @@ const AdminProjectPage = () => {
 
   const { data, isLoading, isError } = useAdminProject({
     page,
-    limit: 10,
+    limit: 5,
     search,
     sort,
   })
-
   const projects = data?.data ?? []
   const totalCount = data?.totalCount ?? 0
   const totalPages = data?.totalPages ?? 1
@@ -97,6 +97,17 @@ const AdminProjectPage = () => {
         >
           상세보기
         </button>
+      ),
+      hidden: (
+        <Badge
+          className={
+            project.hiddenYn
+              ? 'bg-destructive text-white'
+              : 'bg-green-100 text-green-700'
+          }
+        >
+          {project.hiddenYn ? '숨김' : '노출'}
+        </Badge>
       ),
     }
   })

@@ -32,7 +32,7 @@ export interface ProjectTypes {
 // ── 파생 타입 ────────────────────────────────────────────
 
 // API 응답용 — DB 내부 관리 필드 제거
-export type ProjectResponse = Omit<ProjectTypes, 'hiddenYn'>
+export type ProjectResponse = ProjectTypes
 
 // 등록 payload — 서버/DB가 자동 생성하는 필드 제거
 export type CreateProjectPayload = Omit<
