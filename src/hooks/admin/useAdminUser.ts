@@ -10,10 +10,12 @@ const ADMIN_USER_BASE_KEY = ['users'] as const
 export const useUserList = ({
   page = 1,
   limit = 10,
-}: { page?: number; limit?: number } = {}) =>
+  search = '',
+  sort = '-createdAt',
+}: { page?: number; limit?: number; search?: string; sort?: string } = {}) =>
   useQuery({
-    queryKey: [...ADMIN_USER_BASE_KEY, page, limit],
-    queryFn: () => getUserList({ page, limit }),
+    queryKey: [...ADMIN_USER_BASE_KEY, page, limit, search, sort],
+    queryFn: () => getUserList({ page, limit, search, sort }),
   })
 
 export const useUpdateUser = (userId: string) => {
