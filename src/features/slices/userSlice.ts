@@ -6,11 +6,12 @@ import {
 import api from '../../utils/api/api.instance'
 import type { SignUpFormValues } from '@/pages/SignUpPage/components/signUp.schema'
 
-interface User {
+export interface User {
   _id?: string
   name: string
   email?: string
   role?: 'user' | 'admin'
+  tier?: 'FREE' | 'BASIC' | 'PREMIUM'
   profile?: {
     techStack?: string[]
     gitUrl?: string
@@ -45,6 +46,12 @@ export const registerUser = createAsyncThunk(
       return response.data.user
     } catch (error) {
       console.error(error)
+      if (error !== null && typeof error === 'object' && 'response' in error) {
+        const axiosError = error as { response: { data: { message: string } } }
+        return rejectWithValue(
+          axiosError.response?.data?.message || '회원가입에 실패했습니다.'
+        )
+      }
       return rejectWithValue('회원가입에 실패했습니다.')
     }
   }
@@ -94,6 +101,39 @@ export const loginAdmin = createAsyncThunk(
     } catch (error) {
       console.error(error)
       return rejectWithValue('로그인에 실패했습니다.')
+    }
+  }
+)
+
+export const loginWithGoogle = createAsyncThunk(
+  'user/loginWithGoogle',
+  async (token: string, { rejectWithValue }) => {
+    try {
+      const response = await api.post('/user/google', { token })
+      if (response.data.token) {
+        localStorage.setItem('token', response.data.token)
+      }
+      return response.data.user
+    } catch (error) {
+      const axiosError = error as { response?: { data?: { message?: string } } }
+      return rejectWithValue(
+        axiosError.response?.data?.message || '구글 로그인에 실패했습니다.'
+      )
+    }
+  }
+)
+export const updateMyProfile = createAsyncThunk(
+  'user/updateMyProfile',
+  async (profileData: Partial<User>, { rejectWithValue }) => {
+    try {
+      const response = await api.put('/user/me', profileData)
+      return response.data.user
+    } catch (error) {
+      console.error(error)
+      const axiosError = error as { response?: { data?: { message?: string } } }
+      return rejectWithValue(
+        axiosError.response?.data?.message || '프로필 수정에 실패했습니다.'
+      )
     }
   }
 )
@@ -183,6 +223,26 @@ const userSlice = createSlice({
         state.loginLoading = false
         state.user = action.payload
         state.loginError = null
+      })
+      .addCase(loginWithGoogle.pending, (state) => {
+        state.loginLoading = true
+        state.loginError = null
+      })
+      .addCase(loginWithGoogle.fulfilled, (state, action) => {
+        state.loginLoading = false
+        state.user = action.payload
+        state.loginError = null
+      })
+      .addCase(loginWithGoogle.rejected, (state, action) => {
+        state.loginLoading = false
+        state.loginError = action.payload as string
+      })
+      .addCase(updateMyProfile.fulfilled, (state, action) => {
+        state.user = action.payload
+        state.loginError = null
+      })
+      .addCase(updateMyProfile.rejected, (state, action) => {
+        state.loginError = action.payload as string
       })
   },
 })

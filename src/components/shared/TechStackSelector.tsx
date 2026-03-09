@@ -58,13 +58,20 @@ export const TechStackSelector: React.FC<TechStackSelectorProps> = ({
 }) => {
   const [open, setOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+  const [isTouched, setIsTouched] = useState(false)
 
-  const isInternalError = selectedStacks.length === 0
+  const shouldShowError = !!error || (isTouched && selectedStacks.length === 0)
 
   const handleSelect = (stack: string) => {
+    if (!isTouched) setIsTouched(true)
     onAdd(stack)
     if (selectedStacks.length + 1 >= maxCount) setOpen(false)
     setSearchQuery('')
+  }
+
+  const handleRemove = (tech: string) => {
+    if (!isTouched) setIsTouched(true)
+    onRemove(tech)
   }
 
   return (
@@ -80,11 +87,11 @@ export const TechStackSelector: React.FC<TechStackSelectorProps> = ({
 
           <div className="flex h-4 items-center">
             {selectedStacks.length >= maxCount ? (
-              <span className="animate-in fade-in slide-in-from-left-1 text-[11px] font-bold text-red-500">
+              <span className="animate-in fade-in slide-in-from-left-1 text-[11px] leading-none font-bold text-red-500">
                 최대 {maxCount}개까지 가능합니다
               </span>
-            ) : error || isInternalError ? (
-              <span className="animate-in fade-in slide-in-from-left-1 text-[11px] font-bold text-red-500">
+            ) : shouldShowError ? (
+              <span className="animate-in fade-in slide-in-from-left-1 text-[11px] leading-none font-bold text-red-500">
                 {error || '최소 1개의 스택은 선택해야 합니다'}
               </span>
             ) : null}
@@ -94,7 +101,7 @@ export const TechStackSelector: React.FC<TechStackSelectorProps> = ({
 
       <div
         className={`relative flex min-h-[56px] w-full flex-wrap items-center gap-2 rounded-lg border p-3 pr-20 transition-all ${
-          error || isInternalError
+          shouldShowError
             ? 'border-red-500'
             : 'border-slate-200 dark:border-slate-700 dark:bg-slate-800/50'
         }`}
@@ -114,7 +121,7 @@ export const TechStackSelector: React.FC<TechStackSelectorProps> = ({
             <X
               size={12}
               className="cursor-pointer transition-colors hover:text-red-400"
-              onClick={() => onRemove(tech)}
+              onClick={() => handleRemove(tech)}
             />
           </span>
         ))}
@@ -131,7 +138,12 @@ export const TechStackSelector: React.FC<TechStackSelectorProps> = ({
                 <PlusCircle size={14} className="mr-1" /> 추가
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-[200px] p-0" align="end" side="top">
+            <PopoverContent
+              className="w-[200px] p-0"
+              align="end"
+              side="top"
+              onWheel={(e) => e.stopPropagation()}
+            >
               <Command>
                 <CommandInput
                   placeholder="기술 검색..."

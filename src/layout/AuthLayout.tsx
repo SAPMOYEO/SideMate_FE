@@ -102,7 +102,7 @@ const AuthLayout: React.FC = () => {
         >
           <div
             key={location.pathname}
-            className="animate-in fade-in slide-in-from-bottom-4 flex w-full max-w-md flex-col py-12 duration-500 ease-out"
+            className="animate-in fade-in slide-in-from-bottom-4 flex w-full max-w-md flex-col duration-500 ease-out"
           >
             <Outlet />
           </div>
