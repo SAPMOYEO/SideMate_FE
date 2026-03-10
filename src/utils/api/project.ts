@@ -8,7 +8,7 @@ import type {
   ProjectSearchParams,
 } from '@/types/project'
 import api from './api.instance'
-import type { ProjectResponse } from '@/types/project.type'
+import type { ProjectResponse } from '@/types/admin.project.type'
 import type { PaginatedResponse, ParamsTypes } from '@/types/common.type'
 
 /** 프로젝트 목록 조회 (페이지네이션 + 검색 조건) */

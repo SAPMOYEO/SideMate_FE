@@ -9,7 +9,7 @@ import AdminProjectDetailModal from './components/modal/AdminProjectDetailModal'
 import { Badge } from '@/components/ui/badge'
 import { useAdminProject } from '@/hooks/admin/useAdminProject'
 import type { TableColumn } from './components/AdminTable'
-import type { ProjectResponse } from '@/types/project.type'
+import type { ProjectResponse } from '@/types/admin.project.type'
 
 type SortOrder = '-createdAt' | 'createdAt'
 

@@ -1,23 +1,20 @@
-// import { BannerCarousel } from './components/banner/carousel/BannerCarousel'
-// import BannerSearchBar from './components/banner/carousel/BannerSearchBar'
+import { BannerCarousel } from './components/banner/carousel/BannerCarousel'
+import BannerSearchBar from './components/banner/carousel/BannerSearchBar'
 import RecommendProjectList from './components/RecommendProjectList'
 import { Button } from '@/components/ui/button'
-import BannerGrid from './components/banner/grid/BannerGrid'
 const HomePage = () => {
   return (
     <div className="flex flex-col gap-4">
-      {/* <div className="relative">
+      <div className="relative">
         <BannerSearchBar />
         <BannerCarousel />
-      </div> */}
-      <div className="relative px-12 py-8">
-        <BannerGrid />
       </div>
+
       <div className="flex-1 p-12">
         <div className="mb-10 flex flex-col justify-between gap-4 md:flex-row md:items-center">
           <div>
             <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
-              추천 프로젝트
+              최신 프로젝트
             </h2>
             <p className="text-slate-500 dark:text-slate-400">
               당신을 위해 엄선된 기회들입니다.
