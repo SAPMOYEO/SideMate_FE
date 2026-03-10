@@ -3,7 +3,6 @@ import type { FormEvent } from 'react'
 import { X } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
 import {
   Dialog,
   DialogContent,
@@ -43,7 +42,6 @@ const ApplicationModal = ({
   const { mutateAsync: createApplication, isPending } = useCreateApplication()
   const [role, setRole] = useState('')
   const [motivation, setMotivation] = useState('')
-  const [profileOfferYn, setProfileOfferYn] = useState(false)
 
   const roleOptions = useMemo(
     () => Array.from(new Set(roles.map((item) => item.trim()).filter(Boolean))),
@@ -53,7 +51,6 @@ const ApplicationModal = ({
   const resetForm = () => {
     setRole('')
     setMotivation('')
-    setProfileOfferYn(false)
   }
 
   const handleOpenChange = (nextOpen: boolean) => {
@@ -85,7 +82,6 @@ const ApplicationModal = ({
         project: projectId,
         role,
         motivation: motivation.trim(),
-        profileOfferYn,
       })
 
       onApplied(createdApplication)
@@ -176,27 +172,6 @@ const ApplicationModal = ({
               className="resize-none border-slate-200 bg-slate-50"
               placeholder="프로젝트에 기여하고 싶은 이유와 목표를 적어주세요."
             />
-          </div>
-
-          <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-3">
-            <label className="flex items-start gap-2.5">
-              <Checkbox
-                checked={profileOfferYn}
-                onCheckedChange={(checked) =>
-                  setProfileOfferYn(Boolean(checked))
-                }
-                className="mt-0.5 appearance-none border-slate-500 bg-white"
-              />
-              <span className="space-y-1">
-                <span className="block text-sm font-semibold text-slate-700">
-                  프로필 정보 제공 동의
-                </span>
-                <span className="block text-xs text-slate-500">
-                  지원 시 GitHub 주소, 기술 스택 등 프로필 정보가 프로젝트
-                  리더에게 제공되는 것에 동의합니다.
-                </span>
-              </span>
-            </label>
           </div>
 
           <div className="text-xs text-slate-500">

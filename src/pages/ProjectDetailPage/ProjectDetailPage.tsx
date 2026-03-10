@@ -236,7 +236,7 @@ const ProjectDetailPage = () => {
 
   return (
     <div>
-      <div className="mx-auto grid max-w-6xl gap-8 px-4 py-8 md:px-8 lg:grid-cols-[minmax(0,1fr)_320px]">
+      <div className="mx-auto grid max-w-7xl gap-8 px-4 py-8 md:px-8 lg:grid-cols-[minmax(0,1fr)_320px]">
         <section className="space-y-8">
           <div className="space-y-4">
             <div className="flex items-center gap-3 text-sm">

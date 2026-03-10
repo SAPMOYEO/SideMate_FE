@@ -28,7 +28,6 @@ export const createApplication = async (
       applicant: '',
       role: payload.role,
       motivation: payload.motivation,
-      profileOfferYn: payload.profileOfferYn,
       status: 'PENDING',
       createdAt: now,
       updatedAt: now,
@@ -46,7 +45,6 @@ const isApplication = (value: unknown): value is Application => {
     typeof candidate._id === 'string' &&
     typeof candidate.role === 'string' &&
     typeof candidate.motivation === 'string' &&
-    typeof candidate.profileOfferYn === 'boolean' &&
     typeof candidate.status === 'string'
   )
 }

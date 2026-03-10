@@ -6,7 +6,6 @@ export interface Application {
   applicant: string | { _id: string; name?: string; email?: string }
   role: string
   motivation: string
-  profileOfferYn: boolean
   status: ApplicationStatus
   createdAt: string
   updatedAt: string
@@ -16,7 +15,6 @@ export interface CreateApplicationPayload {
   project: string
   role: string
   motivation: string
-  profileOfferYn: boolean
 }
 
 export interface ApplicationListQuery {
