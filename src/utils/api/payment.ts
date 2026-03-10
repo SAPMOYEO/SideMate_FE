@@ -1,4 +1,10 @@
 import api from './api.instance'
+import type {
+  PaymentResponse,
+  CancelSubscriptionResponse,
+  Subscription,
+  PaymentItem,
+} from '@/types/payment.type'
 
 export type PaymentApiMethod = 'CARD' | 'CASH'
 export type PaymentApiType = 'TOPUP' | 'SUBSCRIPTION'
@@ -18,28 +24,42 @@ export interface ChangeSubscriptionPlanPayload {
   plan: 'basic' | 'premium'
 }
 
+export interface GetPaymentsResponse {
+  status: 'success'
+  payments: PaymentItem[]
+  subscription: Subscription | null
+}
+
 /** 결제 목록 + 현재 구독 상태 조회 */
-export const getPayments = async () => {
-  const response = await api.get('/payment')
+export const getPayments = async (): Promise<GetPaymentsResponse> => {
+  const response = await api.get<GetPaymentsResponse>('/payment')
   return response.data
 }
 
 /** TOPUP 결제 / 신규 구독 결제 */
-export const postPayment = async (payload: CreatePaymentPayload) => {
-  const response = await api.post('/payment', payload)
+export const postPayment = async (
+  payload: CreatePaymentPayload
+): Promise<PaymentResponse> => {
+  const response = await api.post<PaymentResponse>('/payment', payload)
   return response.data
 }
 
 /** 구독 플랜 변경 */
 export const patchSubscriptionPlan = async (
   payload: ChangeSubscriptionPlanPayload
-) => {
-  const response = await api.patch('/payment/subscription', payload)
+): Promise<PaymentResponse> => {
+  const response = await api.patch<PaymentResponse>(
+    '/payment/subscription',
+    payload
+  )
   return response.data
 }
 
 /** 구독 해지 */
-export const deleteSubscription = async () => {
-  const response = await api.delete('/payment/subscription')
-  return response.data
-}
+export const deleteSubscription =
+  async (): Promise<CancelSubscriptionResponse> => {
+    const response = await api.delete<CancelSubscriptionResponse>(
+      '/payment/subscription'
+    )
+    return response.data
+  }
