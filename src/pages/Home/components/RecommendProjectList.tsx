@@ -1,9 +1,9 @@
 import ProjectCard from './ProjectCard'
-import { Button } from '@/components/ui/button'
 import api from '@/utils/api/api.instance'
 import { useQuery } from '@tanstack/react-query'
 import { type Project } from '@/types/project'
 import { PREVIEW_LIMIT } from '@/constants/home'
+import { Link } from 'react-router-dom'
 
 const RecommendProjectList = () => {
   const { data: projects } = useQuery({
@@ -25,7 +25,12 @@ const RecommendProjectList = () => {
         })}
       </div>
       <div className="flex justify-center">
-        <Button variant={'outline'}>프로젝트 페이지로</Button>
+        <Link
+          to="/projects"
+          className="bg-background hover:bg-accent hover:text-accent-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50 rounded-lg border p-3 text-sm font-medium whitespace-nowrap shadow-xs"
+        >
+          프로젝트 페이지로
+        </Link>
       </div>
     </div>
   )

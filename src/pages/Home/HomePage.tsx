@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { BannerCarousel } from './components/banner/carousel/BannerCarousel'
 import BannerSearchBar from './components/banner/carousel/BannerSearchBar'
 import RecommendProjectList from './components/RecommendProjectList'
@@ -50,12 +51,12 @@ const HomePage = () => {
             수천 명의 빌더들과 함께 아이디어를 실현할 최고의 팀원을 찾아보세요.
           </p>
           <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <button className="bg-primary shadow-primary/30 w-full rounded-xl px-8 py-3 font-bold text-white shadow-lg transition-transform hover:scale-[1.02] sm:w-auto">
+            <Link
+              to={'/projects/create'}
+              className="bg-primary shadow-primary/30 w-full rounded-xl px-8 py-3 font-bold text-white shadow-lg transition-transform hover:scale-[1.02] sm:w-auto"
+            >
               프로젝트 시작하기
-            </button>
-            <button className="w-full rounded-xl border border-slate-200 bg-white px-8 py-3 font-bold text-slate-900 transition-colors hover:bg-slate-50 sm:w-auto dark:border-slate-800 dark:bg-slate-900 dark:text-white">
-              모든 멘토 보기
-            </button>
+            </Link>
           </div>
         </div>
       </section>
