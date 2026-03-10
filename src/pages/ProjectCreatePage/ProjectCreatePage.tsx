@@ -240,7 +240,7 @@ const ProjectCreatePage = () => {
 
   return (
     <div className="bg-[#f7f8fc]">
-      <div className="mx-auto max-w-4xl px-4 py-10 md:px-8">
+      <div className="mx-auto max-w-7xl px-4 py-10 md:px-8">
         <form
           onSubmit={handleSubmit}
           className="space-y-8 rounded-3xl border border-gray-200 bg-white p-8 shadow-sm"

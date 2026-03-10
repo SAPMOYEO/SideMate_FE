@@ -19,13 +19,14 @@ import ProjectPage from '@/pages/ProjectPage/ProjectPage'
 import ProjectDetailPage from '@/pages/ProjectDetailPage/ProjectDetailPage'
 import ProjectCreatePage from '@/pages/ProjectCreatePage/ProjectCreatePage'
 import PaymentSuccessPage from '@/pages/PaymentSuccessPage/PaymentSuccessPage'
+import HomePage from '@/pages/Home/HomePage'
 
 export default function AppRouter() {
   return (
     <Routes>
       {/* Public - 누구나 접근 가능 */}
       <Route element={<AppLayout />}>
-        <Route path="/" element={<div>Home</div>} />
+        <Route path="/" element={<HomePage />} />
         <Route path="/projects" element={<ProjectPage />} />
         <Route path="/projects/:id" element={<ProjectDetailPage />} />
         <Route path="/payment" element={<PaymentPage />} />

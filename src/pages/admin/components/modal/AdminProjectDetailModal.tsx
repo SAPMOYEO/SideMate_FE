@@ -19,7 +19,7 @@ import {
   Target,
 } from 'lucide-react'
 import { Loader2 } from 'lucide-react'
-import type { ProjectResponse } from '@/types/project.type'
+import type { ProjectResponse } from '@/types/admin.project.type'
 import { useAdminProjectChangeHidden } from '@/hooks/admin/useAdminProject'
 
 // ── Label maps ──────────────────────────────────────────────────

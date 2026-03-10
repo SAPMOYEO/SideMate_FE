@@ -12,7 +12,7 @@ const MyPage: React.FC = () => {
 
   return (
     <div className="min-h-full bg-white dark:bg-slate-950">
-      <main className="mx-auto max-w-4xl space-y-20 px-6 py-12">
+      <div className="mx-auto max-w-7xl space-y-20 px-6 py-12">
         <section>
           <div className={sectionWrapperClasses}>
             <h2 className={sectionTitleClasses}>
@@ -112,7 +112,7 @@ const MyPage: React.FC = () => {
             </div>
           </div>
         </section>
-      </main>
+      </div>
     </div>
   )
 }
