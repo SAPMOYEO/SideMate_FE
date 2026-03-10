@@ -6,7 +6,7 @@ const AppLayout = () => {
   return (
     <div>
       <Header />
-      <div className="flex">
+      <div className="">
         <main className="animate-in fade-in slide-in-from-bottom-4 flex-1 duration-500 ease-out">
           <Outlet />
         </main>

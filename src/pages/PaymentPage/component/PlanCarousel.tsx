@@ -2,9 +2,9 @@ import * as React from 'react'
 import { CreditCard, Landmark } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
+import { fetchMyQuota } from '@/features/slices/aiQuotaSlice'
 import { useDispatch, useSelector } from 'react-redux'
 import type { RootState, AppDispatch } from '@/features/store'
-
 import type { CarouselApi } from '@/components/ui/carousel'
 import {
   Carousel,
@@ -13,20 +13,24 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/components/ui/carousel'
-
 import PlanCard from './PlanCard'
 import PolicyDialog from './PolicyDialog'
-import CardPaymentForm, { type CardValue } from './CardPaymentForm'
+import CardPaymentForm from './CardPaymentForm'
 import CashPaymentForm from './CashPaymentForm'
-import { plans, type Plan } from '../plans'
-
 import {
   createPayment,
   changeSubscriptionPlan,
   setPaymentSuccess,
-  type PaymentMethod,
 } from '@/features/slices/paymentSlice'
+import { loginWithToken } from '@/features/slices/userSlice'
 import { createRandomAccountNumber } from '@/utils/randomAccountNumber'
+import { plans } from '../plans'
+import type {
+  CardValue,
+  PaymentMethod,
+  Plan,
+  PaymentResponse,
+} from '@/types/payment.type'
 
 function createOrderId() {
   return `TXN-${Date.now()}`
@@ -43,6 +47,14 @@ function formatPaymentMethodLabel(method: PaymentMethod, cardNumber?: string) {
   }
 
   return '현금 결제'
+}
+
+function getTotalRemainingFromQuota(result: PaymentResponse): number {
+  return (
+    result.quota.freeRemaining +
+    result.quota.topUpRemaining +
+    result.quota.subExtraRemaining
+  )
 }
 
 export default function PlanCarousel() {
@@ -150,18 +162,14 @@ export default function PlanCarousel() {
     return 0
   }
 
-  const getEstimatedTotalAvailableCount = () => {
-    if (selectedPlan.key === 'topUp') return topUpCount
-    if (selectedPlan.key === 'basic') return 5
-    if (selectedPlan.key === 'premium') return 8
-    return 3
-  }
-
-  const saveSuccessAndNavigate = (accountNumber?: string) => {
+  const saveSuccessAndNavigate = (
+    totalAvailableCount: number,
+    accountNumber?: string
+  ) => {
     dispatch(
       setPaymentSuccess({
         addedCount: getAddedCount(),
-        totalAvailableCount: getEstimatedTotalAvailableCount(),
+        totalAvailableCount,
         amountPaid: totalPrice,
         orderId: createOrderId(),
         paidAt: new Date().toISOString(),
@@ -186,7 +194,7 @@ export default function PlanCarousel() {
       const apiMethod = paymentMethod === 'card' ? 'CARD' : 'CASH'
 
       if (isTopUpPlan) {
-        await dispatch(
+        const result = await dispatch(
           createPayment({
             idempotencyKey: createIdempotencyKey('topup'),
             method: apiMethod,
@@ -195,10 +203,16 @@ export default function PlanCarousel() {
           })
         ).unwrap()
 
+        await dispatch(loginWithToken())
+        await dispatch(fetchMyQuota())
+
         const accountNumber =
           paymentMethod === 'cash' ? createRandomAccountNumber() : undefined
 
-        saveSuccessAndNavigate(accountNumber)
+        saveSuccessAndNavigate(
+          getTotalRemainingFromQuota(result),
+          accountNumber
+        )
         return
       }
 
@@ -220,15 +234,26 @@ export default function PlanCarousel() {
         }
 
         if (isChangingPlan) {
-          await dispatch(
+          const result = await dispatch(
             changeSubscriptionPlan({
               idempotencyKey: createIdempotencyKey('sub-change'),
               method: apiMethod,
               plan: subscriptionPlan,
             })
           ).unwrap()
+
+          await dispatch(loginWithToken())
+          await dispatch(fetchMyQuota())
+
+          const accountNumber =
+            paymentMethod === 'cash' ? createRandomAccountNumber() : undefined
+
+          saveSuccessAndNavigate(
+            getTotalRemainingFromQuota(result),
+            accountNumber
+          )
         } else {
-          await dispatch(
+          const result = await dispatch(
             createPayment({
               idempotencyKey: createIdempotencyKey('sub'),
               method: apiMethod,
@@ -236,12 +261,18 @@ export default function PlanCarousel() {
               plan: subscriptionPlan,
             })
           ).unwrap()
+
+          await dispatch(loginWithToken())
+          await dispatch(fetchMyQuota())
+
+          const accountNumber =
+            paymentMethod === 'cash' ? createRandomAccountNumber() : undefined
+
+          saveSuccessAndNavigate(
+            getTotalRemainingFromQuota(result),
+            accountNumber
+          )
         }
-
-        const accountNumber =
-          paymentMethod === 'cash' ? createRandomAccountNumber() : undefined
-
-        saveSuccessAndNavigate(accountNumber)
       }
     } catch (error) {
       console.error(error)

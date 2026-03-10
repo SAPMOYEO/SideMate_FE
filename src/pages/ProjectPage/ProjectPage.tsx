@@ -10,6 +10,7 @@ import FilterSidebar from './components/FilterSidebar'
 import ProjectCard from './components/ProjectCard'
 import { Link } from 'react-router-dom'
 import { Plus } from 'lucide-react'
+import { useSearchParams } from 'react-router-dom'
 
 const LIMIT = Number(import.meta.env.VITE_PROJECT_LIMIT) || 10
 
@@ -17,14 +18,18 @@ const ProjectPage = () => {
   const [sort, setSort] = useState<'latest' | 'oldest'>('latest')
   const [open, setOpen] = useState(false)
   const [page, setPage] = useState(1)
-  const [filter, setFilter] = useState<ProjectFilterState>(initialProjectFilter)
-
+  const [urlParams] = useSearchParams()
+  const q = urlParams.get('q') ?? ''
+  const [filter, setFilter] = useState<ProjectFilterState>({
+    ...initialProjectFilter,
+    title: q,
+  })
   const searchParams = useMemo<ProjectSearchParams>(
     () => ({
       page,
       limit: LIMIT,
       sort,
-      ...(filter.title.trim() ? { title: filter.title.trim() } : {}),
+      ...(q || filter.title.trim() ? { title: q || filter.title.trim() } : {}),
       ...(filter.category.length ? { category: filter.category } : {}),
       ...(filter.requiredTechStack.length
         ? { requiredTechStack: filter.requiredTechStack }
@@ -39,7 +44,7 @@ const ProjectPage = () => {
         ? { deadlineEndDate: filter.deadlineEndDate }
         : {}),
     }),
-    [filter, page, sort]
+    [filter, page, sort, q]
   )
 
   const { data, isLoading, isError } = useProjects(searchParams)

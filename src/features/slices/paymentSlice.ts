@@ -11,74 +11,13 @@ import {
   type CreatePaymentPayload,
   type ChangeSubscriptionPlanPayload,
 } from '@/utils/api/payment'
-
-export type PaymentMethod = 'card' | 'cash'
-export type PaymentPlanKey = 'free' | 'basic' | 'premium' | 'topUp'
-export type PaymentApiMethod = 'CARD' | 'CASH'
-export type PaymentApiType = 'TOPUP' | 'SUBSCRIPTION'
-
-export interface PaymentItem {
-  _id: string
-  userId: string
-  idempotencyKey: string
-  method: PaymentApiMethod
-  type: PaymentApiType
-  plan?: 'basic' | 'premium'
-  quantity: number
-  payAmount: number
-  status: 'PAID' | 'CANCELED'
-  createdAt: string
-  updatedAt: string
-}
-
-export interface Subscription {
-  _id: string
-  userId: string
-  plan: 'basic' | 'premium'
-  status: 'active' | 'canceled'
-  canceledAt: string | null
-  currentPeriodStart: string
-  currentPeriodEnd: string
-  createdAt: string
-  updatedAt: string
-}
-
-export interface CheckoutDraft {
-  planKey: PaymentPlanKey
-  paymentMethod: PaymentMethod
-  topUpCount: number
-  totalPrice: number
-  agreed: boolean
-  isTopUp: boolean
-}
-
-export interface PaymentSuccessData {
-  addedCount: number
-  totalAvailableCount: number
-  amountPaid: number
-  orderId: string
-  paidAt: string
-  paymentMethodLabel: string
-  planLabel: string
-  bankName?: string
-  accountNumber?: string
-}
-
-interface PaymentState {
-  payments: PaymentItem[]
-  subscription: Subscription | null
-  checkoutDraft: CheckoutDraft | null
-  paymentSuccess: PaymentSuccessData | null
-
-  paymentsLoading: boolean
-  paymentsError: string | null
-
-  cancelLoading: boolean
-  cancelError: string | null
-
-  submitLoading: boolean
-  submitError: string | null
-}
+import type {
+  CheckoutDraft,
+  PaymentState,
+  PaymentSuccessData,
+  PaymentResponse,
+  CancelSubscriptionResponse,
+} from '@/types/payment.type'
 
 const initialState: PaymentState = {
   payments: [],
@@ -96,6 +35,7 @@ const initialState: PaymentState = {
   submitError: null,
 }
 
+// 결제 정보 불러오기
 export const fetchPayments = createAsyncThunk(
   'payment/fetchPayments',
   async (_, { rejectWithValue }) => {
@@ -113,46 +53,55 @@ export const fetchPayments = createAsyncThunk(
   }
 )
 
-export const createPayment = createAsyncThunk(
-  'payment/createPayment',
-  async (payload: CreatePaymentPayload, { rejectWithValue }) => {
-    try {
-      return await postPayment(payload)
-    } catch (error) {
-      console.error(error)
-      return rejectWithValue('결제 생성에 실패했습니다.')
-    }
+// 결제 생성하기
+export const createPayment = createAsyncThunk<
+  PaymentResponse,
+  CreatePaymentPayload,
+  { rejectValue: string }
+>('payment/createPayment', async (payload, { rejectWithValue }) => {
+  try {
+    return await postPayment(payload)
+  } catch (error) {
+    console.error(error)
+    return rejectWithValue('결제 생성에 실패했습니다.')
   }
-)
+})
 
-export const changeSubscriptionPlan = createAsyncThunk(
-  'payment/changeSubscriptionPlan',
-  async (payload: ChangeSubscriptionPlanPayload, { rejectWithValue }) => {
-    try {
-      return await patchSubscriptionPlan(payload)
-    } catch (error) {
-      console.error(error)
-      return rejectWithValue('구독 플랜 변경에 실패했습니다.')
-    }
+// 구독 플랜 변경하기
+export const changeSubscriptionPlan = createAsyncThunk<
+  PaymentResponse,
+  ChangeSubscriptionPlanPayload,
+  { rejectValue: string }
+>('payment/changeSubscriptionPlan', async (payload, { rejectWithValue }) => {
+  try {
+    return await patchSubscriptionPlan(payload)
+  } catch (error) {
+    console.error(error)
+    return rejectWithValue('구독 플랜 변경에 실패했습니다.')
   }
-)
+})
 
-export const cancelSubscription = createAsyncThunk(
-  'payment/cancelSubscription',
-  async (_, { rejectWithValue }) => {
-    try {
-      const data = await deleteSubscription()
+// 구독 해지하기
+export const cancelSubscription = createAsyncThunk<
+  CancelSubscriptionResponse,
+  void,
+  { rejectValue: string }
+>('payment/cancelSubscription', async (_, { rejectWithValue }) => {
+  try {
+    const data = await deleteSubscription()
 
-      return {
-        subscription: data.subscription ?? null,
-        quota: data.quota ?? null,
-      }
-    } catch (error) {
-      console.error(error)
-      return rejectWithValue('구독 해지에 실패했습니다.')
+    return {
+      status: data.status,
+      subscription: data.subscription ?? null,
+      quota: data.quota ?? null,
+      user: data.user,
+      message: data.message,
     }
+  } catch (error) {
+    console.error(error)
+    return rejectWithValue('구독 해지에 실패했습니다.')
   }
-)
+})
 
 const paymentSlice = createSlice({
   name: 'payment',

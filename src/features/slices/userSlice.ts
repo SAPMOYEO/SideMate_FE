@@ -11,6 +11,7 @@ export interface User {
   name: string
   email?: string
   role?: 'user' | 'admin'
+  tier?: 'FREE' | 'BASIC' | 'PREMIUM'
   profile?: {
     techStack?: string[]
     gitUrl?: string
@@ -85,6 +86,21 @@ export const loginWithToken = createAsyncThunk(
       console.error(error)
       localStorage.removeItem('token')
       return rejectWithValue('세션이 만료되었습니다.')
+    }
+  }
+)
+export const loginAdmin = createAsyncThunk(
+  'user/loginAdmin',
+  async (data: { name: string; password: string }, { rejectWithValue }) => {
+    try {
+      const response = await api.post('/admin/login', data)
+      localStorage.setItem('token', response.data.token)
+      api.defaults.headers.common['Authorization'] =
+        `Bearer ${response.data.token}`
+      return { _id: 'admin', role: 'admin' as const, name: 'Admin' }
+    } catch (error) {
+      console.error(error)
+      return rejectWithValue('로그인에 실패했습니다.')
     }
   }
 )
@@ -202,6 +218,11 @@ const userSlice = createSlice({
         state.loginLoading = false
         state.user = null
         state.isInitializing = false
+      })
+      .addCase(loginAdmin.fulfilled, (state, action) => {
+        state.loginLoading = false
+        state.user = action.payload
+        state.loginError = null
       })
       .addCase(loginWithGoogle.pending, (state) => {
         state.loginLoading = true
