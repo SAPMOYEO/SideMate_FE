@@ -53,7 +53,7 @@ export const Header = () => {
     <>
       <header className="border-border-light bg-surface sticky top-0 z-50 flex items-center justify-between border-b px-6 py-4 whitespace-nowrap md:px-10">
         <div className="flex items-center gap-3">
-          <Link to="/">
+          <Link to="/" className="w-[120px] md:w-[160px]">
             <SideMateLogo />
           </Link>
         </div>
@@ -73,7 +73,7 @@ export const Header = () => {
               프로젝트
             </Link>
             <Link
-              className="text-text-muted hover:text-text-main text-sm font-semibold transition-colors"
+              className="text-text-muted hover:text-text-main flex items-center text-sm font-semibold transition-colors"
               to="#"
             >
               AI 피드백
@@ -127,7 +127,7 @@ export const Header = () => {
 
           {isLoggedIn ? (
             <div className="flex items-center gap-5 md:gap-7">
-              <div className="md:hidden">
+              <div className="flex items-center md:hidden">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <button className="text-primary hover:text-primary/80 cursor-pointer transition-colors">
@@ -267,7 +267,7 @@ export const Header = () => {
               </button>
             </div>
 
-            <div className="flex flex-col gap-5">
+            <div className="flex flex-col items-center gap-5">
               <Link
                 to="/"
                 onClick={() => setIsMobileMenuOpen(false)}
@@ -285,7 +285,7 @@ export const Header = () => {
               <Link
                 to="#"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="text-text-main hover:text-primary text-base font-semibold transition-colors"
+                className="text-text-main hover:text-primary flex items-center text-base font-semibold transition-colors"
               >
                 AI 피드백
               </Link>

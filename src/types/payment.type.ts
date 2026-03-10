@@ -1,5 +1,7 @@
 // 결제 관련 타입
 
+import type { AiQuota } from './aiQuota.type'
+
 // 결제 플랜
 export type Plan = {
   key: 'free' | 'basic' | 'premium' | 'topUp'
@@ -29,8 +31,25 @@ export type PolicySection = {
   example?: string[]
 }
 
-// paymentSlice.ts
+// 결과 응답타입
+export interface PaymentResponse {
+  status: 'success'
+  payment: PaymentItem
+  quota: AiQuota
+  subscription?: Subscription | null
+  user?: unknown
+  message?: string
+}
 
+export interface CancelSubscriptionResponse {
+  status: 'success'
+  subscription: Subscription | null
+  quota: AiQuota | null
+  user?: unknown
+  message?: string
+}
+
+// paymentSlice.ts
 export type PaymentMethod = 'card' | 'cash'
 export type PaymentPlanKey = 'free' | 'basic' | 'premium' | 'topUp'
 export type PaymentApiMethod = 'CARD' | 'CASH'

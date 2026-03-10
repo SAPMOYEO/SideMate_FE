@@ -94,7 +94,7 @@ export default function CardPaymentForm({
               expiry={cardValue.expiry.replace('/', '')}
               focused={cardValue.focus}
               name={cardValue.name}
-              number={cardValue.number}
+              number={cardValue.number.replace(/\D/g, '')}
             />
           </div>
         </div>
