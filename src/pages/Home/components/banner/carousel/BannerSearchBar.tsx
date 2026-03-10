@@ -14,7 +14,9 @@ const BannerSearchBar = () => {
   return (
     <div className="absolute inset-0 z-10 flex h-[60vh] w-full flex-col items-center justify-center bg-black/40 px-4 text-center">
       <div className="mb-6 flex items-center gap-3">
-        <div className="bg-primary shadow-primary/20 flex h-12 w-12 items-center justify-center rounded-xl text-white shadow-lg"></div>
+        <div className="shadow-primary/20 flex h-12 w-12 items-center justify-center rounded-xl bg-white p-1 text-white shadow-lg">
+          <img src={'/favicon.svg'} alt="logo" />
+        </div>
         <h1 className="text-4xl font-extrabold tracking-tight text-white md:text-5xl">
           SideMate
         </h1>
