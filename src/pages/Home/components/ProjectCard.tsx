@@ -41,7 +41,7 @@ const ProjectCard = ({ project }: { project: Project }) => {
               )
             })}
           </ul>
-          <Link to={`/project/${project._id}`}>
+          <Link to={`/projects/${project._id}`}>
             <button className="text-primary flex items-center gap-1 text-sm font-bold">
               상세보기
             </button>
