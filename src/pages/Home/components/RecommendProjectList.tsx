@@ -1,37 +1,40 @@
 import ProjectCard from './ProjectCard'
-import api from '@/utils/api/api.instance'
-import { useQuery } from '@tanstack/react-query'
 import { type Project } from '@/types/project'
-import { PREVIEW_LIMIT } from '@/constants/home'
-import { Link } from 'react-router-dom'
+import { FolderX } from 'lucide-react'
 
-const RecommendProjectList = () => {
-  const { data: projects } = useQuery({
-    queryKey: ['project'],
-    queryFn: async (): Promise<Project[]> => {
-      const response = await api.get(
-        `/project?limit=${PREVIEW_LIMIT}&sort=latest`
-      )
-      return response.data.data
-    },
-  })
+interface Props {
+  projects: Project[]
+  isLoading: boolean
+}
+
+const RecommendProjectList = ({ projects, isLoading }: Props) => {
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div
+            key={i}
+            className="h-48 animate-pulse rounded-2xl bg-slate-200 dark:bg-slate-700"
+          />
+        ))}
+      </div>
+    )
+  }
+
+  if (!projects.length) {
+    return (
+      <div className="flex h-48 w-full flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-slate-200 text-slate-400">
+        <FolderX size={36} strokeWidth={1.5} />
+        <p className="text-sm">해당 카테고리의 프로젝트가 없습니다</p>
+      </div>
+    )
+  }
 
   return (
-    <div className="mx-auto flex flex-col gap-10">
-      {/* 프로젝트 리스트 */}
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        {projects?.map((project) => {
-          return <ProjectCard project={project} key={project._id} />
-        })}
-      </div>
-      <div className="flex justify-center">
-        <Link
-          to="/projects"
-          className="bg-background hover:bg-accent hover:text-accent-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50 rounded-lg border p-3 text-sm font-medium whitespace-nowrap shadow-xs"
-        >
-          프로젝트 페이지로
-        </Link>
-      </div>
+    <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+      {projects.map((project) => (
+        <ProjectCard project={project} key={project._id} />
+      ))}
     </div>
   )
 }
