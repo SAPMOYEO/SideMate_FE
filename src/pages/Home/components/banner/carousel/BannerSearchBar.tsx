@@ -1,3 +1,4 @@
+import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -18,7 +19,7 @@ const BannerSearchBar = () => {
         <div className="shadow-primary/20 flex h-8 w-8 items-center justify-center rounded-xl bg-white p-1 shadow-lg md:h-12 md:w-12">
           <img src={'/favicon.svg'} alt="logo" />
         </div>
-        <h1 className="text-2xl font-extrabold tracking-tight text-white md:text-4xl lg:text-5xl">
+        <h1 className="text-4xl font-extrabold tracking-tight text-white md:text-6xl lg:text-5xl">
           SideMate
         </h1>
       </div>
@@ -28,18 +29,18 @@ const BannerSearchBar = () => {
         시작해보세요.
       </p>
       {/* 검색바 */}
-      <div className="w-full max-w-2xl px-2 md:px-4">
+      <div className="w-full max-w-2xl px-8 md:px-4">
         <form className="group relative" onSubmit={handleSubmit}>
           <Input
             onChange={(e) => setQuery(e.target.value)}
-            className="focus:ring-primary/20 block w-full rounded-2xl border-none bg-white py-5 pr-24 pl-4 text-sm text-slate-900 shadow-2xl transition-all focus:ring-4 md:py-8 md:text-lg"
+            className="focus:ring-primary/20 block w-full rounded-2xl border-none bg-white py-6 pr-20 pl-4 text-sm text-slate-900 shadow-2xl transition-all focus:ring-4 md:py-6 md:pr-28 md:text-lg"
             placeholder="프로젝트, 기술 또는 멘토를 검색해보세요..."
             type="text"
           />
-          <div className="absolute inset-y-0 right-3 flex items-center">
-            <button className="bg-primary hover:bg-primary/90 shadow-primary/30 rounded-xl px-3 py-1.5 text-sm font-bold text-white shadow-lg transition-colors md:px-6 md:py-2">
-              검색하기
-            </button>
+          <div className="absolute inset-y-0 right-0 flex items-center pr-2 md:pr-3">
+            <Button className="bg-primary hover:bg-primary/90 shadow-primary/30 rounded-xl px-3 py-1.5 text-sm font-bold text-white shadow-lg transition-colors md:px-6 md:py-2">
+              검색
+            </Button>
           </div>
         </form>
       </div>
