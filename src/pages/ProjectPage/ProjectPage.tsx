@@ -16,7 +16,7 @@ const ProjectPage = () => {
   const [sort, setSort] = useState<'latest' | 'oldest'>('latest')
   const [open, setOpen] = useState(false)
   const [page, setPage] = useState(1)
-  const [urlParams] = useSearchParams()
+  const [urlParams, setUrlParams] = useSearchParams()
   const q = urlParams.get('q') ?? ''
   const [filter, setFilter] = useState<ProjectFilterState>({
     ...initialProjectFilter,
@@ -27,7 +27,7 @@ const ProjectPage = () => {
       page,
       limit: LIMIT,
       sort,
-      ...(q || filter.title.trim() ? { title: q || filter.title.trim() } : {}),
+      ...(filter.title.trim() ? { title: filter.title.trim() } : {}),
       ...(filter.category.length ? { category: filter.category } : {}),
       ...(filter.requiredTechStack.length
         ? { requiredTechStack: filter.requiredTechStack }
@@ -42,7 +42,7 @@ const ProjectPage = () => {
         ? { deadlineEndDate: filter.deadlineEndDate }
         : {}),
     }),
-    [filter, page, sort, q]
+    [filter, page, sort]
   )
 
   const { data, isLoading, isError } = useProjects(searchParams)
@@ -98,9 +98,15 @@ const ProjectPage = () => {
     setFilter((prev) => ({ ...prev, [field]: value }))
   }
 
+  const handleTitleChange = (value: string) => {
+    setPage(1)
+    setFilter((prev) => ({ ...prev, title: value }))
+  }
+
   const resetFilter = () => {
     setPage(1)
     setFilter(initialProjectFilter)
+    setUrlParams({}, { replace: true })
   }
 
   return (
@@ -109,10 +115,7 @@ const ProjectPage = () => {
         <FilterSidebar
           filter={filter}
           onReset={resetFilter}
-          onTitleChange={(value) => {
-            setPage(1)
-            setFilter((prev) => ({ ...prev, title: value }))
-          }}
+          onTitleChange={handleTitleChange}
           onToggleCategory={(value) => toggleInArray('category', value)}
           onToggleTechStack={(value) =>
             toggleInArray('requiredTechStack', value)
@@ -147,10 +150,7 @@ const ProjectPage = () => {
         <FilterSidebar
           filter={filter}
           onReset={resetFilter}
-          onTitleChange={(value) => {
-            setPage(1)
-            setFilter((prev) => ({ ...prev, title: value }))
-          }}
+          onTitleChange={handleTitleChange}
           onToggleCategory={(value) => toggleInArray('category', value)}
           onToggleTechStack={(value) =>
             toggleInArray('requiredTechStack', value)

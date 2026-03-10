@@ -1,6 +1,5 @@
 import type { ProjectFilterState } from '@/types/project'
 import ProjectTechStackCombobox from './ProjectTechStackCombobox'
-
 interface Props {
   filter: ProjectFilterState
   onReset: () => void
