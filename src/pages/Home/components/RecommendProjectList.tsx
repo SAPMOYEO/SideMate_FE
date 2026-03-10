@@ -17,9 +17,9 @@ const RecommendProjectList = () => {
   })
 
   return (
-    <div className="flex flex-col gap-10">
+    <div className="mx-auto flex flex-col gap-10">
       {/* 프로젝트 리스트 */}
-      <div className="grid grid-cols-4 gap-8">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         {projects?.map((project) => {
           return <ProjectCard project={project} key={project._id} />
         })}

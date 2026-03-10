@@ -67,11 +67,14 @@ export const BannerCarousel = () => {
     <Carousel
       setApi={setCarouselApi}
       plugins={[AutoPlay({ delay: 3000, stopOnInteraction: false })]}
-      className="relative h-[60vh]"
+      className="relative h-[40vh] md:h-[50vh] lg:h-[60vh]"
     >
       <CarouselContent>
         {data?.banners.map((banner) => (
-          <CarouselItem key={banner._id} className="h-[60vh]">
+          <CarouselItem
+            key={banner._id}
+            className="h-[40vh] md:h-[50vh] lg:h-[60vh]"
+          >
             <img
               src={banner.imageUrl}
               alt={banner.imageUrl}

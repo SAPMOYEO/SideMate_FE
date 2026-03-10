@@ -6,12 +6,12 @@ import { Button } from '@/components/ui/button'
 const HomePage = () => {
   return (
     <div className="flex flex-col gap-4">
-      <div className="relative">
+      <div className="relative overflow-hidden">
         <BannerSearchBar />
         <BannerCarousel />
       </div>
 
-      <div className="flex-1 p-12">
+      <div className="m-auto w-full max-w-7xl flex-1 px-4 py-8 md:px-8 md:py-10 lg:px-12 lg:py-12">
         <div className="mb-10 flex flex-col justify-between gap-4 md:flex-row md:items-center">
           <div>
             <h2 className="text-2xl font-bold text-slate-900 dark:text-white">

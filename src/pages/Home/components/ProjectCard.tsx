@@ -31,15 +31,13 @@ const ProjectCard = ({ project }: { project: Project }) => {
         <p className="mb-6 line-clamp-2 text-sm text-slate-600 dark:text-slate-400">
           {project.description}
         </p>
-        <div className="mt-auto flex items-center justify-between border-t border-slate-100 pt-4 dark:border-slate-800">
-          <ul className="flex gap-2">
-            {project.requiredTechStack.map((stack) => {
-              return (
-                <li>
-                  <Badge>{stack}</Badge>
-                </li>
-              )
-            })}
+        <div className="mt-auto flex flex-col gap-3 border-t border-slate-100 pt-4 dark:border-slate-800">
+          <ul className="flex flex-wrap gap-2">
+            {project.requiredTechStack.map((stack) => (
+              <li key={stack}>
+                <Badge>{stack}</Badge>
+              </li>
+            ))}
           </ul>
           <Link to={`/projects/${project._id}`}>
             <button className="text-primary flex items-center gap-1 text-sm font-bold">
