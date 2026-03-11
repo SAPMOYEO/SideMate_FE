@@ -1,13 +1,13 @@
 import ProjectCard from './ProjectCard'
 import { type Project } from '@/types/project'
 import { FolderX } from 'lucide-react'
-
+import React from 'react'
 interface Props {
   projects: Project[]
   isLoading: boolean
 }
 
-const RecommendProjectList = ({ projects, isLoading }: Props) => {
+const RecommendProjectList = React.memo(({ projects, isLoading }: Props) => {
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
@@ -37,6 +37,6 @@ const RecommendProjectList = ({ projects, isLoading }: Props) => {
       ))}
     </div>
   )
-}
+})
 
 export default RecommendProjectList

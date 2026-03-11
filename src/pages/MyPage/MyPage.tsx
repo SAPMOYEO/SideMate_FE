@@ -30,9 +30,14 @@ const MyPage: React.FC = () => {
               <Rocket className="text-primary" size={28} strokeWidth={2.5} />
               지원한 프로젝트
             </h2>
-            <span className="cursor-pointer rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500 dark:bg-slate-800">
-              총 3건
-            </span>
+            <div className="flex items-center gap-2">
+              <Link to="/my/project" className="text-sm text-slate-400">
+                상세보기
+              </Link>
+              <span className="cursor-pointer rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500 dark:bg-slate-800">
+                총 3건
+              </span>
+            </div>
           </div>
 
           <div className="space-y-4">

@@ -20,6 +20,7 @@ import ProjectDetailPage from '@/pages/ProjectDetailPage/ProjectDetailPage'
 import ProjectCreatePage from '@/pages/ProjectCreatePage/ProjectCreatePage'
 import PaymentSuccessPage from '@/pages/PaymentSuccessPage/PaymentSuccessPage'
 import HomePage from '@/pages/Home/HomePage'
+import MyProjectPage from '@/pages/MyPage/MyProjectPage'
 
 export default function AppRouter() {
   return (
@@ -47,6 +48,7 @@ export default function AppRouter() {
           <Route path="/projects/create" element={<ProjectCreatePage />} />
           <Route path="/projects/:id/edit" element={<ProjectCreatePage />} />
           <Route path="/my" element={<MyPage />} />
+          <Route path="/my/project" element={<MyProjectPage />} />
         </Route>
       </Route>
 
