@@ -47,7 +47,7 @@ export const PasswordField: React.FC = () => {
     <div className="grid grid-cols-1 gap-4">
       <div className="grid gap-1.5 text-left">
         <label className="ml-1 text-sm font-bold text-slate-700 dark:text-slate-200">
-          비밀번호
+          비밀번호<span className="ml-0.5 text-red-500">*</span>
         </label>
         <div className="relative">
           <Input
@@ -98,7 +98,7 @@ export const PasswordField: React.FC = () => {
 
       <div className="grid gap-1.5 text-left">
         <label className="ml-1 text-sm font-bold text-slate-700 dark:text-slate-200">
-          비밀번호 확인
+          비밀번호 확인<span className="ml-0.5 text-red-500">*</span>
         </label>
         <div className="relative">
           <Controller
