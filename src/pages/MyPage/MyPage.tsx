@@ -8,7 +8,7 @@ const MyPage: React.FC = () => {
   const sectionTitleClasses =
     'text-2xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2'
   const sectionWrapperClasses =
-    'flex items-center justify-between border-b-2 border-slate-900 dark:border-slate-100 pb-4 mb-8'
+    'flex items-center justify-between border-b-2 border-slate-900 dark:border-slate-100 pb-4 mb-6'
 
   return (
     <div className="min-h-full bg-white dark:bg-slate-950">

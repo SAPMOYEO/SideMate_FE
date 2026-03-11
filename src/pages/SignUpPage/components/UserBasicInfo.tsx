@@ -2,9 +2,15 @@ import React from 'react'
 import { useFormContext } from 'react-hook-form'
 import { Input } from '@/components/ui/input'
 import { type SignUpFormValues } from './signUp.schema'
-import api from '@/utils/api/api.instance'
+import { formatPhoneNumber } from '@/utils/formatPhoneNumber'
+import { validateDuplicate } from '@/utils/userValidation'
 
-export const UserBasicInfo: React.FC = () => {
+interface UserBasicInfoProps {
+  isReadOnly?: boolean
+}
+export const UserBasicInfo: React.FC<UserBasicInfoProps> = ({
+  isReadOnly = false,
+}) => {
   const {
     register,
     formState: { errors },
@@ -14,53 +20,37 @@ export const UserBasicInfo: React.FC = () => {
     clearErrors,
   } = useFormContext<SignUpFormValues>()
 
-  const formatPhoneNumber = (value: string) => {
-    const nums = value.replace(/[^\d]/g, '').slice(0, 11)
-    if (nums.length <= 3) return nums
-    if (nums.length <= 6) return `${nums.slice(0, 3)}-${nums.slice(3)}`
-    if (nums.length <= 10) {
-      return `${nums.slice(0, 3)}-${nums.slice(3, 6)}-${nums.slice(6)}`
-    }
-    return `${nums.slice(0, 3)}-${nums.slice(3, 7)}-${nums.slice(7)}`
-  }
-
-  const { onBlur } = register('phone')
-
   return (
     <div className="space-y-4">
       <div className="grid gap-1.5">
         <label className="ml-1 text-sm font-bold text-slate-700 dark:text-slate-200">
-          이메일 주소
+          이메일 주소<span className="ml-0.5 text-red-500">*</span>
         </label>
         <Input
           {...register('email', {
             onBlur: async (e) => {
+              if (isReadOnly) return
               const email = e.target.value.trim()
-
               const isValid = await trigger('email')
               if (!isValid || !email) return
 
-              try {
-                const response = await api.get(
-                  `/user/check-email?email=${email}`
-                )
-
-                if (response.data.isDuplicate) {
-                  setError('email', {
-                    type: 'manual',
-                    message: '이미 사용 중인 이메일입니다.',
-                  })
-                } else {
-                  clearErrors('email')
-                }
-              } catch (err) {
-                console.error('중복 체크 에러:', err)
+              const { isDuplicate } = await validateDuplicate('email', email)
+              if (isDuplicate) {
+                setError('email', {
+                  type: 'manual',
+                  message: '이미 사용 중인 이메일입니다.',
+                })
+              } else {
+                clearErrors('email')
               }
             },
           })}
           type="email"
+          readOnly={isReadOnly}
           placeholder="example@email.com"
-          className={`h-12 ${errors.email ? 'border-red-500 focus-visible:ring-red-500/20' : ''}`}
+          className={`h-12 ${isReadOnly ? 'cursor-not-allowed bg-slate-50 text-slate-500 opacity-80' : ''} ${
+            errors.email ? 'border-red-500 focus-visible:ring-red-500/20' : ''
+          }`}
         />
         {errors.email && (
           <p className="ml-1 text-xs text-red-500">{errors.email.message}</p>
@@ -68,7 +58,7 @@ export const UserBasicInfo: React.FC = () => {
       </div>
       <div className="grid gap-1.5">
         <label className="ml-1 text-sm font-bold text-slate-700 dark:text-slate-200">
-          이름
+          이름<span className="ml-0.5 text-red-500">*</span>
         </label>
         <Input
           {...register('name', {
@@ -83,20 +73,31 @@ export const UserBasicInfo: React.FC = () => {
           <p className="ml-1 text-xs text-red-500">{errors.name.message}</p>
         )}
       </div>
-
       <div className="grid gap-1.5">
         <label className="ml-1 text-sm font-bold text-slate-700 dark:text-slate-200">
-          휴대폰 번호
+          휴대폰 번호<span className="ml-0.5 text-red-500">*</span>
         </label>
         <Input
-          {...register('phone')}
+          {...register('phone', {
+            onBlur: async (e) => {
+              const phone = e.target.value.trim()
+              const isValid = await trigger('phone')
+              if (!isValid || !phone) return
+
+              const { isDuplicate } = await validateDuplicate('phone', phone)
+              if (isDuplicate) {
+                setError('phone', {
+                  type: 'manual',
+                  message: '이미 사용 중인 휴대폰 번호입니다.',
+                })
+              } else {
+                clearErrors('phone')
+              }
+            },
+          })}
           onChange={(e) => {
             const formatted = formatPhoneNumber(e.target.value)
             setValue('phone', formatted)
-          }}
-          onBlur={(e) => {
-            onBlur(e)
-            trigger('phone')
           }}
           maxLength={13}
           placeholder="010-0000-0000"
