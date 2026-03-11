@@ -13,6 +13,7 @@ import AdminLayout from '@/layout/AdminLayout'
 import AdminProjectPage from '@/pages/admin/AdminProjectPage'
 import AdminBanner from '@/pages/admin/AdminBanner'
 import AdminUserPage from '@/pages/admin/AdminUser'
+import AdminLoginPage from '@/pages/admin/AdminLoginPage'
 import PaymentPage from '@/pages/PaymentPage/PaymentPage'
 import ProjectPage from '@/pages/ProjectPage/ProjectPage'
 import ProjectDetailPage from '@/pages/ProjectDetailPage/ProjectDetailPage'
@@ -22,13 +23,14 @@ import FindEmailPage from '@/pages/LoginPage/FindAccount/FindEmailPage'
 import FindPasswordPage from '@/pages/LoginPage/FindAccount/FindPasswordPage'
 import ResetPasswordPage from '@/pages/LoginPage/FindAccount/ResetPasswordPage'
 import OnboardingPage from '@/pages/SignUpPage/components/OnboardingPage'
+import HomePage from '@/pages/Home/HomePage'
 
 export default function AppRouter() {
   return (
     <Routes>
       {/* Public - 누구나 접근 가능 */}
       <Route element={<AppLayout />}>
-        <Route path="/" element={<div>Home</div>} />
+        <Route path="/" element={<HomePage />} />
         <Route path="/projects" element={<ProjectPage />} />
         <Route path="/projects/:id" element={<ProjectDetailPage />} />
         <Route path="/payment" element={<PaymentPage />} />
@@ -62,6 +64,9 @@ export default function AppRouter() {
           <Route path="/my" element={<MyPage />} />
         </Route>
       </Route>
+
+      {/* Admin Login - 인증 없이 접근 가능 */}
+      <Route path="/admin/login" element={<AdminLoginPage />} />
 
       {/* Admin - 관리자만 접근 (아니면 / 로 리다이렉트) */}
       <Route element={<AdminRoute />}>

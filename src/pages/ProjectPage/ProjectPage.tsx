@@ -8,6 +8,9 @@ import {
 import { AdminTablePagination } from '@/components/shared/AdminTablePagination'
 import FilterSidebar from './components/FilterSidebar'
 import ProjectCard from './components/ProjectCard'
+import { Link } from 'react-router-dom'
+import { Plus } from 'lucide-react'
+import { useSearchParams } from 'react-router-dom'
 
 const LIMIT = Number(import.meta.env.VITE_PROJECT_LIMIT) || 10
 
@@ -15,8 +18,12 @@ const ProjectPage = () => {
   const [sort, setSort] = useState<'latest' | 'oldest'>('latest')
   const [open, setOpen] = useState(false)
   const [page, setPage] = useState(1)
-  const [filter, setFilter] = useState<ProjectFilterState>(initialProjectFilter)
-
+  const [urlParams, setUrlParams] = useSearchParams()
+  const q = urlParams.get('q') ?? ''
+  const [filter, setFilter] = useState<ProjectFilterState>({
+    ...initialProjectFilter,
+    title: q,
+  })
   const searchParams = useMemo<ProjectSearchParams>(
     () => ({
       page,
@@ -93,9 +100,15 @@ const ProjectPage = () => {
     setFilter((prev) => ({ ...prev, [field]: value }))
   }
 
+  const handleTitleChange = (value: string) => {
+    setPage(1)
+    setFilter((prev) => ({ ...prev, title: value }))
+  }
+
   const resetFilter = () => {
     setPage(1)
     setFilter(initialProjectFilter)
+    setUrlParams({}, { replace: true })
   }
 
   return (
@@ -104,10 +117,7 @@ const ProjectPage = () => {
         <FilterSidebar
           filter={filter}
           onReset={resetFilter}
-          onTitleChange={(value) => {
-            setPage(1)
-            setFilter((prev) => ({ ...prev, title: value }))
-          }}
+          onTitleChange={handleTitleChange}
           onToggleCategory={(value) => toggleInArray('category', value)}
           onToggleTechStack={(value) =>
             toggleInArray('requiredTechStack', value)
@@ -142,10 +152,7 @@ const ProjectPage = () => {
         <FilterSidebar
           filter={filter}
           onReset={resetFilter}
-          onTitleChange={(value) => {
-            setPage(1)
-            setFilter((prev) => ({ ...prev, title: value }))
-          }}
+          onTitleChange={handleTitleChange}
           onToggleCategory={(value) => toggleInArray('category', value)}
           onToggleTechStack={(value) =>
             toggleInArray('requiredTechStack', value)
@@ -161,7 +168,15 @@ const ProjectPage = () => {
       <main className="min-w-0 flex-1 p-6 lg:p-10">
         <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">프로젝트 탐색</h1>
+            <Link
+              to="/projects/create"
+              className="bg-primary flex w-[120px] cursor-pointer items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-bold text-white shadow-md shadow-indigo-100 transition-all hover:bg-indigo-600"
+            >
+              <Plus size={16} strokeWidth={3} />새 프로젝트
+            </Link>
+            <h1 className="mt-2 text-2xl font-bold text-gray-900">
+              프로젝트 탐색
+            </h1>
             <p className="mt-1 text-sm text-gray-500">
               {data?.totalCount ?? 0}개의 프로젝트가 조회되었습니다
             </p>

@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import {
   CalendarDays,
   CheckCircle2,
@@ -8,8 +8,14 @@ import {
 import { useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
 import { useAppSelector } from '@/hooks'
+import {
+  useApplications,
+  useDeleteApplication,
+} from '@/hooks/application/useApplication'
 import { useDeleteProject, useProjectById } from '@/hooks/project/useProject'
+import type { Application } from '@/types/application'
 import { formatDate } from '@/utils/formatter'
+import ApplicationModal from './components/ApplicationModal'
 
 const STATUS_LABEL: Record<string, string> = {
   RECRUITING: '모집 중',
@@ -57,14 +63,68 @@ const ProjectDetailPage = () => {
   const navigate = useNavigate()
   const { user } = useAppSelector((state) => state.user)
   const { data: project, isLoading, isError } = useProjectById(id)
+  const { data: applicationData } = useApplications(
+    id,
+    { limit: 500, sort: 'latest' },
+    Boolean(id)
+  )
   const { mutateAsync: deleteProject, isPending: isDeleting } =
     useDeleteProject()
+  const { mutateAsync: deleteApplication, isPending: isCancellingApplication } =
+    useDeleteApplication()
+  const [isApplicationModalOpen, setIsApplicationModalOpen] = useState(false)
+  const [appliedSessionMap, setAppliedSessionMap] = useState<
+    Record<string, string>
+  >({})
 
   const totalCnt = useMemo(() => {
     if (!project) return 0
     if (project.totalCnt > 0) return project.totalCnt
     return project.recruitRoles.reduce((sum, role) => sum + role.cnt, 0)
   }, [project])
+
+  const applications = useMemo(
+    () => applicationData?.data ?? [],
+    [applicationData?.data]
+  )
+  const appliedTotalCnt = applications.length
+
+  const appliedCntByRole = useMemo(() => {
+    const map: Record<string, number> = {}
+    applications.forEach((application) => {
+      const roleName = application.role?.trim()
+      if (!roleName) return
+      map[roleName] = (map[roleName] ?? 0) + 1
+    })
+    return map
+  }, [applications])
+
+  const userId = user?._id ?? ''
+  const projectId = project?._id ?? ''
+
+  const myApplicationFromServer = useMemo(() => {
+    if (!userId) return undefined
+
+    return applications.find((application) => {
+      const applicantId =
+        typeof application.applicant === 'string'
+          ? application.applicant
+          : application.applicant?._id
+      return applicantId === userId
+    })
+  }, [applications, userId])
+
+  const hasAppliedFromServer = Boolean(userId && myApplicationFromServer)
+
+  const currentAppliedKey = userId && projectId ? `${userId}:${projectId}` : ''
+  const hasAppliedInSession = currentAppliedKey
+    ? Boolean(appliedSessionMap[currentAppliedKey])
+    : false
+  const currentApplicationId =
+    myApplicationFromServer?._id ||
+    (currentAppliedKey ? appliedSessionMap[currentAppliedKey] : '') ||
+    ''
+  const hasApplied = hasAppliedInSession || hasAppliedFromServer
 
   if (isLoading) {
     return (
@@ -115,9 +175,68 @@ const ProjectDetailPage = () => {
     }
   }
 
+  const handleApplyClick = () => {
+    if (!user) {
+      toast.error('로그인 후 지원할 수 있습니다.')
+      navigate('/login')
+      return
+    }
+
+    if (isOwner) {
+      toast.info('본인이 등록한 프로젝트에는 지원할 수 없습니다.')
+      return
+    }
+
+    if (hasApplied) {
+      toast.info('이미 지원한 프로젝트입니다.')
+      return
+    }
+
+    setIsApplicationModalOpen(true)
+  }
+
+  const handleAppliedSuccess = (application?: Application) => {
+    if (!currentAppliedKey) return
+
+    setAppliedSessionMap((prev) => ({
+      ...prev,
+      [currentAppliedKey]: application?._id ?? prev[currentAppliedKey] ?? '',
+    }))
+  }
+
+  const handleCancelApplication = async () => {
+    if (!user) {
+      toast.error('로그인 후 지원 취소가 가능합니다.')
+      navigate('/login')
+      return
+    }
+
+    if (!currentApplicationId) {
+      toast.error('지원 정보를 다시 불러온 뒤 시도해주세요.')
+      return
+    }
+
+    if (!window.confirm('지원을 취소하시겠습니까?')) return
+
+    try {
+      await deleteApplication(currentApplicationId)
+
+      toast.success('지원이 취소되었습니다.')
+      setAppliedSessionMap((prev) => {
+        if (!currentAppliedKey) return prev
+        const next = { ...prev }
+        delete next[currentAppliedKey]
+        return next
+      })
+    } catch (error) {
+      console.error(error)
+      toast.error('지원 취소 중 오류가 발생했습니다.')
+    }
+  }
+
   return (
     <div>
-      <div className="mx-auto grid max-w-6xl gap-8 px-4 py-8 md:px-8 lg:grid-cols-[minmax(0,1fr)_320px]">
+      <div className="mx-auto grid max-w-7xl gap-8 px-4 py-8 md:px-8 lg:grid-cols-[minmax(0,1fr)_320px]">
         <section className="space-y-8">
           <div className="space-y-4">
             <div className="flex items-center gap-3 text-sm">
@@ -238,7 +357,7 @@ const ProjectDetailPage = () => {
               <div className="flex items-center justify-between text-sm">
                 <span className="text-gray-500">모집 인원</span>
                 <span className="font-semibold text-gray-900">
-                  {totalCnt}명
+                  {appliedTotalCnt} / {totalCnt}명
                 </span>
               </div>
               <div className="flex items-center justify-between text-sm">
@@ -249,14 +368,25 @@ const ProjectDetailPage = () => {
               </div>
             </div>
 
-            {new Date(project.deadline) > new Date() && (
-              <button
-                type="button"
-                className="mt-6 w-full rounded-xl bg-indigo-500 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-200 transition hover:bg-indigo-600"
-              >
-                지원하기
-              </button>
-            )}
+            {new Date(project.deadline) > new Date() &&
+              (hasApplied ? (
+                <button
+                  type="button"
+                  onClick={handleCancelApplication}
+                  disabled={isCancellingApplication}
+                  className="mt-6 w-full rounded-xl bg-rose-50 py-3 text-sm font-semibold text-rose-600 transition hover:bg-rose-100 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {isCancellingApplication ? '취소 중...' : '지원 취소'}
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleApplyClick}
+                  className="mt-6 w-full rounded-xl bg-indigo-500 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-200 transition hover:bg-indigo-600"
+                >
+                  지원하기
+                </button>
+              ))}
 
             <p className="mt-3 text-center text-xs text-gray-400">
               {deadlineText}
@@ -264,7 +394,9 @@ const ProjectDetailPage = () => {
           </div>
 
           <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
-            <h3 className="mb-4 text-sm font-semibold text-gray-700">모집</h3>
+            <h3 className="mb-4 text-sm font-semibold text-gray-700">
+              모집 포지션
+            </h3>
             <div className="space-y-2">
               {project.recruitRoles.map((role) => (
                 <div
@@ -273,7 +405,7 @@ const ProjectDetailPage = () => {
                 >
                   <span className="font-medium text-gray-700">{role.role}</span>
                   <span className="rounded-md bg-indigo-100 px-2 py-0.5 text-xs font-semibold text-indigo-700">
-                    {role.cnt}
+                    {appliedCntByRole[role.role] ?? 0} / {role.cnt}
                   </span>
                 </div>
               ))}
@@ -295,6 +427,16 @@ const ProjectDetailPage = () => {
           </div>
         </aside>
       </div>
+
+      <ApplicationModal
+        open={isApplicationModalOpen}
+        onOpenChange={setIsApplicationModalOpen}
+        projectId={project._id}
+        projectTitle={project.title}
+        roles={project.recruitRoles.map((role) => role.role)}
+        alreadyApplied={hasApplied}
+        onApplied={handleAppliedSuccess}
+      />
     </div>
   )
 }

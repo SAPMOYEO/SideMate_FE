@@ -15,6 +15,8 @@ import type {
   CheckoutDraft,
   PaymentState,
   PaymentSuccessData,
+  PaymentResponse,
+  CancelSubscriptionResponse,
 } from '@/types/payment.type'
 
 const initialState: PaymentState = {
@@ -52,81 +54,81 @@ export const fetchPayments = createAsyncThunk(
 )
 
 // 결제 생성하기
-export const createPayment = createAsyncThunk(
-  'payment/createPayment',
-  async (payload: CreatePaymentPayload, { rejectWithValue }) => {
-    try {
-      return await postPayment(payload)
-    } catch (error) {
-      console.error(error)
-      return rejectWithValue('결제 생성에 실패했습니다.')
-    }
+export const createPayment = createAsyncThunk<
+  PaymentResponse,
+  CreatePaymentPayload,
+  { rejectValue: string }
+>('payment/createPayment', async (payload, { rejectWithValue }) => {
+  try {
+    return await postPayment(payload)
+  } catch (error) {
+    console.error(error)
+    return rejectWithValue('결제 생성에 실패했습니다.')
   }
-)
+})
 
 // 구독 플랜 변경하기
-export const changeSubscriptionPlan = createAsyncThunk(
-  'payment/changeSubscriptionPlan',
-  async (payload: ChangeSubscriptionPlanPayload, { rejectWithValue }) => {
-    try {
-      return await patchSubscriptionPlan(payload)
-    } catch (error) {
-      console.error(error)
-      return rejectWithValue('구독 플랜 변경에 실패했습니다.')
-    }
+export const changeSubscriptionPlan = createAsyncThunk<
+  PaymentResponse,
+  ChangeSubscriptionPlanPayload,
+  { rejectValue: string }
+>('payment/changeSubscriptionPlan', async (payload, { rejectWithValue }) => {
+  try {
+    return await patchSubscriptionPlan(payload)
+  } catch (error) {
+    console.error(error)
+    return rejectWithValue('구독 플랜 변경에 실패했습니다.')
   }
-)
+})
 
 // 구독 해지하기
-export const cancelSubscription = createAsyncThunk(
-  'payment/cancelSubscription',
-  async (_, { rejectWithValue }) => {
-    try {
-      const data = await deleteSubscription()
+export const cancelSubscription = createAsyncThunk<
+  CancelSubscriptionResponse,
+  void,
+  { rejectValue: string }
+>('payment/cancelSubscription', async (_, { rejectWithValue }) => {
+  try {
+    const data = await deleteSubscription()
 
-      return {
-        subscription: data.subscription ?? null,
-        quota: data.quota ?? null,
-      }
-    } catch (error) {
-      console.error(error)
-      return rejectWithValue('구독 해지에 실패했습니다.')
+    return {
+      status: data.status,
+      subscription: data.subscription ?? null,
+      quota: data.quota ?? null,
+      user: data.user,
+      message: data.message,
     }
+  } catch (error) {
+    console.error(error)
+    return rejectWithValue('구독 해지에 실패했습니다.')
   }
-)
+})
 
 const paymentSlice = createSlice({
   name: 'payment',
   initialState,
   reducers: {
-    // 결제 임시 정보 저장하기
     setCheckoutDraft(state, action: PayloadAction<CheckoutDraft>) {
       state.checkoutDraft = action.payload
     },
 
-    // 결제 임시 정보 초기화하기
     clearCheckoutDraft(state) {
       state.checkoutDraft = null
     },
 
-    // 결제 완료 정보 저장하기
     setPaymentSuccess(state, action: PayloadAction<PaymentSuccessData>) {
       state.paymentSuccess = action.payload
     },
 
-    // 결제 완료 정보 초기화하기
     clearPaymentSuccess(state) {
       state.paymentSuccess = null
     },
 
-    // 결제 관련 에러 초기화하기
     resetPaymentError(state) {
       state.paymentsError = null
       state.cancelError = null
       state.submitError = null
     },
 
-    // 결제 상태 전체 초기화하기
     clearPaymentState(state) {
       state.payments = []
       state.subscription = null
