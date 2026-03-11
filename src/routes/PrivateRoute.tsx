@@ -1,8 +1,10 @@
-import { Navigate, Outlet } from 'react-router-dom'
+import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import { useAppSelector } from '@/hooks'
 
 const PrivateRoute = () => {
   const { user, loginLoading } = useAppSelector((state) => state.user)
+  const location = useLocation()
+
   if (loginLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
@@ -10,7 +12,16 @@ const PrivateRoute = () => {
       </div>
     )
   }
-  return user ? <Outlet /> : <Navigate to="/login" replace />
+  if (!user) return <Navigate to="/login" replace />
+
+  if (!user.phone && location.pathname !== '/onboarding') {
+    return <Navigate to="/onboarding" replace />
+  }
+  if (user.phone && location.pathname === '/onboarding') {
+    return <Navigate to="/" replace />
+  }
+
+  return <Outlet />
 }
 
 export default PrivateRoute

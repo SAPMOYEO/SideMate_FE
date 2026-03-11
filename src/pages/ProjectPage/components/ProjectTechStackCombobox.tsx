@@ -27,7 +27,7 @@ const ProjectTechStackCombobox = ({
   selectedStacks,
   onAdd,
   onRemove,
-  maxCount = 10,
+  maxCount = 8,
 }: Props) => {
   const [open, setOpen] = useState(false)
 
@@ -40,7 +40,7 @@ const ProjectTechStackCombobox = ({
             variant="outline"
             className="w-full justify-between text-sm font-normal"
           >
-            기술스택 선택(10개 이하)
+            기술스택 선택(8개 이하)
             <ChevronsUpDown className="h-4 w-4 opacity-60" />
           </Button>
         </PopoverTrigger>

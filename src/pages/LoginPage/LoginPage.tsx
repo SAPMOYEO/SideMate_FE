@@ -5,12 +5,13 @@ import { loginUser, loginWithGoogle } from '@/features/slices/userSlice'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
-import { Eye, EyeOff, Loader2, TriangleAlert } from 'lucide-react'
+import { Eye, EyeOff, TriangleAlert } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { toast } from 'sonner'
 import { GoogleLogin } from '@react-oauth/google'
 import type { CredentialResponse } from '@react-oauth/google'
+import { Spinner } from '@/components/ui/spinner'
 
 const loginSchema = z.object({
   email: z
@@ -41,7 +42,20 @@ const LoginPage: React.FC = () => {
 
   const handleGoogleLogin = async (googleData: CredentialResponse) => {
     if (googleData.credential) {
-      dispatch(loginWithGoogle(googleData.credential))
+      try {
+        const user = await dispatch(
+          loginWithGoogle(googleData.credential)
+        ).unwrap()
+
+        if (!user.phone || user.phone.trim() === '') {
+          navigate('/onboarding')
+        } else {
+          navigate('/')
+        }
+      } catch (err) {
+        console.error('구글 로그인 에러:', err)
+        toast.error('구글 로그인에 실패했습니다. 다시 시도해 주세요.')
+      }
     } else {
       console.error('구글 토큰이 없습니다.')
     }
@@ -188,14 +202,16 @@ const LoginPage: React.FC = () => {
             </p>
           )}
         </div>
-
         <Button
           type="submit"
           className="shadow-primary/20 mt-2 h-12 w-full bg-zinc-900 font-bold shadow-lg"
           disabled={isSubmitting}
         >
           {isSubmitting ? (
-            <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+            <div className="flex items-center justify-center gap-2">
+              <Spinner className="size-5" />
+              <span>로그인 중...</span>
+            </div>
           ) : (
             '로그인'
           )}
