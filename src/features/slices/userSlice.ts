@@ -10,6 +10,14 @@ export interface User {
   _id?: string
   name: string
   email?: string
+  phone?: string
+  marketingAgree?: boolean
+  privacySettings?: {
+    isImagePublic: boolean
+    isEmailPublic: boolean
+    isGithubPublic: boolean
+    isBioPublic: boolean
+  }
   role?: 'user' | 'admin'
   tier?: 'FREE' | 'BASIC' | 'PREMIUM'
   profile?: {
@@ -18,10 +26,12 @@ export interface User {
     bio?: string
     profileImage?: string
   }
+  provider?: 'local' | 'google'
 }
 
 interface UserState {
   user: User | null
+  token: string | null
   loginLoading: boolean
   loginError: string | null
   registerLoading: boolean
@@ -31,6 +41,7 @@ interface UserState {
 
 const initialState: UserState = {
   user: null,
+  token: localStorage.getItem('token') || null,
   loginLoading: true,
   loginError: null,
   registerLoading: false,
@@ -56,6 +67,40 @@ export const registerUser = createAsyncThunk(
     }
   }
 )
+
+interface SocialRegisterReq {
+  name: string
+  email?: string
+  googleId?: string
+  phone: string
+  techStacks: string[]
+  profileImage?: string
+  marketingAgree: boolean
+}
+
+export const registerSocialUser = createAsyncThunk<
+  { user: User; token: string },
+  SocialRegisterReq,
+  { rejectValue: string }
+>('user/registerSocialUser', async (formData, { rejectWithValue }) => {
+  try {
+    const response = await api.post('/user/register-social', formData)
+
+    if (response.data.token) {
+      localStorage.setItem('token', response.data.token)
+    }
+
+    return response.data
+  } catch (error: unknown) {
+    const axiosError = error as {
+      response?: { data?: { message?: string } }
+      message: string
+    }
+    return rejectWithValue(
+      axiosError.response?.data?.message || axiosError.message
+    )
+  }
+})
 
 export const loginUser = createAsyncThunk(
   'user/loginUser',
@@ -123,6 +168,26 @@ export const updateMyProfile = createAsyncThunk(
   }
 )
 
+export const findUserEmail = createAsyncThunk(
+  'user/findUserEmail',
+  async (data: { name: string; phone: string }, { rejectWithValue }) => {
+    try {
+      const response = await api.post('/user/find-email', data)
+      return response.data
+    } catch (error: unknown) {
+      const axiosError = error as {
+        response?: { data?: { message?: string } }
+        message: string
+      }
+      return rejectWithValue(
+        axiosError.response?.data?.message ||
+          axiosError.message ||
+          '사용자를 찾을 수 없습니다.'
+      )
+    }
+  }
+)
+
 const userSlice = createSlice({
   name: 'user',
   initialState,
@@ -154,11 +219,13 @@ const userSlice = createSlice({
       }
     },
     updateUserProfile: (state, action: PayloadAction<Partial<User>>) => {
-      if (state.user && action.payload.profile) {
-        state.user.name = action.payload.name || state.user.name
-        state.user.profile = {
-          ...state.user.profile,
-          ...action.payload.profile,
+      if (state.user) {
+        state.user = {
+          ...state.user,
+          ...action.payload,
+          profile: action.payload.profile
+            ? { ...state.user.profile, ...action.payload.profile }
+            : state.user.profile,
         }
       }
     },
@@ -222,6 +289,19 @@ const userSlice = createSlice({
         state.loginError = null
       })
       .addCase(updateMyProfile.rejected, (state, action) => {
+        state.loginError = action.payload as string
+      })
+      .addCase(registerSocialUser.pending, (state) => {
+        state.loginLoading = true
+      })
+      .addCase(registerSocialUser.fulfilled, (state, action) => {
+        state.loginLoading = false
+        state.user = action.payload.user
+        state.token = action.payload.token
+        localStorage.setItem('token', action.payload.token)
+      })
+      .addCase(registerSocialUser.rejected, (state, action) => {
+        state.loginLoading = false
         state.loginError = action.payload as string
       })
   },
