@@ -7,6 +7,7 @@ import {
   createApplication,
   deleteApplication,
   fetchApplicationsByProjectId,
+  fetchMyApplication,
 } from '@/utils/api/application'
 
 /** 프로젝트 지원 생성 */
@@ -45,5 +46,14 @@ export const useApplications = (
     queryKey: ['applications', projectId, query] as const,
     queryFn: () => fetchApplicationsByProjectId(projectId, query),
     enabled: enabled && Boolean(projectId),
+  })
+}
+
+/** 지원한 프로젝트 조회 */
+
+export const useMyApplication = () => {
+  return useQuery({
+    queryKey: ['applications'] as const,
+    queryFn: () => fetchMyApplication(),
   })
 }

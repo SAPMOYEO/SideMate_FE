@@ -10,161 +10,212 @@ import {
 import { BarChart2, ChevronDown, ChevronUp, Users } from 'lucide-react'
 import ApplicantItem from '../ApplicantItem'
 import ApplicantDetailModal from '../ApplicantDetailModal'
+import { useGetMyProject } from '@/hooks/project/useProject'
+import { useApplications } from '@/hooks/application/useApplication'
+import { formatDate } from '@/utils/formatter'
+import type { Project } from '@/types/project'
 
-const MOCK_APPLICANTS = [
-  {
-    name: '김철수',
-    time: '2시간 전',
-    role: 'Back-end Developer',
-    stack: 'Spring Boot, Node.js',
-    motivation: 'Spring Boot와 Node.js 경험을 바탕으로 기여하고 싶습니다.',
-  },
-  {
-    name: '이영희',
-    time: '어제',
-    role: 'UI/UX Designer',
-    stack: 'Figma, Prototyping',
-    motivation: 'Figma로 다양한 프로젝트를 진행한 경험이 있습니다.',
-  },
-  {
-    name: '박지민',
-    time: '3일 전',
-    role: 'Front-end Developer',
-    stack: 'React, TailwindCSS',
-    motivation: 'React와 TailwindCSS를 활용해 사용자 경험을 개선하고 싶습니다.',
-  },
-]
+interface MappedApplicant {
+  _id: string
+  name: string
+  time: string
+  role: string
+  stack: string
+  motivation: string
+}
 
-type Applicant = (typeof MOCK_APPLICANTS)[number]
-
-const CreatedView = () => {
-  const [selectedApplicant, setSelectedApplicant] = useState<Applicant | null>(
-    null
+const getDaysLeft = (deadline: string) => {
+  const days = Math.ceil(
+    (new Date(deadline).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
   )
+  if (days < 0) return '마감'
+  if (days === 0) return 'D-Day'
+  return `D-${days}`
+}
+
+// ── 프로젝트 카드 (토글·모달 state를 카드별로 독립 관리) ─────────────────
+const ProjectCard = ({ project }: { project: Project }) => {
   const [showApplicants, setShowApplicants] = useState(false)
   const [showAIFeedback, setShowAIFeedback] = useState(false)
   const [detailOpen, setDetailOpen] = useState(false)
+  const [selectedApplicant, setSelectedApplicant] =
+    useState<MappedApplicant | null>(null)
+
+  // 토글이 열릴 때만 fetch
+  const { data: applicantsData } = useApplications(
+    project._id,
+    {},
+    showApplicants
+  )
+
+  const applicants: MappedApplicant[] = (applicantsData?.data ?? []).map(
+    (app) => ({
+      _id: app._id,
+      name:
+        app.applicant && typeof app.applicant === 'object'
+          ? ((app.applicant as { name?: string }).name ?? '알 수 없음')
+          : '알 수 없음',
+      time: formatDate(new Date(app.createdAt)),
+      role: app.role,
+      stack: '',
+      motivation: app.motivation,
+    })
+  )
 
   return (
-    <>
-      <ul className="w-full space-y-4">
-        <li className="rounded-2xl bg-white p-6">
-          {/* 프로젝트 헤더 */}
-          <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <Badge variant="default" className="rounded-md">
-                  모집중
-                </Badge>
+    <li className="rounded-2xl bg-white p-6">
+      {/* 프로젝트 헤더 */}
+      <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <Badge variant="default" className="rounded-md">
+              {project.status}
+            </Badge>
+            {project.deadline && (
+              <>
                 <span className="text-xs font-medium text-slate-500">
-                  모집 마감 D-5
+                  모집 마감 {getDaysLeft(project.deadline)}
                 </span>
                 <span className="text-slate-300">•</span>
-                <span className="text-xs font-medium text-slate-500">
-                  웹 서비스
-                </span>
-              </div>
-              <h3 className="text-xl font-bold text-slate-900 dark:text-white">
-                AI 기반 사이드 프로젝트 매칭 서비스
-              </h3>
-              <p className="text-sm text-slate-600 dark:text-slate-400">
-                팀원들과 함께 성장하는 매칭 알고리즘을 개발하고 있습니다. 기획자
-                1명, 개발자 2명을 추가 모집합니다.
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => setDetailOpen(true)}
-              >
-                상세
-              </Button>
-              {/* AI 피드백 → 토글 */}
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => setShowAIFeedback((prev) => !prev)}
-              >
-                <BarChart2 className="mr-1 size-4" />
-                AI 피드백 보기
-                {showAIFeedback ? (
-                  <ChevronUp className="ml-1 size-3" />
-                ) : (
-                  <ChevronDown className="ml-1 size-3" />
-                )}
-              </Button>
-              {/* 지원자 보기 → 토글 */}
-              <Button
-                size="sm"
-                onClick={() => setShowApplicants((prev) => !prev)}
-              >
-                <Users className="mr-1 size-4" />
-                지원자 보기 ({MOCK_APPLICANTS.length})
-                {showApplicants ? (
-                  <ChevronUp className="ml-1 size-3" />
-                ) : (
-                  <ChevronDown className="ml-1 size-3" />
-                )}
-              </Button>
-            </div>
+              </>
+            )}
+            <span className="text-xs font-medium text-slate-500">
+              {project.category}
+            </span>
           </div>
+          <h3 className="text-xl font-bold text-slate-900 dark:text-white">
+            {project.title}
+          </h3>
+          <p className="line-clamp-2 text-sm text-slate-600 dark:text-slate-400">
+            {project.description}
+          </p>
+        </div>
 
-          {/* AI 피드백 토글 영역 */}
-          {showAIFeedback && (
-            <div className="mb-4 rounded-xl border border-slate-100 bg-slate-50/50 p-4 dark:border-slate-800 dark:bg-slate-800/30">
-              <p className="text-sm font-bold text-slate-700 dark:text-slate-300">
-                AI 피드백
-              </p>
-              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                AI 피드백 내용이 여기에 표시됩니다.
-              </p>
+        <div className="flex flex-wrap gap-2">
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => setDetailOpen(true)}
+          >
+            상세
+          </Button>
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => setShowAIFeedback((prev) => !prev)}
+          >
+            <BarChart2 className="mr-1 size-4" />
+            AI 피드백
+            {showAIFeedback ? (
+              <ChevronUp className="ml-1 size-3" />
+            ) : (
+              <ChevronDown className="ml-1 size-3" />
+            )}
+          </Button>
+          <Button size="sm" onClick={() => setShowApplicants((prev) => !prev)}>
+            <Users className="mr-1 size-4" />
+            지원자 ({applicantsData?.totalCount ?? 0})
+            {showApplicants ? (
+              <ChevronUp className="ml-1 size-3" />
+            ) : (
+              <ChevronDown className="ml-1 size-3" />
+            )}
+          </Button>
+        </div>
+      </div>
+
+      {/* AI 피드백 토글 */}
+      <div
+        className={`grid transition-all duration-300 ease-in-out ${
+          showAIFeedback ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
+        }`}
+      >
+        <div className="overflow-hidden">
+          <div className="mb-4 rounded-xl border border-slate-100 bg-slate-50/50 p-4 dark:border-slate-800 dark:bg-slate-800/30">
+            <p className="text-sm font-bold text-slate-700 dark:text-slate-300">
+              AI 피드백
+            </p>
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+              AI 피드백 내용이 여기에 표시됩니다.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* 지원자 현황 토글 */}
+      <div
+        className={`grid transition-all duration-300 ease-in-out ${
+          showApplicants ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
+        }`}
+      >
+        <div className="overflow-hidden">
+          <div className="border-t border-slate-100 dark:border-slate-800">
+            <div className="bg-slate-50/50 px-6 py-4 dark:bg-slate-800/30">
+              <h4 className="text-sm font-bold text-slate-900 dark:text-white">
+                지원 현황{' '}
+                <span className="text-primary ml-1">{applicants.length}명</span>
+              </h4>
             </div>
-          )}
-
-          {/* 지원자 현황 토글 영역 */}
-          {showApplicants && (
-            <div className="border-t border-slate-100 dark:border-slate-800">
-              <div className="bg-slate-50/50 px-6 py-4 dark:bg-slate-800/30">
-                <h4 className="text-sm font-bold text-slate-900 dark:text-white">
-                  지원 현황{' '}
-                  <span className="text-primary ml-1">
-                    {MOCK_APPLICANTS.length}명
-                  </span>
-                </h4>
-              </div>
+            {applicants.length === 0 ? (
+              <p className="px-6 py-8 text-center text-sm text-slate-400">
+                아직 지원자가 없습니다.
+              </p>
+            ) : (
               <ul className="divide-y divide-slate-100 dark:divide-slate-800">
-                {MOCK_APPLICANTS.map((applicant) => (
+                {applicants.map((applicant) => (
                   <ApplicantItem
-                    key={applicant.name}
+                    key={applicant._id}
                     applicant={applicant}
                     onDetail={() => setSelectedApplicant(applicant)}
                   />
                 ))}
               </ul>
-            </div>
-          )}
-        </li>
-      </ul>
+            )}
+          </div>
+        </div>
+      </div>
 
       {/* 프로젝트 상세 모달 */}
       <Dialog open={detailOpen} onOpenChange={setDetailOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>AI 기반 사이드 프로젝트 매칭 서비스</DialogTitle>
+            <DialogTitle>{project.title}</DialogTitle>
           </DialogHeader>
-          <p className="text-sm text-slate-500">
-            프로젝트 상세 내용이 여기에 표시됩니다.
+          <p className="text-sm leading-relaxed text-slate-500">
+            {project.description}
           </p>
         </DialogContent>
       </Dialog>
 
+      {/* 지원자 상세 모달 */}
       <ApplicantDetailModal
         open={!!selectedApplicant}
         onOpenChange={(open) => !open && setSelectedApplicant(null)}
         applicant={selectedApplicant}
       />
-    </>
+    </li>
+  )
+}
+
+// ── CreatedView ────────────────────────────────────────────────────────────
+const CreatedView = () => {
+  const { data } = useGetMyProject()
+  const projects = (data?.data ?? []) as Project[]
+
+  if (projects.length === 0) {
+    return (
+      <div className="flex flex-1 items-center justify-center">
+        <p className="text-sm text-slate-400">아직 만든 프로젝트가 없습니다.</p>
+      </div>
+    )
+  }
+
+  return (
+    <ul className="w-full space-y-4">
+      {projects.map((project) => (
+        <ProjectCard key={project._id} project={project} />
+      ))}
+    </ul>
   )
 }
 

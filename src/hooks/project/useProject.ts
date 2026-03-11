@@ -3,6 +3,7 @@ import type { CreateProjectPayload, ProjectSearchParams } from '@/types/project'
 import {
   createProject,
   deleteProject,
+  fetchMyProject,
   fetchProjectById,
   fetchProjects,
   updateProject,
@@ -63,5 +64,12 @@ export const useDeleteProject = () => {
       queryClient.invalidateQueries({ queryKey: ['projects'] })
       queryClient.removeQueries({ queryKey: ['project', id] })
     },
+  })
+}
+
+export const useGetMyProject = () => {
+  return useQuery({
+    queryKey: ['my-projects'],
+    queryFn: () => fetchMyProject(),
   })
 }

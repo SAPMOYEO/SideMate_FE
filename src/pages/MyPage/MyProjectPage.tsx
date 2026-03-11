@@ -3,7 +3,8 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 import { useSearchParams } from 'react-router-dom'
 import CreatedView from './components/view/CreatedView'
-import SuppliedView from './components/view/SuppliedView'
+import AppliedView from './components/view/AppliedView'
+
 type TabsType = 'supplied' | 'create'
 
 const MyProjectPage = () => {
@@ -42,7 +43,7 @@ const MyProjectPage = () => {
         </div>
         <div className="flex flex-1 rounded-3xl">
           <Activity mode={tabs === 'supplied' ? 'visible' : 'hidden'}>
-            <SuppliedView />
+            <AppliedView />
           </Activity>
           <Activity mode={tabs !== 'supplied' ? 'visible' : 'hidden'}>
             <CreatedView />
