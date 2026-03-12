@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+﻿import { useMemo, useState } from 'react'
 import {
   CalendarDays,
   CheckCircle2,
@@ -73,6 +73,8 @@ const ProjectDetailPage = () => {
   const { mutateAsync: deleteApplication, isPending: isCancellingApplication } =
     useDeleteApplication()
   const [isApplicationModalOpen, setIsApplicationModalOpen] = useState(false)
+  const [showAllRequiredTechStack, setShowAllRequiredTechStack] =
+    useState(false)
   const [appliedSessionMap, setAppliedSessionMap] = useState<
     Record<string, string>
   >({})
@@ -153,10 +155,15 @@ const ProjectDetailPage = () => {
   const statusStyle =
     STATUS_STYLE[project.status] ?? 'bg-gray-100 text-gray-700'
   const deadlineText = getDeadlineText(project.deadline)
-  const authorInitial = (project.author?.name ?? '?').slice(0, 1)
+  const authorName = project.author?.name ?? '작성자 정보 없음'
   const isOwner = Boolean(
     user?._id && project.author?._id && user._id === project.author._id
   )
+  const isRequiredTechStackExpandable = project.requiredTechStack.length > 8
+  const visibleRequiredTechStack =
+    isRequiredTechStackExpandable && !showAllRequiredTechStack
+      ? project.requiredTechStack.slice(0, 8)
+      : project.requiredTechStack
 
   const handleEdit = () => {
     navigate(`/projects/${project._id}/edit`)
@@ -212,7 +219,7 @@ const ProjectDetailPage = () => {
     }
 
     if (!currentApplicationId) {
-      toast.error('지원 정보를 다시 불러온 뒤 시도해주세요.')
+      toast.error('지원 정보를 다시 불러온 후 시도해주세요.')
       return
     }
 
@@ -253,6 +260,12 @@ const ProjectDetailPage = () => {
             </h1>
 
             <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
+              <span className="inline-flex items-center gap-2 rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700">
+                <span className="rounded-full bg-white px-2 py-0.5 text-[10px] font-semibold text-indigo-600">
+                  작성자
+                </span>
+                <span>{authorName}</span>
+              </span>
               <span className="inline-flex items-center gap-2">
                 <CalendarDays className="h-4 w-4" />
                 {toDateText(project.startDate)} - {toDateText(project.endDate)}
@@ -283,10 +296,10 @@ const ProjectDetailPage = () => {
 
           <div className="space-y-3">
             <h2 className="text-sm font-semibold text-gray-500">
-              필요 기술 스택
+              필수 기술 스택
             </h2>
-            <div className="flex flex-wrap gap-2">
-              {project.requiredTechStack.map((stack) => (
+            <div className="flex flex-wrap items-center gap-2">
+              {visibleRequiredTechStack.map((stack) => (
                 <span
                   key={stack}
                   className="rounded-md bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white"
@@ -294,6 +307,15 @@ const ProjectDetailPage = () => {
                   {stack}
                 </span>
               ))}
+              {isRequiredTechStackExpandable && (
+                <button
+                  type="button"
+                  onClick={() => setShowAllRequiredTechStack((prev) => !prev)}
+                  className="rounded-md border border-gray-200 bg-white px-2.5 py-1 text-xs font-semibold text-gray-600 transition hover:bg-gray-50"
+                >
+                  {showAllRequiredTechStack ? '접기' : '더 보기'}
+                </button>
+              )}
             </div>
           </div>
 
@@ -368,7 +390,8 @@ const ProjectDetailPage = () => {
               </div>
             </div>
 
-            {new Date(project.deadline) > new Date() &&
+            {!isOwner &&
+              new Date(project.deadline) > new Date() &&
               (hasApplied ? (
                 <button
                   type="button"
@@ -395,7 +418,7 @@ const ProjectDetailPage = () => {
 
           <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
             <h3 className="mb-4 text-sm font-semibold text-gray-700">
-              모집 포지션
+              모집 역할
             </h3>
             <div className="space-y-2">
               {project.recruitRoles.map((role) => (
@@ -409,20 +432,6 @@ const ProjectDetailPage = () => {
                   </span>
                 </div>
               ))}
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3 px-2">
-            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-indigo-100 font-bold text-indigo-600">
-              {authorInitial}
-            </div>
-            <div className="min-w-0">
-              <p className="truncate text-sm font-semibold text-gray-900">
-                {project.author?.name ?? '작성자 없음'}
-              </p>
-              <p className="truncate text-xs text-gray-500">
-                {project.author?.email ?? '이메일 정보 없음'}
-              </p>
             </div>
           </div>
         </aside>
