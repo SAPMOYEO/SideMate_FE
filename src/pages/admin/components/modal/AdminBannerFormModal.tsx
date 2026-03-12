@@ -13,7 +13,7 @@ import { Switch } from '@/components/ui/switch'
 import { Label, FieldError } from '@/components/shared/FormField'
 import BannerImageUploader from '@/pages/admin/components/BannerImageUploader'
 import useBannerForm from '@/hooks/admin/useBannerForm'
-import type { Banner } from '@/utils/api/banner'
+import type { Banner } from '@/utils/api/admin'
 
 interface Props {
   open: boolean

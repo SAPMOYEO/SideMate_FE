@@ -3,6 +3,7 @@ import { useFormContext, Controller } from 'react-hook-form'
 import { Eye, EyeOff, Check } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { type SignUpFormValues } from './signUp.schema'
+import { useFormHelper } from '@/hooks/useFormHelper'
 
 export const PasswordField: React.FC = () => {
   const {
@@ -13,18 +14,13 @@ export const PasswordField: React.FC = () => {
     formState: { errors },
   } = useFormContext<SignUpFormValues>()
 
+  const { handleInputChange } = useFormHelper<SignUpFormValues>()
+
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isPasswordFocused, setIsPasswordFocused] = useState(false)
 
   const passwordValue = watch('password', '')
-  const confirmPasswordValue = watch('confirmPassword', '')
-
-  React.useEffect(() => {
-    if (confirmPasswordValue) {
-      trigger('confirmPassword')
-    }
-  }, [passwordValue, confirmPasswordValue, trigger])
 
   const passwordRules = [
     { label: '최소 6자 이상', test: (val: string) => val.trim().length >= 6 },
@@ -110,10 +106,11 @@ export const PasswordField: React.FC = () => {
                 value={field.value ?? ''}
                 onChange={(e) => {
                   field.onChange(e)
-                  trigger('confirmPassword')
+                  handleInputChange('confirmPassword', e.target.value)
                 }}
+                onBlur={() => trigger('confirmPassword')}
                 type={showConfirmPassword ? 'text' : 'password'}
-                className={`h-12 pr-10 ${errors.confirmPassword ? 'border-red-500 focus-visible:ring-red-500/20' : ''}`}
+                className={`h-12 pr-10 ${errors.confirmPassword ? 'border-red-500' : ''}`}
               />
             )}
           />

@@ -7,6 +7,8 @@ import {
   createApplication,
   deleteApplication,
   fetchApplicationsByProjectId,
+  fetchMyApplication,
+  updateApplicationStatus,
 } from '@/utils/api/application'
 
 /** 프로젝트 지원 생성 */
@@ -45,5 +47,32 @@ export const useApplications = (
     queryKey: ['applications', projectId, query] as const,
     queryFn: () => fetchApplicationsByProjectId(projectId, query),
     enabled: enabled && Boolean(projectId),
+  })
+}
+
+/** 지원한 프로젝트 조회 */
+
+export const useMyApplication = () => {
+  return useQuery({
+    queryKey: ['applications'] as const,
+    queryFn: () => fetchMyApplication(),
+  })
+}
+
+/** 지원자 승인 및 거절*/
+
+export const useUpdateApplicationStatus = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({
+      id,
+      status,
+    }: {
+      id: string
+      status: 'APPROVED' | 'REJECTED'
+    }) => updateApplicationStatus({ applicationId: id, status: status }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['applications'] })
+    },
   })
 }

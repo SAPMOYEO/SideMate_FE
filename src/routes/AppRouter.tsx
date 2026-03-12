@@ -25,6 +25,7 @@ import ResetPasswordPage from '@/pages/LoginPage/FindAccount/ResetPasswordPage'
 import OnboardingPage from '@/pages/SignUpPage/components/OnboardingPage'
 import HomePage from '@/pages/Home/HomePage'
 import PaymentHistoryPage from '@/pages/PaymentHistoryPage/PaymentHistoryPage'
+import MyProjectPage from '@/pages/MyPage/MyProjectPage'
 
 export default function AppRouter() {
   return (
@@ -61,6 +62,7 @@ export default function AppRouter() {
           <Route path="/projects/create" element={<ProjectCreatePage />} />
           <Route path="/projects/:id/edit" element={<ProjectCreatePage />} />
           <Route path="/my" element={<MyPage />} />
+          <Route path="/my/project" element={<MyProjectPage />} />
           <Route path="/payment" element={<PaymentPage />} />
           <Route path="/payment-success" element={<PaymentSuccessPage />} />
           <Route path="/payment-history" element={<PaymentHistoryPage />} />

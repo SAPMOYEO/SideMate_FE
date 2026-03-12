@@ -1,3 +1,4 @@
+import { SideMateLogo } from '@/components/icons/SideMateLogo'
 import React from 'react'
 import { Link } from 'react-router-dom'
 
@@ -15,15 +16,8 @@ const FindAccountHeader: React.FC<FindAccountHeaderProps> = ({
   return (
     <div className="mb-8 flex flex-col items-center text-center">
       <div className="mb-8 flex flex-col items-center lg:hidden">
-        <Link to="/" className="mb-4 flex items-center gap-2">
-          <img
-            src="/favicon.svg"
-            alt="SideMate Logo"
-            className="size-7 sm:size-8"
-          />
-          <span className="text-xl font-black tracking-tight text-slate-900 sm:text-2xl dark:text-white">
-            SideMate
-          </span>
+        <Link to="/" className="mb-8 flex items-center justify-center gap-2">
+          <SideMateLogo className="block" />
         </Link>
       </div>
       {icon && (
