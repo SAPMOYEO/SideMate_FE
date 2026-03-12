@@ -9,11 +9,11 @@ import { PasswordField } from './components/PasswordField'
 import { TechStackField } from './components/TechStackField'
 import { TermsSection } from './components/TermsSection'
 import { signUpSchema, type SignUpFormValues } from './components/signUp.schema'
-import { registerUser, loginWithGoogle } from '@/features/slices/userSlice'
+import { registerUser } from '@/features/slices/userSlice'
 import { useAppDispatch } from '@/hooks'
-import { GoogleLogin } from '@react-oauth/google'
-import type { CredentialResponse } from '@react-oauth/google'
 import { Spinner } from '@/components/ui/spinner'
+import { GoogleLoginButton } from '@/components/shared/GoogleLoginButton'
+import { SideMateLogo } from '@/components/icons/SideMateLogo'
 
 const SignUpPage: React.FC = () => {
   const dispatch = useAppDispatch()
@@ -41,17 +41,6 @@ const SignUpPage: React.FC = () => {
     handleSubmit,
     formState: { isSubmitting },
   } = methods
-
-  const handleGoogleLogin = async (googleData: CredentialResponse) => {
-    if (googleData.credential) {
-      const resultAction = await dispatch(
-        loginWithGoogle(googleData.credential)
-      )
-      if (loginWithGoogle.fulfilled.match(resultAction)) {
-        navigate('/')
-      }
-    }
-  }
   const onSubmit = async (data: SignUpFormValues) => {
     const userData = {
       email: data.email,
@@ -111,15 +100,8 @@ const SignUpPage: React.FC = () => {
   return (
     <div className="mx-auto w-full max-w-md">
       <div className="mb-8 flex flex-col items-center lg:hidden">
-        <Link to="/" className="mb-4 flex items-center gap-2">
-          <img
-            src="/favicon.svg"
-            alt="SideMate Logo"
-            className="size-7 sm:size-8"
-          />
-          <span className="text-xl font-black tracking-tight text-slate-900 sm:text-2xl dark:text-white">
-            SideMate
-          </span>
+        <Link to="/" className="mb-8 flex items-center justify-center gap-2">
+          <SideMateLogo className="block" />
         </Link>
       </div>
 
@@ -131,31 +113,7 @@ const SignUpPage: React.FC = () => {
           AI 기획부터 팀 빌딩까지, 프로젝트 성공을 향한 첫걸음
         </p>
       </div>
-
-      <div className="mb-8 grid grid-cols-1 gap-4">
-        <div className="relative h-11 w-full">
-          <Button
-            variant="outline"
-            type="button"
-            className="pointer-events-none absolute inset-0 flex h-full w-full items-center justify-center border-slate-200 font-semibold dark:border-slate-700"
-          >
-            <img
-              src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
-              alt="G"
-              className="mr-2 size-4"
-            />
-            Google 계정으로 시작하기
-          </Button>
-
-          <div className="absolute inset-0 z-10 cursor-pointer overflow-hidden opacity-0">
-            <GoogleLogin
-              onSuccess={handleGoogleLogin}
-              onError={() => console.log('Login Failed')}
-              width="400px"
-            />
-          </div>
-        </div>
-      </div>
+      <GoogleLoginButton text="Google 계정으로 시작하기" />
 
       <div className="relative mb-8 text-center">
         <div className="absolute inset-0 flex items-center">
@@ -167,7 +125,13 @@ const SignUpPage: React.FC = () => {
       </div>
 
       <FormProvider {...methods}>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 text-left">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault()
+            handleSubmit(onSubmit)(e)
+          }}
+          className="space-y-4 text-left"
+        >
           <UserBasicInfo />
           <PasswordField />
           <TechStackField />
