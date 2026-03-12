@@ -3,10 +3,9 @@ import { sectionTitleClasses, sectionWrapperClasses } from '@/constants/style'
 import { Link } from 'react-router-dom'
 import { useGetMyProject } from '@/hooks/project/useProject'
 import type { Project } from '@/types/project'
-
 const PreviewCreatedProjectSection = () => {
   const { data } = useGetMyProject()
-  const projects = (data?.data ?? []) as Project[]
+  const projects = (data?.pages[0].data ?? []) as Project[]
 
   return (
     <section>
@@ -15,12 +14,17 @@ const PreviewCreatedProjectSection = () => {
           <FolderCog className="text-primary" size={28} strokeWidth={2.5} />
           생성 프로젝트 & AI 분석
         </h2>
-        <Link
-          to="/projects/create"
-          className="bg-primary flex cursor-pointer items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-bold text-white shadow-md shadow-indigo-100 transition-all hover:bg-indigo-600"
-        >
-          <Plus size={16} strokeWidth={3} />새 프로젝트
-        </Link>
+        <div className="flex items-center gap-4">
+          <Link to="/my/project?tab=create" className="text-sm text-slate-400">
+            상세보기
+          </Link>
+          <Link
+            to="/projects/create"
+            className="bg-primary flex cursor-pointer items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-bold whitespace-nowrap text-white shadow-md shadow-indigo-100 transition-all hover:bg-indigo-600"
+          >
+            <Plus size={12} strokeWidth={3} />새 프로젝트
+          </Link>
+        </div>
       </div>
 
       {projects.length === 0 ? (

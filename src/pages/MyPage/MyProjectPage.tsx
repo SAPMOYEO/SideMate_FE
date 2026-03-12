@@ -17,7 +17,7 @@ const MyProjectPage = () => {
 
   return (
     <div className="flex h-[calc(100dvh-84px)] bg-[#F6F6F8]">
-      <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col overflow-hidden px-6 py-12">
+      <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col overflow-auto px-6 py-12">
         <div className="mb-8 flex flex-col">
           {/* Tab */}
           <Tabs
@@ -41,7 +41,7 @@ const MyProjectPage = () => {
           </Tabs>
           <div className="bg-border mt-2.5 h-0.5 w-full"></div>
         </div>
-        <div className="flex flex-1 rounded-3xl">
+        <div className="flex rounded-3xl">
           <Activity mode={tabs === 'supplied' ? 'visible' : 'hidden'}>
             <AppliedView />
           </Activity>

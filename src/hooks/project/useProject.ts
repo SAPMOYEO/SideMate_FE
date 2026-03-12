@@ -1,4 +1,9 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  useInfiniteQuery,
+} from '@tanstack/react-query'
 import type { CreateProjectPayload, ProjectSearchParams } from '@/types/project'
 import {
   createProject,
@@ -68,8 +73,15 @@ export const useDeleteProject = () => {
 }
 
 export const useGetMyProject = () => {
-  return useQuery({
+  return useInfiniteQuery({
     queryKey: ['my-projects'],
-    queryFn: () => fetchMyProject(),
+    queryFn: ({ pageParam }) => fetchMyProject(pageParam),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, allPages) => {
+      // console.log('LAST:', lastPage)
+      // console.log('ALL:', allPages)
+      const nextPage = allPages.length + 1
+      return nextPage <= lastPage.totalPages ? nextPage : undefined
+    },
   })
 }

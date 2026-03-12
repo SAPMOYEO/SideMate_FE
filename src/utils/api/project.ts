@@ -8,6 +8,7 @@ import type {
   ProjectSearchParams,
 } from '@/types/project'
 import api from './api.instance'
+import type { PaginatedResponse } from '@/types/common.type'
 
 /** 프로젝트 목록 조회 (페이지네이션 + 검색 조건) */
 export const fetchProjects = async (
@@ -48,7 +49,10 @@ export const deleteProject = async (id: string): Promise<DeleteProjectRes> => {
 
 /** 내 프로젝트 가져오기 */
 
-export const fetchMyProject = async () => {
-  const { data } = await api.get('/project/me')
+export const fetchMyProject = async (
+  page: number
+): Promise<PaginatedResponse<Project>> => {
+  const { data } = await api.get('/project/me', { params: { page } })
+  console.log('fetch :', data)
   return data
 }

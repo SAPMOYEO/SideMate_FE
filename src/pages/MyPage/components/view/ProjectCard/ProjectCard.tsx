@@ -25,11 +25,7 @@ const ProjectCard = ({ project }: { project: Project }) => {
   const [selectedApplicant, setSelectedApplicant] =
     useState<MappedApplicant | null>(null)
 
-  const { data: applicantsData } = useApplications(
-    project._id,
-    {},
-    showApplicants
-  )
+  const { data: applicantsData } = useApplications(project._id)
   const { mutate: updateStatus } = useUpdateApplicationStatus()
 
   const applicants: MappedApplicant[] = (applicantsData?.data ?? []).map(
