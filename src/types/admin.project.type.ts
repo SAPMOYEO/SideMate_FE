@@ -15,7 +15,6 @@ export interface ProjectTypes {
   startDate: string
   endDate: string
   requiredTechStack: string[]
-  mandatoryTechStack: string[]
   recruitRoles: RecruitRole[]
   totalCnt: number
   deadline: string

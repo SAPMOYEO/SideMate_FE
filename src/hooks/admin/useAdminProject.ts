@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { getProjectList, updateProjectHiddenStatus } from '@/utils/api/project'
+import { getProjectList, updateProjectHiddenStatus } from '@/utils/api/admin'
 import type { ParamsTypes } from '@/types/common.type'
 
 const ADMIN_PROJECT_BASE_KEY = ['projects'] as const

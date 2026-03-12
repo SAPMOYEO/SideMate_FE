@@ -50,3 +50,19 @@ export interface CreateApplicationRes {
   project?: Application
   message?: string
 }
+
+export type PopulatedApplication = Omit<Application, 'project'> & {
+  project: {
+    _id: string
+    title?: string
+    status?: string
+    deadline?: string
+  }
+}
+
+export interface MyApplicationsRes {
+  status: string
+  data: PopulatedApplication[]
+  totalCount: number
+  totalPages: number
+}

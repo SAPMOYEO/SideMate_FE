@@ -199,15 +199,6 @@ const AdminProjectDetailModal = ({
                     ))}
                   </div>
                 </InfoRow>
-                <InfoRow label="우대 스택">
-                  <div className="flex flex-wrap gap-1.5">
-                    {project.mandatoryTechStack.map((tech) => (
-                      <Badge key={tech} variant="outline">
-                        {tech}
-                      </Badge>
-                    ))}
-                  </div>
-                </InfoRow>
               </div>
             </section>
 

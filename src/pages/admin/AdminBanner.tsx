@@ -12,7 +12,7 @@ import {
   useUpdateBanner,
   useDeleteBanner,
 } from '@/hooks/admin/useBanners'
-import type { Banner } from '@/utils/api/banner'
+import type { Banner } from '@/utils/api/admin'
 
 const LIMIT = 5
 
