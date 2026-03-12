@@ -155,7 +155,9 @@ const ProjectDetailPage = () => {
   const statusStyle =
     STATUS_STYLE[project.status] ?? 'bg-gray-100 text-gray-700'
   const deadlineText = getDeadlineText(project.deadline)
-  const authorName = project.author?.name ?? '작성자 정보 없음'
+  const authorName =
+    project?.author?.name || project?.author?.name || '알 수 없음'
+  const authorInitial = (project.author?.name ?? '?').slice(0, 1)
   const isOwner = Boolean(
     user?._id && project.author?._id && user._id === project.author._id
   )
@@ -434,7 +436,93 @@ const ProjectDetailPage = () => {
               ))}
             </div>
           </div>
+
+          <div className="flex items-center gap-3 px-2">
+            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-indigo-100 font-bold text-indigo-600">
+              {authorInitial}
+            </div>
+            <div className="min-w-0">
+              <p className="truncate text-sm font-semibold text-gray-900">
+                {project.author?.name ?? '작성자 없음'}
+              </p>
+            </div>
+          </div>
         </aside>
+        {isOwner && (
+          <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="text-sm font-semibold text-gray-700">지원 현황</h3>
+              <span className="text-xs font-medium text-indigo-600">
+                총 {applications.length}명
+              </span>
+            </div>
+
+            <div className="space-y-3">
+              {applications.length > 0 ? (
+                applications.map((app) => (
+                  <div
+                    key={app._id}
+                    className="group flex items-center justify-between rounded-xl border border-gray-50 bg-gray-50 p-3 transition-all hover:border-indigo-100 hover:bg-white"
+                  >
+                    <div
+                      className="flex min-w-0 cursor-pointer items-center gap-3"
+                      onClick={() => {
+                        console.log('지원자 상세 보기:', app)
+                      }}
+                    >
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-indigo-100 text-xs font-bold text-indigo-600">
+                        {typeof app.applicant === 'object' &&
+                        app.applicant &&
+                        'profileImage' in app.applicant ? (
+                          <img
+                            src={
+                              (app.applicant as { profileImage: string })
+                                .profileImage
+                            }
+                            alt=""
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          <span>
+                            {(
+                              (typeof app.applicant === 'object'
+                                ? app.applicant?.name
+                                : app.applicant) ?? '가'
+                            ).slice(0, 1)}
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="min-w-0">
+                        <p className="truncate text-xs font-bold text-gray-900">
+                          {typeof app.applicant === 'object'
+                            ? (app.applicant?.name ?? '지원자')
+                            : (app.applicant ?? '지원자')}
+                        </p>
+                        <p className="text-[10px] font-medium text-gray-500">
+                          {app.role}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-1">
+                      <button className="rounded-lg bg-indigo-50 px-2 py-1 text-[10px] font-bold text-indigo-600 transition-colors hover:bg-indigo-600 hover:text-white">
+                        수락
+                      </button>
+                      <button className="rounded-lg bg-gray-100 px-2 py-1 text-[10px] font-bold text-gray-400 transition-colors hover:bg-rose-50 hover:text-rose-600">
+                        거절
+                      </button>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="py-8 text-center text-xs text-gray-400">
+                  아직 지원자가 없습니다.
+                </p>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       <ApplicationModal

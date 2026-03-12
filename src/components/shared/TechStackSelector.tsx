@@ -125,7 +125,7 @@ export const TechStackSelector: React.FC<TechStackSelectorProps> = ({
           </span>
         ))}
 
-        <div className="absolute top-1/2 right-2 -translate-y-1/2">
+        <div className="absolute top-1/2 right-2 -translate-y-1/2 text-slate-400">
           <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
               <Button
