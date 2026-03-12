@@ -24,7 +24,7 @@ const BannerSearchBar = () => {
         </h1>
       </div>
       {/* 설명 — 모바일에서 숨김 */}
-      <p className="mb-6 hidden max-w-2xl text-lg text-slate-200 md:mb-10 md:block md:text-xl">
+      <p className="mb-6 hidden max-w-2xl text-lg text-slate-200 text-shadow-gray-800 md:mb-10 md:block md:text-xl">
         당신의 위대한 아이디어를 현실로. 전문가들과 함께 사이드 프로젝트를
         시작해보세요.
       </p>

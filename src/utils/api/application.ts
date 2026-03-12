@@ -92,3 +92,19 @@ export const fetchMyApplication = async (): Promise<MyApplicationsRes> => {
   const { data } = await api.get('/application/me')
   return data
 }
+
+/** 지원 승인 (팀장만 가능) */
+
+export const updateApplicationStatus = async ({
+  status,
+  applicationId,
+}: {
+  applicationId: string
+  status: 'APPROVED' | 'REJECTED'
+}) => {
+  const { data } = await api.patch(`/application/${applicationId}/status`, {
+    status,
+  })
+
+  return data
+}

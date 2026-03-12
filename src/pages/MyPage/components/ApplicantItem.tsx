@@ -1,12 +1,15 @@
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import ApplicationStatusBadge from './ApplicationStatusBadge'
+import type { ApplicationStatus } from '@/types/application'
 
 interface Applicant {
   name: string
   time: string
   role: string
   stack: string
+  status: ApplicationStatus
   profileImage?: string
 }
 
@@ -42,7 +45,7 @@ const ApplicantItem = ({ applicant, onApprove, onReject, onDetail }: Props) => {
           </p>
         </div>
       </div>
-      <div className="flex w-full gap-2 sm:w-auto">
+      <div className="flex w-full items-center gap-2 sm:w-auto">
         <Button
           variant="outline"
           size="sm"
@@ -51,17 +54,27 @@ const ApplicantItem = ({ applicant, onApprove, onReject, onDetail }: Props) => {
         >
           상세
         </Button>
-        <Button
-          variant="secondary"
-          size="sm"
-          className="flex-1 sm:flex-none"
-          onClick={onReject}
-        >
-          거절
-        </Button>
-        <Button size="sm" className="flex-1 sm:flex-none" onClick={onApprove}>
-          승인
-        </Button>
+        {applicant.status === 'PENDING' ? (
+          <>
+            <Button
+              variant="secondary"
+              size="sm"
+              className="flex-1 sm:flex-none"
+              onClick={onReject}
+            >
+              거절
+            </Button>
+            <Button
+              size="sm"
+              className="flex-1 sm:flex-none"
+              onClick={onApprove}
+            >
+              승인
+            </Button>
+          </>
+        ) : (
+          <ApplicationStatusBadge status={applicant.status} />
+        )}
       </div>
     </li>
   )

@@ -3,15 +3,21 @@ import { Button } from '@/components/ui/button'
 import ApplicationStatusBadge from '../ApplicationStatusBadge'
 import { useMyApplication } from '@/hooks/application/useApplication'
 import { formatDate } from '@/utils/formatter'
-
+import { useNavigate } from 'react-router-dom'
 const AppliedView = () => {
   const { data } = useMyApplication()
-
+  const navigate = useNavigate()
   return (
     <ul className="w-full space-y-4">
       {data?.data?.map((item) => {
         return (
-          <li className="rounded-2xl bg-white p-6" key={item._id}>
+          <li
+            className="cursor-pointer rounded-2xl bg-white p-6"
+            key={item._id}
+            onClick={() => {
+              navigate(`/projects/${item.project._id}`)
+            }}
+          >
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
@@ -37,9 +43,6 @@ const AppliedView = () => {
                     지원 취소
                   </Button>
                 )}
-                <Button variant="secondary" size="sm">
-                  상세
-                </Button>
               </div>
             </div>
           </li>
