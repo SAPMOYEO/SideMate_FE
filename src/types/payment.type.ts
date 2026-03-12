@@ -65,6 +65,9 @@ export interface PaymentItem {
   quantity: number
   payAmount: number
   status: 'PAID' | 'CANCELED'
+  cardLastFour?: string
+  bankName?: string
+  accountNumberMasked?: string
   createdAt: string
   updatedAt: string
 }
@@ -88,6 +91,11 @@ export interface CheckoutDraft {
   totalPrice: number
   agreed: boolean
   isTopUp: boolean
+}
+
+export interface GetPaymentDetailResponse {
+  status: 'success'
+  payment: PaymentItem
 }
 
 export interface PaymentSuccessData {

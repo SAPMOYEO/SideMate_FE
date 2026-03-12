@@ -226,7 +226,18 @@ export const Header = () => {
                     <User className={iconClasses} />
                     <span>내 계정</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem className={menuItemClasses}>
+                  <DropdownMenuItem
+                    className={menuItemClasses}
+                    onClick={() => {
+                      navigate('/payment-history')
+                      setTimeout(() => {
+                        window.scrollTo({
+                          top: 0,
+                          behavior: 'smooth',
+                        })
+                      }, 300)
+                    }}
+                  >
                     <CreditCard className={iconClasses} />
                     <span>결제정보</span>
                   </DropdownMenuItem>
