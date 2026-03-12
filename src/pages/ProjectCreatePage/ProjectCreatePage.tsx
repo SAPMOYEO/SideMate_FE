@@ -29,7 +29,12 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover'
 import { FRAMEWORKS } from '@/constants/stack'
-import { useAppSelector } from '@/hooks'
+import { useAppDispatch, useAppSelector } from '@/hooks'
+import { fetchMyQuota } from '@/features/slices/aiQuotaSlice'
+import {
+  clearFeedback,
+  createProjectFeedback,
+} from '@/features/slices/feedbackSlice'
 import {
   useCreateProject,
   useProjectById,
@@ -71,7 +76,17 @@ const ProjectCreatePage = () => {
   const { id = '' } = useParams()
   const isEditMode = Boolean(id)
   const navigate = useNavigate()
+  const dispatch = useAppDispatch()
   const { user } = useAppSelector((state) => state.user)
+
+  // feedback slice 상태 조회
+  const feedbackData = useAppSelector((state) => state.feedback.feedback)
+  const isAnalyzingFeedback = useAppSelector(
+    (state) => state.feedback.submitLoading
+  )
+
+  // 생성 전 draft 프로젝트 식별용 임시 ID
+  const [tempProjectId] = useState(() => crypto.randomUUID())
 
   // 등록/수정 mutation 훅
   const { mutateAsync: createProject, isPending: isCreating } =
@@ -106,14 +121,32 @@ const ProjectCreatePage = () => {
     { id: 1, role: '', cnt: 1 },
   ])
 
-  // ===== AI 피드백 UI 상태 =====
-  const [isAnalyzingFeedback, setIsAnalyzingFeedback] = useState(false) //나중에 AI 피드백 받는 isLoading으로 대체할 것
-  const [aiFeedback, setAiFeedback] = useState<AiFeedback | null>(null)
+  // feedback slice 데이터를 UI 전용 형태로 변환
+  const aiFeedback = useMemo<AiFeedback | null>(() => {
+    if (!feedbackData) return null
+
+    return {
+      subtitle: '현재 작성 중인 프로젝트 모집글에 대한 AI 분석 리포트입니다.',
+      strengths: feedbackData.strengths,
+      warnings: feedbackData.weaknesses,
+      suggestions: feedbackData.suggestions,
+      detail: [
+        ...feedbackData.strengths,
+        ...feedbackData.weaknesses,
+        ...feedbackData.suggestions,
+      ].join('\n\n'),
+    }
+  }, [feedbackData])
 
   // 페이지 진입 시 스크롤을 상단으로 고정
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' })
   }, [])
+
+  // 페이지 진입 시 이전 피드백 초기화
+  useEffect(() => {
+    dispatch(clearFeedback())
+  }, [dispatch])
 
   /* eslint-disable react-hooks/set-state-in-effect */
   // 수정 모드에서 기존 데이터로 폼을 채워 넣는 구간
@@ -218,56 +251,58 @@ const ProjectCreatePage = () => {
     return null
   }
 
-  // 백엔드가 아직 없으므로 현재 폼 값 기반으로 더미 피드백 생성
-  const buildDummyFeedback = (): AiFeedback => {
-    const normalizedTitle = title.trim() || '현재 프로젝트'
-    const stackSummary =
-      requiredTechStack.length > 0
-        ? requiredTechStack.slice(0, 3).join(', ')
-        : '핵심 기술 스택 미선정'
-    const roleSummary = recruitRoles
-      .filter((row) => row.role.trim())
-      .slice(0, 3)
-      .map((row) => row.role.trim())
-      .join(', ')
-
-    return {
-      subtitle: `"${normalizedTitle}" 프로젝트에 대한 AI 분석 리포트입니다.`,
-      strengths: [
-        `핵심 기술 스택 방향성이 명확합니다 (${stackSummary})`,
-        `모집 역할 정의가 비교적 구체적입니다 (${roleSummary || '역할 입력 필요'})`,
-        '프로젝트 설명과 목표 항목이 분리되어 전달력이 좋습니다.',
-      ],
-      warnings: [
-        description.trim().length < 60
-          ? '프로젝트 설명이 다소 짧아 지원자 이해도가 떨어질 수 있습니다.'
-          : '프로젝트 설명의 완성도는 양호하지만 예상 산출물을 더 명확히 적어주세요.',
-        goal.trim().length < 40
-          ? '프로젝트 목표가 추상적으로 보일 수 있어 측정 가능한 문장을 권장합니다.'
-          : '프로젝트 목표에 완료 기준(KPI)을 1~2개 추가하면 더 좋습니다.',
-        recruitRoles.some((row) => !row.role.trim())
-          ? '모집 역할 중 비어 있는 항목이 있어 지원자 혼선을 유발할 수 있습니다.'
-          : '모집 역할별 우선순위를 함께 제시하면 매칭 정확도가 올라갑니다.',
-      ],
-      suggestions: [
-        '기술 스택별 활용 목적을 한 줄씩 보완해 실제 난이도를 전달해보세요.',
-        '지원자가 빠르게 판단할 수 있도록 첫 3줄 요약을 상단에 배치해보세요.',
-        '모집 마감일 직전 일정을 고려해 역할별 선발 인원 기준을 명시해보세요.',
-      ],
-      detail:
-        '현재 등록된 프로젝트 정보는 핵심 항목이 대부분 채워져 있어 지원 전환 가능성이 높은 편입니다. 다만 프로젝트 설명과 목표에 결과물의 형태, 완료 기준, 협업 방식의 디테일을 조금 더 보강하면 지원자의 기대치를 정렬하기 쉬워집니다. 특히 역할별 업무 범위와 우선순위를 명확히 제시하면 초기 커뮤니케이션 비용을 줄이고 적합한 지원자 유입에 도움이 됩니다.',
-    }
-  }
-
-  // AI 피드백 요청 핸들러 (더미 지연 + 결과 세팅)
+  // AI 피드백 요청 핸들러
   const handleRequestAiFeedback = async () => {
     if (isAnalyzingFeedback) return
 
-    setIsAnalyzingFeedback(true)
-    await new Promise((resolve) => setTimeout(resolve, 1800))
+    const errorMessage = validateForm()
 
-    setAiFeedback(buildDummyFeedback())
-    setIsAnalyzingFeedback(false)
+    if (errorMessage) {
+      toast.error(errorMessage)
+      return
+    }
+
+    try {
+      const payload = {
+        projectId: null,
+        requestId: crypto.randomUUID(),
+        tempProjectId,
+        type: 'project-create-draft' as const,
+        inputSnapshot: {
+          title: title.trim(),
+          category,
+          description: description.trim(),
+          goal: goal.trim(),
+          startDate,
+          endDate,
+          requiredTechStack,
+          recruitRoles: recruitRoles
+            .filter((row) => row.role.trim())
+            .map((row) => ({
+              role: row.role.trim(),
+              cnt: row.cnt,
+            })),
+          totalCnt,
+          deadline,
+          communicationMethod,
+          gitUrl: gitUrl.trim() || '',
+        },
+      }
+
+      await dispatch(createProjectFeedback(payload)).unwrap()
+
+      // AI 가능 횟수 리프레시
+      dispatch(fetchMyQuota())
+
+      toast.success('AI 피드백을 불러왔습니다.')
+    } catch (error) {
+      console.error(error)
+      toast.error(
+        typeof error === 'string'
+          ? error
+          : 'AI 피드백 생성 중 오류가 발생했습니다.'
+      )
+    }
   }
 
   // 등록/수정 공통 submit 핸들러
@@ -638,7 +673,7 @@ const ProjectCreatePage = () => {
             </div>
           </form>
 
-          {/* AI 피드백 결과 패널 (더미 데이터) */}
+          {/* AI 피드백 결과 패널 */}
           {aiFeedback && (
             <aside className="space-y-4 rounded-3xl border border-gray-200 bg-white p-5 shadow-sm xl:sticky xl:top-6">
               <div className="space-y-2 border-b border-gray-100 pb-4">
