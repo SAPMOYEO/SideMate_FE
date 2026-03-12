@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react'
-import { Camera, Edit, Eye, EyeOff, Loader2 } from 'lucide-react'
+import { Camera, CircleUser, Edit, Eye, EyeOff, Loader2 } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -265,21 +265,31 @@ const ProfileEditModal: React.FC = () => {
           <div className="flex flex-col gap-10">
             <section className="space-y-6">
               <div className="mb-8 flex flex-col items-center gap-3">
-                <div
-                  className="group relative cursor-pointer"
-                  onClick={handleImageClick}
-                >
+                <div className="group relative">
                   <div
-                    className={`h-28 w-28 rounded-full border-4 border-slate-50 bg-cover bg-center shadow-md transition-opacity dark:border-slate-800 ${isUploading ? 'opacity-50' : 'opacity-100'}`}
-                    style={{
-                      backgroundImage: `url(${previewImage || 'https://github.com/shadcn.png'})`,
-                    }}
-                  />
-                  <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
-                    {isUploading ? (
-                      <Loader2 className="animate-spin text-white" size={32} />
+                    className={`relative h-28 w-28 overflow-hidden rounded-full border-4 border-slate-50 bg-zinc-100 shadow-lg transition-opacity dark:border-slate-800 dark:bg-slate-800 ${
+                      isUploading ? 'opacity-50' : 'opacity-100'
+                    }`}
+                  >
+                    {previewImage ? (
+                      <div
+                        className="h-full w-full bg-cover bg-center"
+                        style={{ backgroundImage: `url(${previewImage})` }}
+                      />
                     ) : (
-                      <Camera className="text-white" size={32} />
+                      <div className="flex h-full w-full translate-y-0.5 transform items-center justify-center text-zinc-300">
+                        <CircleUser size={80} strokeWidth={1} />
+                      </div>
+                    )}
+                  </div>
+                  <div
+                    onClick={handleImageClick}
+                    className="absolute right-0 bottom-0 flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border-2 border-4 border-slate-50 border-white bg-zinc-100 text-zinc-400 shadow-lg transition-transform duration-300 hover:scale-110 active:scale-95 dark:border-slate-900 dark:bg-slate-800 dark:text-slate-300"
+                  >
+                    {isUploading ? (
+                      <Loader2 className="animate-spin" size={18} />
+                    ) : (
+                      <Camera size={18} />
                     )}
                   </div>
                 </div>

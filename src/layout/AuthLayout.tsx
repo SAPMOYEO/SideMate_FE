@@ -1,6 +1,7 @@
 import React from 'react'
 import { Outlet, Link, useLocation } from 'react-router-dom'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
+import { SideMateLogo } from '@/components/icons/SideMateLogo'
 
 const AuthLayout: React.FC = () => {
   const location = useLocation()
@@ -32,10 +33,9 @@ const AuthLayout: React.FC = () => {
 
         <Link
           to="/"
-          className="relative z-10 flex items-center gap-3 text-white no-underline"
+          className="relative z-10 flex items-center no-underline transition-opacity hover:opacity-80"
         >
-          <img src="/favicon.svg" alt="Logo" className="size-8" />
-          <h2 className="text-2xl font-extrabold tracking-tight">SideMate</h2>
+          <SideMateLogo className="[&_span]:text-white [&_span]:[-webkit-text-stroke:0] [&_span]:[text-shadow:none]" />
         </Link>
 
         <div className="relative z-10 max-w-lg">

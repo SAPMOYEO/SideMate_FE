@@ -34,8 +34,6 @@ export default function AppRouter() {
         <Route path="/" element={<HomePage />} />
         <Route path="/projects" element={<ProjectPage />} />
         <Route path="/projects/:id" element={<ProjectDetailPage />} />
-        <Route path="/payment" element={<PaymentPage />} />
-        <Route path="/payment-success" element={<PaymentSuccessPage />} />
       </Route>
 
       {/* PublicOnly - 비로그인만 접근 (로그인 상태면 / 로 리다이렉트) */}
@@ -64,6 +62,8 @@ export default function AppRouter() {
           <Route path="/projects/:id/edit" element={<ProjectCreatePage />} />
           <Route path="/my" element={<MyPage />} />
           <Route path="/my/project" element={<MyProjectPage />} />
+          <Route path="/payment" element={<PaymentPage />} />
+          <Route path="/payment-success" element={<PaymentSuccessPage />} />
         </Route>
       </Route>
 

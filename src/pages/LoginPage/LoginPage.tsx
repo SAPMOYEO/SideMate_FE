@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAppDispatch } from '@/hooks'
-import { loginUser, loginWithGoogle } from '@/features/slices/userSlice'
+import { loginUser } from '@/features/slices/userSlice'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
@@ -9,9 +9,9 @@ import { Eye, EyeOff, TriangleAlert } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { toast } from 'sonner'
-import { GoogleLogin } from '@react-oauth/google'
-import type { CredentialResponse } from '@react-oauth/google'
 import { Spinner } from '@/components/ui/spinner'
+import { GoogleLoginButton } from '@/components/shared/GoogleLoginButton'
+import { SideMateLogo } from '@/components/icons/SideMateLogo'
 
 const loginSchema = z.object({
   email: z
@@ -40,27 +40,6 @@ const LoginPage: React.FC = () => {
     defaultValues: { email: '', password: '' },
   })
 
-  const handleGoogleLogin = async (googleData: CredentialResponse) => {
-    if (googleData.credential) {
-      try {
-        const user = await dispatch(
-          loginWithGoogle(googleData.credential)
-        ).unwrap()
-
-        if (!user.phone || user.phone.trim() === '') {
-          navigate('/onboarding')
-        } else {
-          navigate('/')
-        }
-      } catch (err) {
-        console.error('구글 로그인 에러:', err)
-        toast.error('구글 로그인에 실패했습니다. 다시 시도해 주세요.')
-      }
-    } else {
-      console.error('구글 토큰이 없습니다.')
-    }
-  }
-
   const onSubmit = async (data: LoginFormValues) => {
     setLoginError(null)
     try {
@@ -85,15 +64,8 @@ const LoginPage: React.FC = () => {
   return (
     <div className="mx-auto w-full max-w-md">
       <div className="mb-8 flex flex-col items-center lg:hidden">
-        <Link to="/" className="mb-4 flex items-center gap-2">
-          <img
-            src="/favicon.svg"
-            alt="SideMate Logo"
-            className="size-7 sm:size-8"
-          />
-          <span className="text-xl font-black tracking-tight text-slate-900 sm:text-2xl dark:text-white">
-            SideMate
-          </span>
+        <Link to="/" className="mb-8 flex items-center justify-center gap-2">
+          <SideMateLogo className="block" />
         </Link>
       </div>
 
@@ -105,31 +77,7 @@ const LoginPage: React.FC = () => {
           AI와 동료들이 기다리고 있는 대시보드로 이동합니다.
         </p>
       </div>
-
-      <div className="mb-8 grid grid-cols-1 gap-4">
-        <div className="relative h-11 w-full">
-          <Button
-            variant="outline"
-            type="button"
-            className="pointer-events-none h-11 w-full border-slate-200 font-semibold dark:border-slate-700"
-          >
-            <img
-              src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
-              alt="G"
-              className="mr-2 size-4"
-            />
-            Google 계정으로 로그인
-          </Button>
-
-          <div className="absolute inset-0 overflow-hidden opacity-0">
-            <GoogleLogin
-              onSuccess={handleGoogleLogin}
-              onError={() => console.log('Login Failed')}
-              width="400px"
-            />
-          </div>
-        </div>
-      </div>
+      <GoogleLoginButton text="Google 계정으로 로그인" />
 
       <div className="relative mb-8 text-center">
         <div className="absolute inset-0 flex items-center">

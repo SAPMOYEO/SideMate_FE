@@ -130,7 +130,7 @@ const ApplicationModal = ({
               <DialogTitle className="text-2xl font-extrabold text-slate-900">
                 프로젝트 지원하기
               </DialogTitle>
-              <p className="text-sm text-slate-500">{projectTitle}</p>
+              <p className="text-left text-sm text-slate-500">{projectTitle}</p>
             </div>
             <button
               type="button"
