@@ -15,26 +15,25 @@ const BannerSearchBar = () => {
   return (
     <div className="absolute inset-0 z-10 flex h-[40vh] w-full flex-col items-center justify-center bg-black/40 px-4 text-center md:h-[50vh] lg:h-[60vh]">
       {/* 로고 — 모바일에서 축소 */}
-      <div className="mb-3 flex items-center gap-2 md:mb-6 md:gap-3">
-        <div className="shadow-primary/20 flex h-8 w-8 items-center justify-center rounded-xl bg-white p-1 shadow-lg md:h-12 md:w-12">
-          <img src={'/favicon.svg'} alt="logo" />
-        </div>
-        <h1 className="text-4xl font-extrabold tracking-tight text-white md:text-6xl lg:text-5xl">
-          SideMate
+      <div className="mb-6 md:mb-8">
+        <h1 className="text-2xl font-[900] tracking-tight break-keep text-zinc-300 antialiased drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)] md:text-5xl lg:text-6xl">
+          당신의{' '}
+          <span className="animate-pulse text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.5)] [animation-duration:4s]">
+            아이디어
+          </span>
+          를 현실로
         </h1>
+        <p className="mt-4 max-w-2xl text-sm font-medium text-white/90 drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)] md:text-xl">
+          전문가들과 함께 사이드 프로젝트를 시작해 보세요.
+        </p>
       </div>
-      {/* 설명 — 모바일에서 숨김 */}
-      <p className="mb-6 hidden max-w-2xl text-lg text-slate-200 md:mb-10 md:block md:text-xl">
-        당신의 위대한 아이디어를 현실로. 전문가들과 함께 사이드 프로젝트를
-        시작해보세요.
-      </p>
       {/* 검색바 */}
       <div className="w-full max-w-2xl px-8 md:px-4">
         <form className="group relative" onSubmit={handleSubmit}>
           <Input
             onChange={(e) => setQuery(e.target.value)}
             className="focus:ring-primary/20 block w-full rounded-2xl border-none bg-white py-6 pr-20 pl-4 text-sm text-slate-900 shadow-2xl transition-all focus:ring-4 md:py-6 md:pr-28 md:text-lg"
-            placeholder="프로젝트, 기술 또는 멘토를 검색해보세요..."
+            placeholder="어떤 프로젝트를 찾고 계신가요?"
             type="text"
           />
           <div className="absolute inset-y-0 right-0 flex items-center pr-2 md:pr-3">

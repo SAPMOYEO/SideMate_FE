@@ -9,6 +9,7 @@ import {
   Sparkles,
   Menu,
   X,
+  CircleUser,
 } from 'lucide-react'
 import { SideMateLogo } from '../icons'
 import { Button } from '../ui/button'
@@ -60,12 +61,6 @@ export const Header = () => {
 
         <div className="flex flex-1 items-center justify-end gap-8">
           <div className="hidden items-center gap-8 md:flex">
-            <Link
-              to="/"
-              className="text-text-muted hover:text-text-main text-sm font-semibold transition-colors"
-            >
-              홈
-            </Link>
             <Link
               className="text-text-main hover:text-primary text-sm font-semibold transition-colors"
               to="/projects"
@@ -126,7 +121,7 @@ export const Header = () => {
           </div>
 
           {isLoggedIn ? (
-            <div className="flex items-center gap-5 md:gap-7">
+            <div className="flex items-center gap-3.5 md:gap-7">
               <div className="flex items-center md:hidden">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -174,15 +169,22 @@ export const Header = () => {
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <div className="h-9 w-9 cursor-pointer overflow-hidden rounded-full bg-gray-200 ring-offset-2 transition-all duration-500 hover:ring-2 hover:ring-slate-300">
-                    <img
-                      src={
-                        user?.profile?.profileImage ||
-                        'https://github.com/shadcn.png'
-                      }
-                      alt="프로필"
-                      className="h-full w-full object-cover"
-                    />
+                  <div className="h-9 w-9 cursor-pointer overflow-hidden rounded-full bg-zinc-100 ring-offset-2 transition-all duration-500 hover:ring-2 hover:ring-slate-300 dark:bg-slate-800">
+                    {user?.profile?.profileImage ? (
+                      <img
+                        src={user.profile.profileImage}
+                        alt="프로필"
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center text-zinc-400">
+                        <CircleUser
+                          size={32}
+                          strokeWidth={1.5}
+                          className="relative top-[0.5px]"
+                        />
+                      </div>
+                    )}
                   </div>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="mt-2 w-auto">
@@ -211,7 +213,15 @@ export const Header = () => {
                   )}
                   <DropdownMenuItem
                     className={menuItemClasses}
-                    onClick={() => navigate('/my')}
+                    onClick={() => {
+                      navigate('/my')
+                      setTimeout(() => {
+                        window.scrollTo({
+                          top: 0,
+                          behavior: 'smooth',
+                        })
+                      }, 300)
+                    }}
                   >
                     <User className={iconClasses} />
                     <span>내 계정</span>
