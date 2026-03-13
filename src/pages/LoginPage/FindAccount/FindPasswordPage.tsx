@@ -128,7 +128,6 @@ const FindPasswordPage: React.FC = () => {
           to="/login"
           className="flex items-center gap-1 transition-colors hover:text-slate-600 hover:underline"
         >
-          {' '}
           로그인으로 돌아가기
         </Link>
         <span className="h-1 w-1 rounded-full bg-slate-300" />

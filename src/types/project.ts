@@ -114,7 +114,6 @@ export interface CreateProjectPayload {
   startDate: string
   endDate: string
   requiredTechStack: string[]
-  mandatoryTechStack: string[]
   recruitRoles: CreateProjectRole[]
   totalCnt: number
   deadline: string
@@ -122,6 +121,7 @@ export interface CreateProjectPayload {
   status: string
   gitUrl?: string
   aiFeedbackIds?: string[]
+  tempProjectId?: string
 }
 
 export interface CreateProjectRes {
