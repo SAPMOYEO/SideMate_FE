@@ -2,12 +2,21 @@ import { useGetMyProject } from '@/hooks/project/useProject'
 import type { Project } from '@/types/project'
 import ProjectCard from './ProjectCard/ProjectCard'
 import { useInView } from 'react-intersection-observer'
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { Skeleton } from '@/components/ui/skeleton'
 const CreatedView = () => {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useGetMyProject()
-  const projects = (data?.pages.flatMap((page) => page.data) ?? []) as Project[]
+
+  const projects = useMemo(
+    () =>
+      ((data?.pages.flatMap((page) => page.data) ?? []) as Project[]).sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      ),
+    [data]
+  )
+
   const [ref, inView] = useInView()
 
   useEffect(() => {
