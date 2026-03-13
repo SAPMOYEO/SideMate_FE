@@ -1,6 +1,7 @@
 import React from 'react'
-import { Github, UserCircle, Info, Lock, CircleAlert } from 'lucide-react'
+import { Github, UserCircle, Info, Lock, CircleAlert, User } from 'lucide-react'
 import { useAppSelector } from '@/hooks'
+import ProfileEditModal from './ProfileEditModal'
 
 const ProfileSection: React.FC = () => {
   const { user } = useAppSelector((state) => state.user)
@@ -8,6 +9,15 @@ const ProfileSection: React.FC = () => {
 
   return (
     <div className="space-y-4">
+      <div className="flex items-center justify-between border-b-2 border-zinc-900 pb-4 dark:border-white">
+        <div className="flex items-center gap-2">
+          <User size={22} className="text-indigo-600" strokeWidth={2.5} />
+          <h2 className="text-2xl font-black tracking-tight text-zinc-900 dark:text-white">
+            내 프로필
+          </h2>
+        </div>
+        <ProfileEditModal />
+      </div>
       <div className="flex items-center gap-2 px-1">
         <Info size={14} className="shrink-0 text-indigo-500" />
         <p className="text-[11px] font-bold tracking-tight text-zinc-500 dark:text-slate-400">
@@ -61,7 +71,7 @@ const ProfileSection: React.FC = () => {
             ) : (
               <p className="flex items-center justify-center gap-1.5 text-sm text-zinc-400 md:justify-start">
                 <Lock size={14} className="shrink-0 text-indigo-400" />
-                GitHub 주소 비공개
+                GitHub 주소는 비공개 상태입니다.
               </p>
             )}
           </div>
@@ -81,7 +91,7 @@ const ProfileSection: React.FC = () => {
             ) : (
               <div className="inline-flex items-center gap-1.5 rounded-lg py-2 text-sm text-zinc-400 dark:bg-slate-800/50">
                 <Lock size={14} className="shrink-0 text-indigo-400" />
-                <span>한 줄 소개가 비공개 상태입니다.</span>
+                <span>한 줄 소개는 비공개 상태입니다.</span>
               </div>
             )}
           </div>

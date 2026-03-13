@@ -70,7 +70,7 @@ export const useUpdateApplicationStatus = () => {
     }: {
       id: string
       status: 'APPROVED' | 'REJECTED'
-    }) => updateApplicationStatus({ applicationId: id, status: status }),
+    }) => updateApplicationStatus({ applicationId: id, status }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['applications'] })
     },
