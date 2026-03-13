@@ -5,22 +5,25 @@ const STATUS_CONFIG: Record<
   string,
   { label: string; dotClass: string; className: string }
 > = {
-  APPROVED: {
-    label: '승인됨',
+  ACCEPTED: {
+    label: '승인',
     dotClass: 'bg-emerald-500',
-    className:
-      'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400',
+    className: 'text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400',
+  },
+  APPROVED: {
+    label: '승인',
+    dotClass: 'bg-emerald-500',
+    className: ' text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400',
   },
   PENDING: {
-    label: '대기중',
-    dotClass: 'bg-amber-500 animate-pulse',
-    className:
-      'bg-amber-50 text-amber-600 dark:bg-amber-900/20 dark:text-amber-400',
+    label: '대기',
+    dotClass: 'bg-amber-500',
+    className: ' text-amber-600 dark:bg-amber-900/20 dark:text-amber-400',
   },
   REJECTED: {
-    label: '거절됨',
+    label: '거절',
     dotClass: 'bg-red-500',
-    className: 'bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400',
+    className: ' text-red-600 dark:bg-red-900/20 dark:text-red-400',
   },
 }
 

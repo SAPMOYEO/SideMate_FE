@@ -11,11 +11,13 @@ import { useAppSelector } from '@/hooks'
 import {
   useApplications,
   useDeleteApplication,
+  useUpdateApplicationStatus,
 } from '@/hooks/application/useApplication'
 import { useDeleteProject, useProjectById } from '@/hooks/project/useProject'
 import type { Application } from '@/types/application'
 import { formatDate } from '@/utils/formatter'
 import ApplicationModal from './components/ApplicationModal'
+import ProjectApplicantManager from './components/ProjectApplicantManager'
 
 const STATUS_LABEL: Record<string, string> = {
   RECRUITING: '모집 중',
@@ -72,6 +74,7 @@ const ProjectDetailPage = () => {
     useDeleteProject()
   const { mutateAsync: deleteApplication, isPending: isCancellingApplication } =
     useDeleteApplication()
+  const { mutateAsync: updateApplicationStatus } = useUpdateApplicationStatus()
   const [isApplicationModalOpen, setIsApplicationModalOpen] = useState(false)
   const [showAllRequiredTechStack, setShowAllRequiredTechStack] =
     useState(false)
@@ -91,12 +94,31 @@ const ProjectDetailPage = () => {
   )
   const appliedTotalCnt = applications.length
 
-  const appliedCntByRole = useMemo(() => {
+  const availableRoleNames = useMemo(() => {
+    if (!project) return []
+    return project.recruitRoles
+      .filter((r) => {
+        const accepted = applications.filter(
+          (app) =>
+            app.role === r.role &&
+            (app.status === 'APPROVED' || app.status === 'ACCEPTED')
+        ).length
+        return accepted < r.cnt
+      })
+      .map((r) => r.role)
+  }, [project, applications])
+
+  const acceptedCntByRole = useMemo(() => {
     const map: Record<string, number> = {}
     applications.forEach((application) => {
       const roleName = application.role?.trim()
       if (!roleName) return
-      map[roleName] = (map[roleName] ?? 0) + 1
+      if (
+        application.status === 'APPROVED' ||
+        application.status === 'ACCEPTED'
+      ) {
+        map[roleName] = (map[roleName] ?? 0) + 1
+      }
     })
     return map
   }, [applications])
@@ -157,7 +179,6 @@ const ProjectDetailPage = () => {
   const deadlineText = getDeadlineText(project.deadline)
   const authorName =
     project?.author?.name || project?.author?.name || '알 수 없음'
-  const authorInitial = (project.author?.name ?? '?').slice(0, 1)
   const isOwner = Boolean(
     user?._id && project.author?._id && user._id === project.author._id
   )
@@ -243,6 +264,25 @@ const ProjectDetailPage = () => {
     }
   }
 
+  const handleAccept = async (app: Application) => {
+    try {
+      await updateApplicationStatus({ id: app._id, status: 'APPROVED' })
+      toast.success('지원을 수락했습니다.')
+    } catch (error) {
+      console.error(error)
+      toast.error('수락 처리 중 오류가 발생했습니다.')
+    }
+  }
+  const handleReject = async (app: Application) => {
+    try {
+      await updateApplicationStatus({ id: app._id, status: 'REJECTED' })
+      toast.success('지원을 거절했습니다.')
+    } catch (error) {
+      console.error(error)
+      toast.error('거절 처리 중 오류가 발생했습니다.')
+    }
+  }
+
   return (
     <div>
       <div className="mx-auto grid max-w-7xl gap-8 px-4 py-8 md:px-8 lg:grid-cols-[minmax(0,1fr)_320px]">
@@ -257,16 +297,16 @@ const ProjectDetailPage = () => {
               <span className="text-gray-500">{project.category}</span>
             </div>
 
-            <h1 className="text-3xl font-extrabold tracking-tight text-gray-900">
+            <h1 className="pt-3 pb-3 text-3xl font-extrabold tracking-tight text-gray-900">
               {project.title}
             </h1>
 
-            <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
-              <span className="inline-flex items-center gap-2 rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700">
-                <span className="rounded-full bg-white px-2 py-0.5 text-[10px] font-semibold text-indigo-600">
-                  작성자
+            <div className="flex flex-wrap items-center gap-8 border-b pb-8 text-sm text-gray-500">
+              <span className="inline-flex items-center justify-center gap-2 py-1 text-xs font-semibold text-indigo-700">
+                <span className="py-0.5 text-[10px] font-semibold text-zinc-500">
+                  프로젝트 리더:
                 </span>
-                <span>{authorName}</span>
+                <span className="text-[13px]">{authorName}</span>
               </span>
               <span className="inline-flex items-center gap-2">
                 <CalendarDays className="h-4 w-4" />
@@ -276,7 +316,7 @@ const ProjectDetailPage = () => {
           </div>
 
           <div className="space-y-3">
-            <h2 className="text-sm font-semibold text-gray-500">
+            <h2 className="text-sm font-semibold text-zinc-700">
               프로젝트 설명
             </h2>
             <p className="leading-8 whitespace-pre-line text-gray-700">
@@ -285,7 +325,7 @@ const ProjectDetailPage = () => {
           </div>
 
           <div className="space-y-3">
-            <h2 className="text-sm font-semibold text-gray-500">
+            <h2 className="text-sm font-semibold text-zinc-700">
               프로젝트 목표
             </h2>
             <div className="rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700">
@@ -297,7 +337,7 @@ const ProjectDetailPage = () => {
           </div>
 
           <div className="space-y-3">
-            <h2 className="text-sm font-semibold text-gray-500">
+            <h2 className="text-sm font-semibold text-zinc-700">
               필수 기술 스택
             </h2>
             <div className="flex flex-wrap items-center gap-2">
@@ -313,7 +353,7 @@ const ProjectDetailPage = () => {
                 <button
                   type="button"
                   onClick={() => setShowAllRequiredTechStack((prev) => !prev)}
-                  className="rounded-md border border-gray-200 bg-white px-2.5 py-1 text-xs font-semibold text-gray-600 transition hover:bg-gray-50"
+                  className="cursor-pointer rounded-md border border-gray-200 bg-white px-2.5 py-1 text-xs font-semibold text-gray-600 transition hover:bg-gray-50"
                 >
                   {showAllRequiredTechStack ? '접기' : '더 보기'}
                 </button>
@@ -353,26 +393,6 @@ const ProjectDetailPage = () => {
               </div>
             </div>
           </div>
-
-          {isOwner && (
-            <div className="flex justify-end gap-2 border-t pt-4">
-              <button
-                type="button"
-                onClick={handleEdit}
-                className="rounded-md border border-gray-300 px-3 py-1.5 text-xs font-semibold text-gray-700 transition hover:bg-gray-50"
-              >
-                수정
-              </button>
-              <button
-                type="button"
-                onClick={handleDelete}
-                disabled={isDeleting}
-                className="rounded-md border border-rose-200 px-3 py-1.5 text-xs font-semibold text-rose-600 transition hover:bg-rose-50 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                {isDeleting ? '삭제 중...' : '삭제'}
-              </button>
-            </div>
-          )}
         </section>
 
         <aside className="space-y-5">
@@ -416,113 +436,64 @@ const ProjectDetailPage = () => {
             <p className="mt-3 text-center text-xs text-gray-400">
               {deadlineText}
             </p>
-          </div>
-
-          <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
-            <h3 className="mb-4 text-sm font-semibold text-gray-700">
-              모집 역할
-            </h3>
-            <div className="space-y-2">
-              {project.recruitRoles.map((role) => (
-                <div
-                  key={role.role}
-                  className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2 text-sm"
+            {isOwner && (
+              <div className="mt-4 flex justify-end gap-2 border-t pt-5">
+                <button
+                  type="button"
+                  onClick={handleEdit}
+                  className="w-full cursor-pointer rounded-md border border-gray-300 px-3 py-1.5 text-xs font-semibold text-gray-700 transition hover:bg-gray-50"
                 >
-                  <span className="font-medium text-gray-700">{role.role}</span>
-                  <span className="rounded-md bg-indigo-100 px-2 py-0.5 text-xs font-semibold text-indigo-700">
-                    {appliedCntByRole[role.role] ?? 0} / {role.cnt}
-                  </span>
-                </div>
-              ))}
-            </div>
+                  수정
+                </button>
+                <button
+                  type="button"
+                  onClick={handleDelete}
+                  disabled={isDeleting}
+                  className="w-full cursor-pointer rounded-md border border-rose-200 px-3 py-1.5 text-xs font-semibold text-rose-600 transition hover:bg-rose-50 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {isDeleting ? '삭제 중...' : '삭제'}
+                </button>
+              </div>
+            )}
           </div>
 
-          <div className="flex items-center gap-3 px-2">
-            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-indigo-100 font-bold text-indigo-600">
-              {authorInitial}
-            </div>
-            <div className="min-w-0">
-              <p className="truncate text-sm font-semibold text-gray-900">
-                {project.author?.name ?? '작성자 없음'}
-              </p>
-            </div>
-          </div>
-        </aside>
-        {isOwner && (
-          <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
-            <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-gray-700">지원 현황</h3>
-              <span className="text-xs font-medium text-indigo-600">
-                총 {applications.length}명
-              </span>
-            </div>
-
-            <div className="space-y-3">
-              {applications.length > 0 ? (
-                applications.map((app) => (
+          {isOwner ? (
+            <ProjectApplicantManager
+              project={project}
+              applications={applications}
+              onAccept={handleAccept}
+              onReject={handleReject}
+            />
+          ) : (
+            <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
+              <h3 className="mb-4 text-sm font-semibold text-gray-700">
+                모집 역할
+              </h3>
+              <div className="space-y-2">
+                {project.recruitRoles.map((role) => (
                   <div
-                    key={app._id}
-                    className="group flex items-center justify-between rounded-xl border border-gray-50 bg-gray-50 p-3 transition-all hover:border-indigo-100 hover:bg-white"
+                    key={role.role}
+                    className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2 text-sm"
                   >
-                    <div
-                      className="flex min-w-0 cursor-pointer items-center gap-3"
-                      onClick={() => {
-                        console.log('지원자 상세 보기:', app)
-                      }}
-                    >
-                      <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-indigo-100 text-xs font-bold text-indigo-600">
-                        {typeof app.applicant === 'object' &&
-                        app.applicant &&
-                        'profileImage' in app.applicant ? (
-                          <img
-                            src={
-                              (app.applicant as { profileImage: string })
-                                .profileImage
-                            }
-                            alt=""
-                            className="h-full w-full object-cover"
-                          />
-                        ) : (
-                          <span>
-                            {(
-                              (typeof app.applicant === 'object'
-                                ? app.applicant?.name
-                                : app.applicant) ?? '가'
-                            ).slice(0, 1)}
-                          </span>
-                        )}
-                      </div>
-
-                      <div className="min-w-0">
-                        <p className="truncate text-xs font-bold text-gray-900">
-                          {typeof app.applicant === 'object'
-                            ? (app.applicant?.name ?? '지원자')
-                            : (app.applicant ?? '지원자')}
-                        </p>
-                        <p className="text-[10px] font-medium text-gray-500">
-                          {app.role}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex gap-1">
-                      <button className="rounded-lg bg-indigo-50 px-2 py-1 text-[10px] font-bold text-indigo-600 transition-colors hover:bg-indigo-600 hover:text-white">
-                        수락
-                      </button>
-                      <button className="rounded-lg bg-gray-100 px-2 py-1 text-[10px] font-bold text-gray-400 transition-colors hover:bg-rose-50 hover:text-rose-600">
-                        거절
-                      </button>
-                    </div>
+                    <span className="font-medium text-gray-700">
+                      {role.role}
+                    </span>
+                    {(acceptedCntByRole[role.role] ?? 0) >= role.cnt ? (
+                      <span className="inline-flex items-center gap-1 text-emerald-600">
+                        <CheckCircle2 className="h-4 w-4" />
+                        <span className="text-xs font-semibold">모집 완료</span>
+                      </span>
+                    ) : (
+                      <span className="rounded-md bg-indigo-100 px-2 py-0.5 text-xs font-semibold text-indigo-700">
+                        {acceptedCntByRole[role.role] ?? 0} / {role.cnt}
+                      </span>
+                    )}
                   </div>
-                ))
-              ) : (
-                <p className="py-8 text-center text-xs text-gray-400">
-                  아직 지원자가 없습니다.
-                </p>
-              )}
+                ))}
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </aside>
       </div>
 
       <ApplicationModal
@@ -530,7 +501,7 @@ const ProjectDetailPage = () => {
         onOpenChange={setIsApplicationModalOpen}
         projectId={project._id}
         projectTitle={project.title}
-        roles={project.recruitRoles.map((role) => role.role)}
+        roles={availableRoleNames}
         alreadyApplied={hasApplied}
         onApplied={handleAppliedSuccess}
       />
