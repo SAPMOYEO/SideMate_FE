@@ -11,7 +11,7 @@ import {
   CircleUser,
 } from 'lucide-react'
 import { SideMateLogo } from '../icons'
-import { NotificationPopover } from './NotificationPopover'
+import { NotificationPopover } from '../notifications/NotificationPopover'
 import { Button } from '../ui/button'
 import { useAppDispatch, useAppSelector } from '@/hooks'
 import { clearUser } from '@/features/slices/userSlice'
