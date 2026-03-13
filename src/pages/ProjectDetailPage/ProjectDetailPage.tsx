@@ -8,6 +8,7 @@ import {
 import { useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
 import { useAppSelector } from '@/hooks'
+import { useQueryClient } from '@tanstack/react-query'
 import {
   useApplications,
   useDeleteApplication,
@@ -74,6 +75,7 @@ const ProjectDetailPage = () => {
     useDeleteProject()
   const { mutateAsync: deleteApplication, isPending: isCancellingApplication } =
     useDeleteApplication()
+  const queryClient = useQueryClient()
   const { mutateAsync: updateApplicationStatus } = useUpdateApplicationStatus()
   const [isApplicationModalOpen, setIsApplicationModalOpen] = useState(false)
   const [showAllRequiredTechStack, setShowAllRequiredTechStack] =
@@ -267,6 +269,8 @@ const ProjectDetailPage = () => {
   const handleAccept = async (app: Application) => {
     try {
       await updateApplicationStatus({ id: app._id, status: 'APPROVED' })
+      queryClient.invalidateQueries({ queryKey: ['projects'] })
+      queryClient.invalidateQueries({ queryKey: ['project', id] })
       toast.success('지원을 수락했습니다.')
     } catch (error) {
       console.error(error)
@@ -276,6 +280,8 @@ const ProjectDetailPage = () => {
   const handleReject = async (app: Application) => {
     try {
       await updateApplicationStatus({ id: app._id, status: 'REJECTED' })
+      queryClient.invalidateQueries({ queryKey: ['projects'] })
+      queryClient.invalidateQueries({ queryKey: ['project', id] })
       toast.success('지원을 거절했습니다.')
     } catch (error) {
       console.error(error)
@@ -303,7 +309,7 @@ const ProjectDetailPage = () => {
 
             <div className="flex flex-wrap items-center gap-8 border-b pb-8 text-sm text-gray-500">
               <span className="inline-flex items-center justify-center gap-2 py-1 text-xs font-semibold text-indigo-700">
-                <span className="py-0.5 text-[10px] font-semibold text-zinc-500">
+                <span className="py-0.5 text-[13px] font-semibold text-zinc-500">
                   프로젝트 리더:
                 </span>
                 <span className="text-[13px]">{authorName}</span>
@@ -319,7 +325,7 @@ const ProjectDetailPage = () => {
             <h2 className="text-sm font-semibold text-zinc-700">
               프로젝트 설명
             </h2>
-            <p className="leading-8 whitespace-pre-line text-gray-700">
+            <p className="leading-8 break-keep whitespace-pre-line text-gray-700">
               {project.description}
             </p>
           </div>
@@ -331,7 +337,7 @@ const ProjectDetailPage = () => {
             <div className="rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700">
               <div className="flex items-start gap-2">
                 <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-indigo-500" />
-                <p className="whitespace-pre-line">{project.goal}</p>
+                <p className="break-keep whitespace-pre-line">{project.goal}</p>
               </div>
             </div>
           </div>
@@ -388,7 +394,7 @@ const ProjectDetailPage = () => {
                     {project.gitUrl}
                   </a>
                 ) : (
-                  <p>-</p>
+                  <p>추후 공개 예정</p>
                 )}
               </div>
             </div>

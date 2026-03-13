@@ -95,7 +95,7 @@ const ApplicantDetailModal = ({
                       href={`https://github.com/${applicant.gitUrl}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-1 text-sm font-medium text-indigo-800 transition-colors hover:text-indigo-500"
+                      className="flex items-center gap-1 text-sm font-medium text-zinc-500 transition-colors hover:text-indigo-500"
                     >
                       <Github size={15} /> github.com/{applicant.gitUrl}
                     </a>

@@ -54,7 +54,10 @@ export const Header = () => {
     <>
       <header className="border-border-light bg-surface sticky top-0 z-50 flex items-center justify-between border-b px-6 py-4 whitespace-nowrap md:px-10">
         <div className="flex items-center gap-3">
-          <Link to="/" className="w-[120px] md:w-[160px]">
+          <Link
+            to="/"
+            className="flex w-[120px] shrink-0 items-center sm:w-auto"
+          >
             <SideMateLogo />
           </Link>
         </div>
