@@ -36,6 +36,7 @@ export interface CreateFeedbackPayload {
 
 // AI 피드백 본문 데이터
 export interface FeedbackItem {
+  overallComment: string
   strengths: string[]
   weaknesses: string[]
   suggestions: string[]
@@ -58,6 +59,32 @@ export interface CreateFeedbackResponse {
   feedback: FeedbackItem
   quota: unknown
   summary: FeedbackSummary
+}
+
+// 프로젝트에 연결된 AI 피드백 1개 데이터
+export interface ProjectFeedback {
+  _id: string
+  type: FeedbackType
+  overallComment: string
+  strengths: string[]
+  weaknesses: string[]
+  suggestions: string[]
+  fullResponse: string[]
+  inputSnapshot: FeedbackInputSnapshot
+  createdAt: string
+  updatedAt: string
+}
+
+// 생성 전 draft 피드백 최신 1개 조회 응답
+export interface DraftProjectFeedbackResponse {
+  status: 'success'
+  data: ProjectFeedback | null
+}
+
+// 프로젝트 AI 피드백 목록 조회 응답
+export interface ProjectFeedbackListResponse {
+  status: 'success'
+  data: ProjectFeedback[]
 }
 
 // feedback slice 상태
