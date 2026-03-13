@@ -69,7 +69,7 @@ export const Header = () => {
             </Link>
             <Link
               className="text-text-muted hover:text-text-main flex items-center text-sm font-semibold transition-colors"
-              to="#"
+              to="/my/project?tab=create"
             >
               AI 피드백
             </Link>
@@ -304,7 +304,7 @@ export const Header = () => {
                 프로젝트
               </Link>
               <Link
-                to="#"
+                to="/my/project?tab=create"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="text-text-main hover:text-primary flex items-center text-base font-semibold transition-colors"
               >
