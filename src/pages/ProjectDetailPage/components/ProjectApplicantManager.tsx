@@ -109,7 +109,7 @@ const ProjectApplicantManager = ({
     <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
       <div className="mb-4 flex items-center justify-between">
         <h3 className="text-sm font-semibold text-gray-700">
-          모집 역할 및 지원자
+          모집 현황 및 지원자
         </h3>
         <Badge
           variant="secondary"
@@ -163,7 +163,7 @@ const ProjectApplicantManager = ({
                 <div className="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-inner">
                   {roleApplicants.length > 0 ? (
                     <>
-                      <div className="flex justify-between px-8 py-2 text-xs text-zinc-500">
+                      <div className="flex justify-between border-b px-8 py-2 text-xs font-semibold text-zinc-500">
                         <span>승인 {acceptedCount}</span>
                         <span>대기 {pendingCount}</span>
                         <span>거절 {rejectedCount}</span>

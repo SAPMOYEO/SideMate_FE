@@ -50,6 +50,7 @@ export type ProjectAuthor = Pick<User, '_id' | 'name' | 'email'>
 export interface RecruitRole {
   role: string
   cnt: number
+  currentCnt?: number
 }
 
 export interface ProjectFilter {
