@@ -32,8 +32,8 @@ const ProjectCardHeader = ({
   onToggleApplicants,
 }: Props) => {
   return (
-    <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
-      <div className="space-y-2">
+    <div className="relative mb-6">
+      <div className="space-y-2 max-[667px]:pr-0">
         <div className="flex items-center gap-2">
           <Badge variant="default" className="rounded-md">
             {project.status}
@@ -58,7 +58,7 @@ const ProjectCardHeader = ({
         </p>
       </div>
 
-      <div className="flex flex-wrap gap-2">
+      <div className="absolute top-0 right-0 flex flex-wrap justify-end gap-2 max-[667px]:static max-[667px]:mt-4 max-[667px]:justify-start">
         <Button variant="secondary" size="sm" onClick={onDetailClick}>
           상세
         </Button>
