@@ -26,7 +26,7 @@ const ApplicantSection = ({
         <div className="border-t border-slate-100 dark:border-slate-800">
           <div className="bg-slate-50/50 px-6 py-4 dark:bg-slate-800/30">
             <h4 className="text-sm font-bold text-slate-900 dark:text-white">
-              지원 현황{' '}
+              지원 현황
               <span className="text-primary ml-1">{applicants.length}명</span>
             </h4>
           </div>
