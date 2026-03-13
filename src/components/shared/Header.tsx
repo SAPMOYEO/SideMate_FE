@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import {
-  Bell,
   LogOut,
   User,
   CreditCard,
@@ -12,6 +11,7 @@ import {
   CircleUser,
 } from 'lucide-react'
 import { SideMateLogo } from '../icons'
+import { NotificationPopover } from './NotificationPopover'
 import { Button } from '../ui/button'
 import { useAppDispatch, useAppSelector } from '@/hooks'
 import { clearUser } from '@/features/slices/userSlice'
@@ -163,9 +163,7 @@ export const Header = () => {
                 </DropdownMenu>
               </div>
 
-              <button className="text-text-muted hover:text-primary cursor-pointer transition-colors">
-                <Bell size={22} strokeWidth={1.5} />
-              </button>
+              <NotificationPopover />
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
