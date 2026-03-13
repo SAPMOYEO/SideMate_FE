@@ -9,6 +9,7 @@ import {
   Sparkles,
   Plus,
   Trash2,
+  RotateCw,
 } from 'lucide-react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
@@ -34,12 +35,16 @@ import { fetchMyQuota } from '@/features/slices/aiQuotaSlice'
 import {
   clearFeedback,
   createProjectFeedback,
+  setFeedback,
+  setFeedbackId,
 } from '@/features/slices/feedbackSlice'
 import {
   useCreateProject,
   useProjectById,
   useUpdateProject,
 } from '@/hooks/project/useProject'
+import { fetchLatestDraftProjectFeedback } from '@/utils/api/feedback'
+import axios from 'axios'
 
 type RecruitRoleForm = {
   // 목록 렌더링 키/수정/삭제에 쓰는 프론트 전용 id
@@ -59,7 +64,7 @@ type AiFeedback = {
   warnings: string[]
   // 개선 제안 항목
   suggestions: string[]
-  // 상세 분석 문단
+  // 종합 내용 문단
   detail: string
 }
 
@@ -87,6 +92,10 @@ const ProjectCreatePage = () => {
 
   // 생성 전 draft 프로젝트 식별용 임시 ID
   const [tempProjectId] = useState(() => crypto.randomUUID())
+
+  // 타임아웃/응답 유실 시 복구 패널 노출 상태
+  const [showFeedbackRecovery, setShowFeedbackRecovery] = useState(false)
+  const [isRecoveringFeedback, setIsRecoveringFeedback] = useState(false)
 
   // 등록/수정 mutation 훅
   const { mutateAsync: createProject, isPending: isCreating } =
@@ -131,9 +140,7 @@ const ProjectCreatePage = () => {
       warnings: feedbackData.weaknesses,
       suggestions: feedbackData.suggestions,
       detail: [
-        ...feedbackData.strengths,
-        ...feedbackData.weaknesses,
-        ...feedbackData.suggestions,
+        feedbackData.overallComment || '종합 내용을 아직 불러오지 못했습니다',
       ].join('\n\n'),
     }
   }, [feedbackData])
@@ -148,7 +155,6 @@ const ProjectCreatePage = () => {
     dispatch(clearFeedback())
   }, [dispatch])
 
-  /* eslint-disable react-hooks/set-state-in-effect */
   // 수정 모드에서 기존 데이터로 폼을 채워 넣는 구간
   useEffect(() => {
     if (!isEditMode || !editingProject) return
@@ -185,7 +191,6 @@ const ProjectCreatePage = () => {
         : [{ id: 1, role: '', cnt: 1 }]
     )
   }, [isEditMode, editingProject, user?._id, navigate])
-  /* eslint-enable react-hooks/set-state-in-effect */
 
   // 서버로 보낼 totalCnt = 역할별 cnt 합계
   const totalCnt = useMemo(
@@ -251,6 +256,42 @@ const ProjectCreatePage = () => {
     return null
   }
 
+  // 생성된 draft 피드백 다시 불러오기
+  const handleRecoverFeedback = async () => {
+    if (isRecoveringFeedback) return
+
+    try {
+      setIsRecoveringFeedback(true)
+
+      const result = await fetchLatestDraftProjectFeedback(tempProjectId)
+
+      if (!result.data) {
+        toast.message('아직 생성된 피드백이 없습니다.')
+        return
+      }
+
+      dispatch(
+        setFeedback({
+          overallComment: result.data.overallComment || '',
+          strengths: result.data.strengths,
+          weaknesses: result.data.weaknesses,
+          suggestions: result.data.suggestions,
+        })
+      )
+      dispatch(setFeedbackId(result.data._id))
+      setShowFeedbackRecovery(false)
+      dispatch(fetchMyQuota())
+
+      toast.success('생성된 AI 피드백 내용을 다시 불러왔습니다.')
+    } catch (error) {
+      console.error(error)
+      toast.error('생성된 피드백 내용을 다시 불러오지 못했습니다.')
+    } finally {
+      setIsRecoveringFeedback(false)
+    }
+  }
+
+  // AI 피드백 요청 핸들러
   // AI 피드백 요청 핸들러
   const handleRequestAiFeedback = async () => {
     if (isAnalyzingFeedback) return
@@ -293,10 +334,26 @@ const ProjectCreatePage = () => {
 
       // AI 가능 횟수 리프레시
       dispatch(fetchMyQuota())
+      setShowFeedbackRecovery(false)
 
       toast.success('AI 피드백을 불러왔습니다.')
     } catch (error) {
       console.error(error)
+
+      const isUncertainFailure =
+        axios.isAxiosError(error) &&
+        (error.code === 'ECONNABORTED' ||
+          error.message.includes('timeout') ||
+          error.message.includes('Network Error'))
+
+      if (isUncertainFailure) {
+        setShowFeedbackRecovery(true)
+        toast.message(
+          'AI 피드백 응답이 지연되고 있습니다. 이미 생성되었을 수 있어요. 오른쪽 영역에서 다시 불러와 보세요.'
+        )
+        return
+      }
+
       toast.error(
         typeof error === 'string'
           ? error
@@ -325,7 +382,6 @@ const ProjectCreatePage = () => {
         startDate,
         endDate,
         requiredTechStack,
-        mandatoryTechStack: [],
         recruitRoles: recruitRoles.map((row) => ({
           role: row.role.trim(),
           cnt: row.cnt,
@@ -337,6 +393,7 @@ const ProjectCreatePage = () => {
           ? (editingProject?.status ?? 'RECRUITING')
           : 'RECRUITING',
         gitUrl: gitUrl.trim() || undefined,
+        tempProjectId: isEditMode ? undefined : tempProjectId,
       }
 
       const project =
@@ -723,12 +780,51 @@ const ProjectCreatePage = () => {
 
               <section className="rounded-2xl border border-gray-200 bg-white p-4">
                 <h3 className="mb-2 text-sm font-semibold text-slate-800">
-                  상세 분석 내용
+                  종합 내용
                 </h3>
                 <p className="text-xs leading-6 whitespace-pre-line text-slate-600">
                   {aiFeedback.detail}
                 </p>
               </section>
+            </aside>
+          )}
+
+          {/* 타임아웃/응답 유실 시 복구 패널 */}
+          {!aiFeedback && showFeedbackRecovery && (
+            <aside className="space-y-4 rounded-3xl border border-amber-200 bg-white p-5 shadow-sm xl:sticky xl:top-6">
+              <div className="space-y-2 border-b border-amber-100 pb-4">
+                <div className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-semibold text-amber-700">
+                  <AlertTriangle className="h-3.5 w-3.5" /> 응답 확인 필요
+                </div>
+                <h2 className="text-xl font-extrabold text-slate-900">
+                  AI 피드백 응답이 지연되고 있어요
+                </h2>
+                <p className="text-sm text-slate-500">
+                  서버에서 이미 피드백이 생성되었을 수 있습니다. 아래 버튼을
+                  눌러 생성된 피드백 내용을 다시 불러와 보세요.
+                </p>
+              </div>
+
+              <div className="rounded-2xl border border-amber-100 bg-amber-50/50 p-4">
+                <p className="text-sm leading-6 text-slate-700">
+                  현재 화면에서는 응답을 받지 못했지만, 실제로는 AI 피드백이
+                  저장된 상태일 수 있습니다.
+                </p>
+              </div>
+
+              <Button
+                type="button"
+                size="lg"
+                variant="outline"
+                className="w-full"
+                onClick={handleRecoverFeedback}
+                disabled={isRecoveringFeedback}
+              >
+                <RotateCw className="mr-1.5 h-4 w-4" />
+                {isRecoveringFeedback
+                  ? '불러오는 중...'
+                  : '생성된 피드백 내용 다시 불러오기'}
+              </Button>
             </aside>
           )}
         </div>
