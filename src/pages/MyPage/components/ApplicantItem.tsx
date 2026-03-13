@@ -1,22 +1,10 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import ApplicationStatusBadge from './ApplicationStatusBadge'
-import type { ApplicationStatus } from '@/types/application'
+import type { ApplicantDetail } from '@/types/applicant'
 import { UserCircle } from 'lucide-react'
 
-interface Applicant {
-  name: string
-  time: string
-  role: string
-  stack: string
-  status: ApplicationStatus
-  profileImage?: string
-  privacySettings?: {
-    isImagePublic: boolean
-  }
-}
-
 interface Props {
-  applicant: Applicant
+  applicant: ApplicantDetail
   onApprove?: () => void
   onReject?: () => void
   onDetail?: () => void

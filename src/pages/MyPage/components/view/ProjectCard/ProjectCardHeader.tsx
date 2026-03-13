@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { BarChart2, ChevronDown, ChevronUp, Users } from 'lucide-react'
@@ -8,7 +9,6 @@ interface Props {
   showAIFeedback: boolean
   showApplicants: boolean
   applicantCount: number
-  onDetailClick: () => void
   onToggleAIFeedback: () => void
   onToggleApplicants: () => void
 }
@@ -27,10 +27,11 @@ const ProjectCardHeader = ({
   showAIFeedback,
   showApplicants,
   applicantCount,
-  onDetailClick,
   onToggleAIFeedback,
   onToggleApplicants,
 }: Props) => {
+  const navigate = useNavigate()
+
   return (
     <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
       <div className="space-y-2">
@@ -59,7 +60,11 @@ const ProjectCardHeader = ({
       </div>
 
       <div className="flex flex-wrap gap-2">
-        <Button variant="secondary" size="sm" onClick={onDetailClick}>
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={() => navigate(`/projects/${project._id}`)}
+        >
           상세
         </Button>
         <Button variant="secondary" size="sm" onClick={onToggleAIFeedback}>

@@ -23,28 +23,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-
-interface Applicant {
-  name: string
-  time: string
-  role: string
-  stack: string
-  status?: string
-  motivation?: string
-  profileImage?: string
-  gitUrl?: string
-  bio?: string
-  privacySettings?: {
-    isImagePublic: boolean
-    isGithubPublic: boolean
-    isBioPublic: boolean
-  }
-}
+import type { ApplicantDetail } from '@/types/applicant'
 
 interface Props {
   open: boolean
   onOpenChange: (open: boolean) => void
-  applicant: Applicant | null
+  applicant: ApplicantDetail | null
   onApprove?: () => void
   onReject?: () => void
   isRoleFilled?: boolean

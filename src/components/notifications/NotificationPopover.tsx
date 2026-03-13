@@ -41,7 +41,7 @@ export const NotificationPopover = () => {
           )}
         </button>
       </PopoverTrigger>
-      <PopoverContent align="end" className="w-80 p-0">
+      <PopoverContent align="end" collisionPadding={16} className="w-80 p-0">
         <div className="border-b px-4 py-3">
           <h3 className="text-sm font-semibold">알림</h3>
         </div>

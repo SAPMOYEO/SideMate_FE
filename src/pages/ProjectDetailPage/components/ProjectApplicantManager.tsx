@@ -8,41 +8,11 @@ import {
 import { Badge } from '@/components/ui/badge'
 import type { Project, RecruitRole } from '@/types/project'
 import type { Application } from '@/types/application'
+
+import { mapApplicationToApplicantDetail } from '@/types/applicant'
 import ApplicantItem from '../../MyPage/components/ApplicantItem'
 import ApplicantDetailModal from '../../MyPage/components/ApplicantDetailModal'
 import { CheckCircle2, CircleAlert } from 'lucide-react'
-
-export interface ApplicantUser {
-  _id: string
-  name?: string
-  profile?: {
-    profileImage?: string
-    bio?: string
-    techStack?: string[]
-    gitUrl?: string
-  }
-  privacySettings?: {
-    isImagePublic: boolean
-    isGithubPublic: boolean
-    isBioPublic: boolean
-  }
-}
-export interface ExtendedApplicant {
-  name: string
-  time: string
-  role: string
-  stack: string
-  status: string
-  profileImage?: string
-  bio?: string
-  gitUrl?: string
-  motivation?: string
-  privacySettings?: {
-    isImagePublic: boolean
-    isGithubPublic: boolean
-    isBioPublic: boolean
-  }
-}
 
 interface Props {
   project: Project
@@ -73,36 +43,6 @@ const ProjectApplicantManager = ({
   const handleViewDetail = (app: Application) => {
     setSelectedApp(app)
     setIsModalOpen(true)
-  }
-
-  const mapToApplicantData = (app: Application): ExtendedApplicant => {
-    const isObject = (val: unknown): val is Record<string, unknown> => {
-      return typeof val === 'object' && val !== null
-    }
-
-    const user = isObject(app.applicant)
-      ? (app.applicant as ApplicantUser)
-      : null
-
-    const profile = user?.profile || {}
-
-    const techStack = Array.isArray(profile.techStack) ? profile.techStack : []
-    const rawApp = app as unknown as Record<string, unknown>
-    const motivation =
-      (rawApp.message as string) || (rawApp.motivation as string) || ''
-
-    return {
-      name: user?.name || '지원자',
-      time: '방금 전',
-      role: app.role || '',
-      stack: techStack.length > 0 ? techStack.join(', ') : '미등록',
-      status: app.status,
-      profileImage: profile.profileImage,
-      bio: profile.bio,
-      gitUrl: profile.gitUrl,
-      motivation: motivation,
-      privacySettings: user?.privacySettings,
-    }
   }
 
   return (
@@ -176,7 +116,7 @@ const ProjectApplicantManager = ({
                             className="[&_li]:gap-3 [&_li]:p-4 [&_p]:truncate"
                           >
                             <ApplicantItem
-                              applicant={mapToApplicantData(app)}
+                              applicant={mapApplicationToApplicantDetail(app)}
                               onDetail={() => handleViewDetail(app)}
                               onApprove={() => onAccept(app)}
                               onReject={() => onReject(app)}
@@ -213,7 +153,9 @@ const ProjectApplicantManager = ({
           <ApplicantDetailModal
             open={isModalOpen}
             onOpenChange={setIsModalOpen}
-            applicant={selectedApp ? mapToApplicantData(selectedApp) : null}
+            applicant={
+              selectedApp ? mapApplicationToApplicantDetail(selectedApp) : null
+            }
             isRoleFilled={isRoleFilled}
             onApprove={() => {
               if (!selectedApp) return
