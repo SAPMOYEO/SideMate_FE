@@ -11,7 +11,7 @@ const ProfileSection: React.FC = () => {
       <div className="flex items-center gap-2 px-1">
         <Info size={14} className="shrink-0 text-indigo-500" />
         <p className="text-[11px] font-bold tracking-tight text-zinc-500 dark:text-slate-400">
-          프로젝트 지원 시, 프로젝트 리더가 보게 되는 내 프로필입니다.{' '}
+          프로젝트 지원 시, 프로젝트 리더가 보게 되는 내 프로필입니다.
           <span className="font-extrabold text-indigo-500/80">프로필 수정</span>
           에서 공개 여부를 설정할 수 있습니다.
         </p>
