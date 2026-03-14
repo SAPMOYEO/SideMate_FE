@@ -6,7 +6,7 @@ import { ko } from 'date-fns/locale'
 import { Badge } from '@/components/ui/badge'
 const ProjectCard = ({ project }: { project: Project }) => {
   return (
-    <div className="relative flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white transition-all duration-300 hover:shadow-xl dark:border-slate-800 dark:bg-slate-900">
+    <div className="relative flex h-full min-h-[220px] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white transition-all duration-300 hover:shadow-xl dark:border-slate-800 dark:bg-slate-900">
       <div className="absolute top-4 right-4">
         <span className="text-primary rounded-full bg-white/90 px-3 py-1 text-xs font-bold tracking-wider uppercase shadow-sm backdrop-blur-sm">
           New
