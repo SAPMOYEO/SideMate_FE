@@ -18,8 +18,8 @@ const ProjectCard = ({ project }: { project: Project }) => {
     useState<ApplicantDetail | null>(null)
 
   const { data: applicantsData } = useApplications(project._id)
-  const { mutate: updateStatus } = useUpdateApplicationStatus()
-
+  const { mutateAsync: updateStatus } = useUpdateApplicationStatus()
+  console.log(applicantsData)
   const applicants: ApplicantDetail[] = (applicantsData?.data ?? []).map(
     mapApplicationToApplicantDetail
   )
@@ -49,6 +49,22 @@ const ProjectCard = ({ project }: { project: Project }) => {
         open={!!selectedApplicant}
         onOpenChange={(open) => !open && setSelectedApplicant(null)}
         applicant={selectedApplicant}
+        onApprove={() =>
+          updateStatus({
+            id: selectedApplicant?._id as string,
+            status: 'APPROVED',
+          }).then(() => {
+            setSelectedApplicant(null)
+          })
+        }
+        onReject={() =>
+          updateStatus({
+            id: selectedApplicant?._id as string,
+            status: 'REJECTED',
+          }).then(() => {
+            setSelectedApplicant(null)
+          })
+        }
       />
     </li>
   )

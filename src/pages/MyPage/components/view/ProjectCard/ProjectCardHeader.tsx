@@ -1,7 +1,13 @@
 import { useNavigate } from 'react-router-dom'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { BarChart2, ChevronDown, ChevronUp, Users } from 'lucide-react'
+import {
+  BarChart2,
+  ChevronDown,
+  ChevronUp,
+  ExternalLink,
+  Users,
+} from 'lucide-react'
 import type { Project } from '@/types/project'
 
 interface Props {
@@ -59,12 +65,13 @@ const ProjectCardHeader = ({
         </p>
       </div>
 
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap items-center gap-2 self-center">
         <Button
           variant="secondary"
           size="sm"
           onClick={() => navigate(`/projects/${project._id}`)}
         >
+          <ExternalLink className="mr-1 size-4" />
           상세
         </Button>
         <Button variant="secondary" size="sm" onClick={onToggleAIFeedback}>
