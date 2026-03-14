@@ -76,6 +76,20 @@ const COMMUNICATION_OPTIONS = [
   { value: 'OFFLINE', label: '오프라인' },
 ]
 
+const formatDateInputValue = (date: Date) => {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
+const addDaysToDateString = (dateString: string, days: number) => {
+  const [year, month, day] = dateString.split('-').map(Number)
+  const date = new Date(year, month - 1, day)
+  date.setDate(date.getDate() + days)
+  return formatDateInputValue(date)
+}
+
 const ProjectCreatePage = () => {
   // id가 있으면 수정 모드, 없으면 등록 모드
   const { id = '' } = useParams()
@@ -130,6 +144,23 @@ const ProjectCreatePage = () => {
     { id: 1, role: '', cnt: 1 },
   ])
 
+  // ===== AI 피드백 UI 상태 =====
+  const todayDate = useMemo(() => formatDateInputValue(new Date()), [])
+  const tomorrowDate = useMemo(
+    () => addDaysToDateString(todayDate, 1),
+    [todayDate]
+  )
+  const quickDeadlineOptions = useMemo(
+    () => [
+      { label: '내일', value: addDaysToDateString(todayDate, 1) },
+      { label: '1주일', value: addDaysToDateString(todayDate, 7) },
+      { label: '2주일', value: addDaysToDateString(todayDate, 14) },
+    ],
+    [todayDate]
+  )
+  const minEndDate = startDate
+    ? addDaysToDateString(startDate, 1)
+    : addDaysToDateString(todayDate, 1)
   // feedback slice 데이터를 UI 전용 형태로 변환
   const aiFeedback = useMemo<AiFeedback | null>(() => {
     if (!feedbackData) return null
@@ -246,8 +277,12 @@ const ProjectCreatePage = () => {
     if (!goal.trim()) return '프로젝트 목표를 입력해주세요.'
     if (!startDate || !endDate) return '프로젝트 기간을 입력해주세요.'
     if (!deadline) return '모집 마감일을 입력해주세요.'
-    if (new Date(startDate) > new Date(endDate))
-      return '프로젝트 시작일은 종료일보다 늦을 수 없습니다.'
+    if (startDate < todayDate)
+      return '프로젝트 시작일은 오늘 이전으로 선택할 수 없습니다.'
+    if (endDate <= startDate)
+      return '프로젝트 종료일은 시작일보다 이후 날짜여야 합니다.'
+    if (deadline < tomorrowDate)
+      return '모집 마감일은 내일부터 선택할 수 있습니다.'
     if (!communicationMethod) return '소통 방식을 선택해주세요.'
     if (requiredTechStack.length === 0)
       return '기술 스택을 1개 이상 선택해주세요.'
@@ -549,8 +584,29 @@ const ProjectCreatePage = () => {
                 <Input
                   type="date"
                   value={deadline}
+                  min={tomorrowDate}
                   onChange={(e) => setDeadline(e.target.value)}
                 />
+                <div className="flex flex-wrap gap-2 pt-1">
+                  {quickDeadlineOptions.map((option) => {
+                    const selected = deadline === option.value
+
+                    return (
+                      <button
+                        key={option.label}
+                        type="button"
+                        onClick={() => setDeadline(option.value)}
+                        className={`rounded-full border px-3 py-1 text-xs font-semibold transition ${
+                          selected
+                            ? 'border-indigo-600 bg-indigo-50 text-indigo-700'
+                            : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
+                        }`}
+                      >
+                        {option.label}
+                      </button>
+                    )
+                  })}
+                </div>
               </div>
 
               <div className="space-y-2">
@@ -573,12 +629,14 @@ const ProjectCreatePage = () => {
                 <Input
                   type="date"
                   value={startDate}
+                  min={todayDate}
                   onChange={(e) => setStartDate(e.target.value)}
                 />
                 <span className="text-slate-400">~</span>
                 <Input
                   type="date"
                   value={endDate}
+                  min={minEndDate}
                   onChange={(e) => setEndDate(e.target.value)}
                 />
               </div>
