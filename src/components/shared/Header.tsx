@@ -1,17 +1,17 @@
 import * as React from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import {
-  Bell,
   LogOut,
   User,
   CreditCard,
-  LayoutDashboard,
+  FolderKanban,
   Sparkles,
   Menu,
   X,
   CircleUser,
 } from 'lucide-react'
 import { SideMateLogo } from '../icons'
+import { NotificationPopover } from '../notifications/NotificationPopover'
 import { Button } from '../ui/button'
 import { useAppDispatch, useAppSelector } from '@/hooks'
 import { clearUser } from '@/features/slices/userSlice'
@@ -47,8 +47,8 @@ export const Header = () => {
   }
 
   const iconClasses =
-    'mr-2 h-4 w-4 text-muted-foreground transition-all duration-500 ease-in-out group-hover:text-primary group-hover:stroke-[2.5]'
-  const menuItemClasses = 'group cursor-pointer hover:bg-primary/10'
+    'h-4 w-4 text-muted-foreground transition-all duration-500 ease-in-out group-hover:text-primary group-hover:stroke-[2.5]'
+  const menuItemClasses = 'group cursor-pointer hover:bg-primary/10 flex-row'
 
   return (
     <>
@@ -166,9 +166,7 @@ export const Header = () => {
                 </DropdownMenu>
               </div>
 
-              <button className="text-text-muted hover:text-primary cursor-pointer transition-colors">
-                <Bell size={22} strokeWidth={1.5} />
-              </button>
+              <NotificationPopover />
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -202,18 +200,7 @@ export const Header = () => {
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  {user?.role === 'admin' && (
-                    <>
-                      <DropdownMenuItem
-                        className={menuItemClasses}
-                        onClick={() => navigate('/admin/banner')}
-                      >
-                        <LayoutDashboard className={iconClasses} />
-                        <span>대시보드</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                    </>
-                  )}
+
                   <DropdownMenuItem
                     className={menuItemClasses}
                     onClick={() => {
@@ -228,6 +215,21 @@ export const Header = () => {
                   >
                     <User className={iconClasses} />
                     <span>내 계정</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className={menuItemClasses}
+                    onClick={() => {
+                      navigate('/my/project?tab=create')
+                      setTimeout(() => {
+                        window.scrollTo({
+                          top: 0,
+                          behavior: 'smooth',
+                        })
+                      }, 300)
+                    }}
+                  >
+                    <FolderKanban className={iconClasses} />
+                    <span className="text-right">내 프로젝트</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     className={menuItemClasses}

@@ -1,10 +1,10 @@
 import ApplicantItem from '../../ApplicantItem'
-import type { MappedApplicant } from './types'
+import type { ApplicantDetail } from '@/types/applicant'
 
 interface Props {
   show: boolean
-  applicants: MappedApplicant[]
-  onDetail: (applicant: MappedApplicant) => void
+  applicants: ApplicantDetail[]
+  onDetail: (applicant: ApplicantDetail) => void
   onApprove: (id: string) => void
   onReject: (id: string) => void
 }

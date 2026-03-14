@@ -1,6 +1,13 @@
+import { useNavigate } from 'react-router-dom'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { BarChart2, ChevronDown, ChevronUp, Users } from 'lucide-react'
+import {
+  BarChart2,
+  ChevronDown,
+  ChevronUp,
+  ExternalLink,
+  Users,
+} from 'lucide-react'
 import type { Project } from '@/types/project'
 
 interface Props {
@@ -8,7 +15,6 @@ interface Props {
   showAIFeedback: boolean
   showApplicants: boolean
   applicantCount: number
-  onDetailClick: () => void
   onToggleAIFeedback: () => void
   onToggleApplicants: () => void
 }
@@ -27,10 +33,11 @@ const ProjectCardHeader = ({
   showAIFeedback,
   showApplicants,
   applicantCount,
-  onDetailClick,
   onToggleAIFeedback,
   onToggleApplicants,
 }: Props) => {
+  const navigate = useNavigate()
+
   return (
     <div className="relative mb-6">
       <div className="space-y-2 max-[667px]:pr-0">
@@ -58,8 +65,13 @@ const ProjectCardHeader = ({
         </p>
       </div>
 
-      <div className="absolute top-0 right-0 flex flex-wrap justify-end gap-2 max-[667px]:static max-[667px]:mt-4 max-[667px]:justify-start">
-        <Button variant="secondary" size="sm" onClick={onDetailClick}>
+      <div className="flex flex-wrap items-center gap-2 self-center">
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={() => navigate(`/projects/${project._id}`)}
+        >
+          <ExternalLink className="mr-1 size-4" />
           상세
         </Button>
         <Button variant="secondary" size="sm" onClick={onToggleAIFeedback}>
