@@ -69,7 +69,14 @@ type AiFeedback = {
 }
 
 // 폼 선택 옵션 상수
-const CATEGORY_OPTIONS = ['웹개발', '모바일앱', 'AI & 머신러닝', '블록체인']
+const CATEGORY_OPTIONS = [
+  '웹개발',
+  '모바일앱',
+  'AI & 머신러닝',
+  '블록체인',
+  '디자인',
+  '게임',
+]
 const COMMUNICATION_OPTIONS = [
   { value: 'DISCORD', label: '디스코드' },
   { value: 'OPEN_CHAT', label: '오픈채팅' },
