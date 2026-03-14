@@ -85,7 +85,7 @@ export const TermsSection: React.FC = () => {
                 render={({ field }) => (
                   <Checkbox
                     id={item.id}
-                    checked={field.value}
+                    checked={!!field.value}
                     onCheckedChange={field.onChange}
                     className={`size-4 cursor-pointer transition-all ${
                       item.required &&

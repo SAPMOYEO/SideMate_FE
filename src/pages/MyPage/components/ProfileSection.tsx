@@ -1,5 +1,14 @@
 import React from 'react'
-import { Github, UserCircle, Info, Lock, CircleAlert, User } from 'lucide-react'
+import {
+  Github,
+  UserCircle,
+  Info,
+  Lock,
+  CircleAlert,
+  User,
+  ScrollText,
+  Settings,
+} from 'lucide-react'
 import { useAppSelector } from '@/hooks'
 import ProfileEditModal from './ProfileEditModal'
 
@@ -22,7 +31,10 @@ const ProfileSection: React.FC = () => {
         <Info size={14} className="shrink-0 text-indigo-500" />
         <p className="text-[11px] font-bold tracking-tight text-zinc-500 dark:text-slate-400">
           프로젝트 지원 시, 프로젝트 리더가 보게 되는 내 프로필입니다.
-          <span className="font-extrabold text-indigo-500/80">프로필 수정</span>
+          <span className="font-extrabold text-indigo-500/80">
+            {' '}
+            프로필 수정
+          </span>
           에서 공개 여부를 설정할 수 있습니다.
         </p>
       </div>
@@ -57,9 +69,9 @@ const ProfileSection: React.FC = () => {
                   href={`https://github.com/${user.profile.gitUrl}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-2 text-sm font-medium text-zinc-500 transition-colors hover:text-indigo-500 md:justify-start"
+                  className="flex items-center justify-center gap-1 text-sm font-medium text-zinc-500 transition-colors hover:text-indigo-500 md:justify-start"
                 >
-                  <Github size={16} />
+                  <Github size={14} />
                   github.com/{user.profile.gitUrl}
                 </a>
               ) : (
@@ -79,9 +91,18 @@ const ProfileSection: React.FC = () => {
           <div className="mb-6">
             {privacy?.isBioPublic ? (
               user?.profile?.bio ? (
-                <p className="leading-relaxed break-keep text-zinc-600 dark:text-zinc-400">
-                  {user.profile.bio}
-                </p>
+                <div className="flex flex-col gap-1 pt-3">
+                  <div className="flex items-center gap-1.5 text-zinc-400">
+                    <ScrollText size={14} className="shrink-0" />
+                    <span className="text-[11px] font-bold tracking-tight">
+                      한 줄 소개
+                    </span>
+                  </div>
+
+                  <p className="text-sm leading-relaxed font-normal break-keep text-zinc-700 dark:text-zinc-400">
+                    {user.profile.bio}
+                  </p>
+                </div>
               ) : (
                 <div className="flex items-center gap-1.5 text-sm text-zinc-400">
                   <CircleAlert size={14} className="shrink-0 text-indigo-400" />
@@ -96,11 +117,12 @@ const ProfileSection: React.FC = () => {
             )}
           </div>
 
-          <div className="mb-4">
-            <p className="mb-3 text-[10px] font-black tracking-widest text-zinc-400 uppercase">
+          <div className="space-y-2">
+            <p className="flex items-center gap-1 text-[10px] font-black tracking-widest text-zinc-400 uppercase">
+              <Settings size={14} className="shrink-0" />
               기술 스택
             </p>
-            <div className="flex flex-wrap justify-center gap-2 md:justify-start">
+            <div className="flex flex-wrap gap-1">
               {user?.profile?.techStack && user.profile.techStack.length > 0 ? (
                 user.profile.techStack.map((tech) => (
                   <span

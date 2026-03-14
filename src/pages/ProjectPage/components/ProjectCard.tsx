@@ -3,6 +3,7 @@ import type { Project } from '@/types/project'
 import { formatDate } from '@/utils/formatter'
 import { Link } from 'react-router-dom'
 import RoleProgress from './RoleProgress'
+import { useAppSelector } from '@/hooks'
 
 interface Props {
   project: Pick<
@@ -15,10 +16,15 @@ interface Props {
     | 'recruitRoles'
     | 'totalCnt'
     | 'createdAt'
+    | 'author'
   >
 }
 
 const ProjectCard = ({ project }: Props) => {
+  const { user } = useAppSelector((state) => state.user)
+  const isOwner = Boolean(
+    user?._id && project.author?._id && user._id === project.author._id
+  )
   const [showAllTechStack, setShowAllTechStack] = useState(false)
   const visibleRecruitRoles = project.recruitRoles.slice(0, 3)
   const isTechStackExpandable = project.requiredTechStack.length > 8
@@ -30,7 +36,9 @@ const ProjectCard = ({ project }: Props) => {
     project.requiredTechStack.length - visibleTechStack.length
 
   return (
-    <div className="flex flex-col justify-between gap-6 rounded-xl border bg-white p-6 transition duration-200 hover:shadow-lg lg:flex-row lg:items-center">
+    <div
+      className={`flex flex-col justify-between gap-6 rounded-xl border bg-white p-6 transition duration-200 hover:shadow-lg lg:flex-row lg:items-center ${isOwner ? 'border-indigo-500' : ''}`}
+    >
       <div className="flex-1">
         <div className="mb-2 flex items-center gap-3 text-xs">
           <span className="rounded-md bg-indigo-50 px-2 py-1 font-medium text-indigo-600">
@@ -103,9 +111,13 @@ const ProjectCard = ({ project }: Props) => {
 
         <Link
           to={`/projects/${project._id}`}
-          className="bg-primary rounded-lg py-2 text-center text-white transition hover:bg-indigo-600"
+          className={
+            isOwner
+              ? 'rounded-lg bg-indigo-500 py-2 text-center text-white transition hover:bg-zinc-800'
+              : 'hover: hover: rounded-lg border border-indigo-50 bg-indigo-50 py-2 text-center text-indigo-600 transition hover:border-indigo-600'
+          }
         >
-          상세 보기
+          {isOwner ? '내 프로젝트 관리' : '상세 보기'}
         </Link>
       </div>
     </div>

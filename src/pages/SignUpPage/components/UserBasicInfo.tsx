@@ -34,6 +34,9 @@ export const UserBasicInfo: React.FC<UserBasicInfoProps> = ({
             onBlur: async (e) => {
               if (isReadOnly) return
               const email = e.target.value.trim()
+              if (email !== e.target.value) {
+                setValue('email', email, { shouldValidate: false })
+              }
               const isValid = await trigger('email')
               if (!isValid || !email) return
               const { isDuplicate } = await validateDuplicate('email', email)
@@ -69,7 +72,10 @@ export const UserBasicInfo: React.FC<UserBasicInfoProps> = ({
         <Input
           {...register('name', {
             onBlur: (e) => {
-              e.target.value = e.target.value.trim()
+              const trimmed = e.target.value.trim()
+              if (trimmed !== e.target.value) {
+                setValue('name', trimmed, { shouldValidate: false })
+              }
             },
           })}
           onChange={(e) => {

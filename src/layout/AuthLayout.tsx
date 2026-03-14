@@ -35,7 +35,7 @@ const AuthLayout: React.FC = () => {
           to="/"
           className="relative z-10 flex items-center no-underline transition-opacity hover:opacity-80"
         >
-          <SideMateLogo className="[&_span]:text-white [&_span]:[-webkit-text-stroke:0] [&_span]:[text-shadow:none]" />
+          <SideMateLogo className="[&_span]:text-primary [&_span]:[-webkit-text-stroke:0] [&_span]:[text-shadow:none]" />
         </Link>
 
         <div className="relative z-10 max-w-lg">

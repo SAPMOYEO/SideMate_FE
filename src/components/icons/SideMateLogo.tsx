@@ -6,7 +6,7 @@ export const SideMateLogo = ({ className = '' }: { className?: string }) => {
       <img src={LOGO_ICON} alt="SideMate" className="h-8 w-auto shrink-0" />
       <h1 className="hidden sm:block">
         <span
-          className={`xs:text-white text-2xl font-[800] tracking-[-0.02em] text-[#430387] antialiased dark:text-white`}
+          className={`xs:text-white text-primary text-2xl font-[800] tracking-[-0.02em] antialiased dark:text-white`}
         >
           SideMate
         </span>

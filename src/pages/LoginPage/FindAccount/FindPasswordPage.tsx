@@ -32,6 +32,8 @@ const FindPasswordPage: React.FC = () => {
     formState: { errors, isSubmitting },
   } = useForm<FindPasswordFormValues>({
     resolver: zodResolver(findPasswordSchema),
+    mode: 'onBlur',
+    reValidateMode: 'onBlur',
     defaultValues: { email: '' },
   })
   const onSubmit = async (data: FindPasswordFormValues) => {

@@ -5,8 +5,6 @@ import { formatDistanceToNow } from 'date-fns'
 import { ko } from 'date-fns/locale'
 import { Badge } from '@/components/ui/badge'
 const ProjectCard = ({ project }: { project: Project }) => {
-  console.log('Project Card : ', project)
-
   return (
     <div className="relative flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white transition-all duration-300 hover:shadow-xl dark:border-slate-800 dark:bg-slate-900">
       <div className="absolute top-4 right-4">

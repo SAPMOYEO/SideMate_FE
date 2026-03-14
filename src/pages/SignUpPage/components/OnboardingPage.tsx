@@ -37,6 +37,11 @@ const OnboardingPage: React.FC = () => {
       name: user?.name || '',
       phone: '',
       techStacks: [],
+      terms: {
+        service: false,
+        privacy: false,
+        marketing: false,
+      },
     },
   })
 

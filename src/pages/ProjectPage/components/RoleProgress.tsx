@@ -17,8 +17,8 @@ const RoleProgress = ({ role }: Props) => {
         <span className="font-medium">{role.name}</span>
         <span>
           {role.current >= role.total ? (
-            <span className="flex items-center gap-1 font-semibold text-emerald-600">
-              <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" />
+            <span className="font-base flex items-center gap-1 text-emerald-600">
+              <CheckCircle2 className="h-3 w-3 shrink-0 text-emerald-600" />
               모집 완료
             </span>
           ) : (

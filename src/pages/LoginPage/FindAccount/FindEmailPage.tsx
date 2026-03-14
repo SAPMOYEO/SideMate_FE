@@ -78,6 +78,7 @@ const FindEmailPage: React.FC = () => {
     resolver: zodResolver(findEmailSchema),
     defaultValues: { name: '', phone: '' },
     mode: 'onBlur',
+    reValidateMode: 'onBlur',
   })
 
   const onSubmit = async (data: FindEmailFormValues) => {
@@ -135,8 +136,14 @@ const FindEmailPage: React.FC = () => {
             <div className="my-10 rounded-2xl bg-slate-50 p-6">
               <span className="font-black">{foundEmail}</span>
             </div>
-            {provider === 'google' && (
+            {provider === 'google' ? (
               <GoogleLoginButton text="Google 계정으로 로그인" />
+            ) : (
+              <Link to="/login">
+                <Button className="mt-2 h-12 w-full bg-zinc-900 font-bold shadow-lg">
+                  로그인
+                </Button>
+              </Link>
             )}
           </div>
         )}
