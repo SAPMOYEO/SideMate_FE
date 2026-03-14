@@ -133,6 +133,8 @@ const ProjectCreatePage = () => {
   const [endDate, setEndDate] = useState('')
   const [deadline, setDeadline] = useState('')
   const [communicationMethod, setCommunicationMethod] = useState('')
+  type GitUrlSource = 'LATER' | 'PROFILE_GITHUB' | 'CUSTOM'
+  const [gitUrlSource, setGitUrlSource] = useState<GitUrlSource>('LATER')
   const [gitUrl, setGitUrl] = useState('')
 
   // ===== 기술 스택 선택 UI 상태 =====
@@ -210,7 +212,20 @@ const ProjectCreatePage = () => {
     setEndDate(editingProject.endDate?.slice(0, 10) ?? '')
     setDeadline(editingProject.deadline?.slice(0, 10) ?? '')
     setCommunicationMethod(editingProject.communicationMethod ?? '')
-    setGitUrl(editingProject.gitUrl ?? '')
+    const repoUrl = editingProject.gitUrl?.trim() ?? ''
+    const profileGitFull = user?.profile?.gitUrl
+      ? `https://github.com/${user.profile.gitUrl}`
+      : ''
+    if (!repoUrl) {
+      setGitUrlSource('LATER')
+      setGitUrl('')
+    } else if (profileGitFull && repoUrl === profileGitFull) {
+      setGitUrlSource('PROFILE_GITHUB')
+      setGitUrl('')
+    } else {
+      setGitUrlSource('CUSTOM')
+      setGitUrl(repoUrl)
+    }
     setRequiredTechStack(editingProject.requiredTechStack ?? [])
     setRecruitRoles(
       editingProject.recruitRoles.length
@@ -230,6 +245,12 @@ const ProjectCreatePage = () => {
   )
   // 등록/수정 중 버튼 비활성화를 위한 통합 상태
   const isSubmitting = isEditMode ? isUpdating : isCreating
+  const getResolvedGitUrl = (): string => {
+    if (gitUrlSource === 'LATER') return ''
+    if (gitUrlSource === 'PROFILE_GITHUB' && user?.profile?.gitUrl)
+      return `https://github.com/${user.profile.gitUrl}`
+    return gitUrl.trim()
+  }
 
   // 기술 스택 토글 (선택/해제)
   const toggleTechStack = (stack: string) => {
@@ -361,7 +382,7 @@ const ProjectCreatePage = () => {
           totalCnt,
           deadline,
           communicationMethod,
-          gitUrl: gitUrl.trim() || '',
+          gitUrl: getResolvedGitUrl(),
         },
       }
 
@@ -427,7 +448,7 @@ const ProjectCreatePage = () => {
         status: isEditMode
           ? (editingProject?.status ?? 'RECRUITING')
           : 'RECRUITING',
-        gitUrl: gitUrl.trim() || undefined,
+        gitUrl: getResolvedGitUrl(),
         tempProjectId: isEditMode ? undefined : tempProjectId,
       }
 
@@ -613,11 +634,58 @@ const ProjectCreatePage = () => {
                 <label className="text-sm font-semibold text-slate-700">
                   저장소 주소 (선택)
                 </label>
-                <Input
-                  value={gitUrl}
-                  onChange={(e) => setGitUrl(e.target.value)}
-                  placeholder="https://github.com/..."
-                />
+                <div className="space-y-2 rounded-md border border-gray-200 bg-slate-50/50 p-3">
+                  <label className="flex cursor-pointer items-center gap-2">
+                    <input
+                      type="radio"
+                      name="gitUrlSource"
+                      checked={gitUrlSource === 'LATER'}
+                      onChange={() => setGitUrlSource('LATER')}
+                      className="h-4 w-4 border-gray-300 text-indigo-600"
+                    />
+                    <span className="text-sm font-medium text-slate-700">
+                      추후 공개 예정
+                    </span>
+                  </label>
+                  {user?.profile?.gitUrl &&
+                    user?.privacySettings?.isGithubPublic === true && (
+                      <label className="flex cursor-pointer items-center gap-2">
+                        <input
+                          type="radio"
+                          name="gitUrlSource"
+                          checked={gitUrlSource === 'PROFILE_GITHUB'}
+                          onChange={() => setGitUrlSource('PROFILE_GITHUB')}
+                          className="h-4 w-4 border-gray-300 text-indigo-600"
+                        />
+                        <span className="text-sm font-medium text-slate-700">
+                          내 GitHub 주소 사용 ( github.com/{user.profile.gitUrl}
+                          )
+                        </span>
+                      </label>
+                    )}
+                  <label className="flex cursor-pointer items-center gap-2">
+                    <input
+                      type="radio"
+                      name="gitUrlSource"
+                      checked={gitUrlSource === 'CUSTOM'}
+                      onChange={() => setGitUrlSource('CUSTOM')}
+                      className="h-4 w-4 border-gray-300 text-indigo-600"
+                    />
+                    <span className="shrink-0 text-sm font-medium whitespace-nowrap text-slate-700">
+                      직접 입력
+                    </span>
+                  </label>
+                  {gitUrlSource === 'CUSTOM' && (
+                    <div className="w-full min-w-0">
+                      <Input
+                        value={gitUrl}
+                        onChange={(e) => setGitUrl(e.target.value)}
+                        placeholder="https://github.com/..."
+                        className="mt-1 w-full min-w-0"
+                      />
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
