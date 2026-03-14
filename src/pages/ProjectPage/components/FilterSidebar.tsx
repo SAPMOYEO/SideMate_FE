@@ -13,14 +13,7 @@ interface Props {
   ) => void
 }
 
-const categoryOptions = [
-  '웹개발',
-  '모바일앱',
-  'AI & 머신러닝',
-  '블록체인',
-  '디자인',
-  '게임',
-]
+const categoryOptions = ['웹개발', '모바일앱', 'AI & 머신러닝', '블록체인']
 const statusOptions = [
   { label: '모집 중', value: 'RECRUITING' },
   { label: '모집 마감', value: 'CLOSED' },
