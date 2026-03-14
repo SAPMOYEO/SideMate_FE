@@ -172,7 +172,7 @@ export const Header = () => {
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <div className="h-9 w-9 cursor-pointer overflow-hidden rounded-full bg-zinc-100 ring-offset-2 transition-all duration-500 hover:ring-2 hover:ring-slate-300 dark:bg-slate-800">
+                  <div className="hover:ring-primary/80 h-7 w-7 cursor-pointer overflow-hidden rounded-full bg-zinc-100 ring-offset-2 transition-all duration-500 hover:ring-2 dark:bg-slate-800">
                     {user?.profile?.profileImage ? (
                       <img
                         src={user.profile.profileImage}
@@ -182,9 +182,9 @@ export const Header = () => {
                     ) : (
                       <div className="flex h-full w-full items-center justify-center text-zinc-400">
                         <CircleUser
-                          size={32}
+                          size={28}
                           strokeWidth={1.5}
-                          className="relative top-[0.5px]"
+                          className="relative"
                         />
                       </div>
                     )}
@@ -273,50 +273,57 @@ export const Header = () => {
         </div>
       </header>
 
-      {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-[60] md:hidden">
-          <div
-            className="absolute inset-0 bg-black/40"
-            onClick={() => setIsMobileMenuOpen(false)}
-          />
-          <div className="bg-surface absolute top-0 right-0 flex h-full w-[280px] flex-col border-l px-6 py-6 shadow-xl">
-            <div className="mb-8 flex items-center justify-between">
-              <span className="text-base font-bold">메뉴</span>
-              <button
-                type="button"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="text-text-muted hover:text-primary cursor-pointer transition-colors"
-              >
-                <X size={22} strokeWidth={1.8} />
-              </button>
-            </div>
+      <div
+        className={`fixed inset-0 z-[60] transition-opacity duration-400 ease-out md:hidden ${
+          isMobileMenuOpen ? 'opacity-100' : 'pointer-events-none opacity-0'
+        }`}
+        aria-hidden={!isMobileMenuOpen}
+      >
+        <div
+          className="absolute inset-0 bg-black/40 transition-opacity duration-400"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+        <div
+          className={`bg-surface absolute top-0 right-0 flex h-full w-[180px] flex-col border-l px-6 py-6 shadow-xl transition-transform duration-400 ease-out ${
+            isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
+          }`}
+        >
+          <div className="mb-6 flex items-center justify-between border-b pb-5">
+            <span className="text-base font-bold">메뉴</span>
+            <button
+              type="button"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="text-text-muted hover:text-primary cursor-pointer transition-colors"
+            >
+              <X size={22} strokeWidth={1.8} />
+            </button>
+          </div>
 
-            <div className="flex flex-col items-center gap-5">
-              <Link
-                to="/"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="text-text-main hover:text-primary text-base font-semibold transition-colors"
-              >
-                홈
-              </Link>
-              <Link
-                to="/projects"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="text-text-main hover:text-primary text-base font-semibold transition-colors"
-              >
-                프로젝트
-              </Link>
-              <Link
-                to="#"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="text-text-main hover:text-primary flex items-center text-base font-semibold transition-colors"
-              >
-                AI 피드백
-              </Link>
-            </div>
+          <div className="flex flex-col items-center gap-5">
+            <Link
+              to="/"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="text-text-main hover:text-primary text-base font-semibold transition-colors"
+            >
+              홈
+            </Link>
+            <Link
+              to="/projects"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="text-text-main hover:text-primary text-base font-semibold transition-colors"
+            >
+              프로젝트
+            </Link>
+            <Link
+              to="/my/project?tab=create"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="text-text-main hover:text-primary flex items-center text-base font-semibold transition-colors"
+            >
+              AI 피드백
+            </Link>
           </div>
         </div>
-      )}
+      </div>
     </>
   )
 }

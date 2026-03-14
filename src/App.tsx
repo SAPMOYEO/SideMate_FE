@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import AppRouter from './routes/AppRouter'
+import ScrollToTop from '@/components/shared/ScrollToTop'
 import { useAppDispatch } from '@/hooks'
 import {
   loginWithToken,
@@ -40,6 +41,7 @@ function App() {
   }, [dispatch])
   return (
     <>
+      <ScrollToTop />
       <AppRouter />
       <Toaster richColors position="top-center" />
     </>

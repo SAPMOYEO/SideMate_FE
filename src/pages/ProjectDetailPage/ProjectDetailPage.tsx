@@ -58,7 +58,11 @@ const getDeadlineText = (deadline?: string) => {
   const diff = Math.ceil((target.getTime() - today.getTime()) / 86400000)
   if (diff < 0) return '마감됨'
   if (diff === 0) return '오늘 마감'
-  return `마감 ${diff}일 전`
+  return (
+    <>
+      마감 <span className="text-primary font-extrabold">{diff}</span>일 전
+    </>
+  )
 }
 
 const ProjectDetailPage = () => {
@@ -334,11 +338,19 @@ const ProjectDetailPage = () => {
             <h2 className="text-sm font-semibold text-zinc-700">
               프로젝트 목표
             </h2>
-            <div className="rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700">
-              <div className="flex items-start gap-2">
-                <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-indigo-500" />
-                <p className="break-keep whitespace-pre-line">{project.goal}</p>
-              </div>
+            <div className="space-y-2">
+              {(project.goal
+                ? project.goal.split('\n').filter((line) => line.trim())
+                : []
+              ).map((goalItem, index) => (
+                <div
+                  key={index}
+                  className="flex items-start gap-2 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700"
+                >
+                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-indigo-500" />
+                  <p className="break-keep">{goalItem.trim()}</p>
+                </div>
+              ))}
             </div>
           </div>
 
@@ -411,12 +423,16 @@ const ProjectDetailPage = () => {
                 </span>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-500">마감일</span>
+                <span className="text-gray-500">지원 마감일</span>
                 <span className="font-semibold text-rose-500">
                   {toDateText(project.deadline)}
                 </span>
               </div>
             </div>
+
+            <p className="mt-3 text-center text-xs text-gray-400">
+              {deadlineText}
+            </p>
 
             {!isOwner &&
               new Date(project.deadline) > new Date() &&
@@ -433,15 +449,12 @@ const ProjectDetailPage = () => {
                 <button
                   type="button"
                   onClick={handleApplyClick}
-                  className="mt-6 w-full rounded-xl bg-indigo-500 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-200 transition hover:bg-indigo-600"
+                  className="mt-6 w-full cursor-pointer rounded-xl bg-indigo-500 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-200 transition hover:bg-indigo-600"
                 >
                   지원하기
                 </button>
               ))}
 
-            <p className="mt-3 text-center text-xs text-gray-400">
-              {deadlineText}
-            </p>
             {isOwner && (
               <div className="mt-4 flex justify-end gap-2 border-t pt-5">
                 <button

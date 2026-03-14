@@ -21,7 +21,7 @@ const SignUpPage: React.FC = () => {
   const methods = useForm<SignUpFormValues>({
     resolver: zodResolver(signUpSchema),
     mode: 'onTouched',
-    reValidateMode: 'onChange',
+    reValidateMode: 'onBlur',
     defaultValues: {
       name: '',
       phone: '',

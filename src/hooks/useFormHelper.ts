@@ -16,7 +16,7 @@ export const useFormHelper = <T extends FieldValues>() => {
     fieldName: Path<T>,
     value: PathValue<T, Path<T>>
   ) => {
-    setValue(fieldName, value, { shouldValidate: true })
+    setValue(fieldName, value, { shouldValidate: false })
 
     if (errors[fieldName]) {
       clearErrors(fieldName)
