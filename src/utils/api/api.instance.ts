@@ -38,7 +38,12 @@ api.interceptors.response.use(
     }
 
     if (status === 403) {
-      // 권한 없음
+      // 로그인 요청의 403은 계정 정지 → 리다이렉트하지 않고 에러 전달
+      const url = error.config?.url || ''
+      if (url.includes('/login') || url.includes('/google')) {
+        return Promise.reject(error)
+      }
+      // 그 외 403은 권한 없음 페이지로
       window.location.href = '/403'
     }
 
