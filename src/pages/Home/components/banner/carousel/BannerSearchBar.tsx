@@ -17,7 +17,7 @@ const BannerSearchBar = () => {
       {/* 로고 — 모바일에서 축소 */}
       <div className="mb-6 md:mb-8">
         <h1 className="text-2xl font-[900] tracking-tight break-keep text-zinc-300 antialiased drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)] md:text-5xl lg:text-6xl">
-          당신의{' '}
+          당신의
           <span className="animate-pulse text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.5)] [animation-duration:4s]">
             {' '}
             아이디어

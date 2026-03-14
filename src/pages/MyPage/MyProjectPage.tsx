@@ -21,7 +21,7 @@ const MyProjectPage = () => {
         <div className="mb-8 flex flex-col">
           {/* Tab */}
           <Tabs
-            defaultValue={tabs}
+            value={tabs}
             onValueChange={(v) => handleTabsChange(v as TabsType)}
           >
             <TabsList variant="line">

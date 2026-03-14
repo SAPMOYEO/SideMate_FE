@@ -4,9 +4,35 @@ import ApplicationStatusBadge from '../ApplicationStatusBadge'
 import { useMyApplication } from '@/hooks/application/useApplication'
 import { formatDate } from '@/utils/formatter'
 import { useNavigate } from 'react-router-dom'
+import { useDeleteApplication } from '@/hooks/application/useApplication'
+import { toast } from 'sonner'
 const AppliedView = () => {
   const { data } = useMyApplication()
   const navigate = useNavigate()
+  const { mutateAsync: deleteApplication } = useDeleteApplication()
+  const handleCancelApplication = async (id: string) => {
+    if (!id) {
+      toast.error('지원 정보를 다시 불러온 후 시도해주세요.')
+      return
+    }
+
+    if (!window.confirm('지원을 취소하시겠습니까?')) return
+
+    try {
+      await deleteApplication(id)
+      toast.success('지원이 취소되었습니다.')
+    } catch (error) {
+      console.error(error)
+      toast.error('지원 취소 중 오류가 발생했습니다.')
+    }
+  }
+  if (data?.data.length === 0) {
+    return (
+      <div className="flex min-h-96 w-full items-center justify-center">
+        <p className="text-sm text-slate-400">지원하신 프로젝트가 없습니다.</p>
+      </div>
+    )
+  }
   return (
     <ul className="w-full space-y-4">
       {data?.data?.map((item) => {
@@ -36,6 +62,10 @@ const AppliedView = () => {
               <div className="flex items-center gap-2">
                 {item.status !== 'REJECTED' && (
                   <Button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleCancelApplication(item._id)
+                    }}
                     variant="outline"
                     size="sm"
                     className="text-red-500 hover:text-red-600"

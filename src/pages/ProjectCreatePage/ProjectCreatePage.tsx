@@ -64,7 +64,6 @@ type AiFeedback = {
   warnings: string[]
   // 개선 제안 항목
   suggestions: string[]
-  // 상세 분석 문단
   // 종합 내용 문단
   detail: string
 }
@@ -141,9 +140,6 @@ const ProjectCreatePage = () => {
       warnings: feedbackData.weaknesses,
       suggestions: feedbackData.suggestions,
       detail: [
-        ...feedbackData.strengths,
-        ...feedbackData.weaknesses,
-        ...feedbackData.suggestions,
         feedbackData.overallComment || '종합 내용을 아직 불러오지 못했습니다',
       ].join('\n\n'),
     }
@@ -386,7 +382,6 @@ const ProjectCreatePage = () => {
         startDate,
         endDate,
         requiredTechStack,
-        mandatoryTechStack: [],
         recruitRoles: recruitRoles.map((row) => ({
           role: row.role.trim(),
           cnt: row.cnt,
@@ -785,7 +780,7 @@ const ProjectCreatePage = () => {
 
               <section className="rounded-2xl border border-gray-200 bg-white p-4">
                 <h3 className="mb-2 text-sm font-semibold text-slate-800">
-                  상세 분석 내용 종합 내용
+                  종합 내용
                 </h3>
                 <p className="text-xs leading-6 whitespace-pre-line text-slate-600">
                   {aiFeedback.detail}
