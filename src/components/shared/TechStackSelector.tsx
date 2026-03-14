@@ -76,25 +76,24 @@ export const TechStackSelector: React.FC<TechStackSelectorProps> = ({
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex items-center gap-3">
-        <label className="text-sm font-semibold text-slate-700 dark:text-slate-200">
-          기술 스택
-        </label>
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-bold text-slate-400">
-            {selectedStacks.length} / {maxCount}
-          </span>
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <label className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+            기술 스택 <span className="ml-0.5 text-red-500">*</span>
+          </label>
 
-          <div className="flex h-4 items-center">
-            {selectedStacks.length >= maxCount ? (
-              <span className="animate-in fade-in slide-in-from-left-1 text-[11px] leading-none font-bold text-red-500">
-                최대 {maxCount}개까지 가능합니다
-              </span>
-            ) : shouldShowError ? (
-              <span className="animate-in fade-in slide-in-from-left-1 text-[11px] leading-none font-bold text-red-500">
-                {error || '최소 1개의 스택은 선택해야 합니다'}
-              </span>
-            ) : null}
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-bold text-slate-400">
+              {selectedStacks.length} / {maxCount}
+            </span>
+
+            <div className="flex h-4 items-center">
+              {selectedStacks.length >= maxCount && (
+                <span className="animate-in fade-in slide-in-from-left-1 text-[11px] leading-none font-bold text-red-500">
+                  최대 {maxCount}개까지 가능합니다
+                </span>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -126,7 +125,7 @@ export const TechStackSelector: React.FC<TechStackSelectorProps> = ({
           </span>
         ))}
 
-        <div className="absolute top-1/2 right-2 -translate-y-1/2">
+        <div className="absolute top-1/2 right-2 -translate-y-1/2 text-slate-400">
           <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
               <Button
@@ -160,6 +159,11 @@ export const TechStackSelector: React.FC<TechStackSelectorProps> = ({
           </Popover>
         </div>
       </div>
+      {error && (
+        <p className="animate-in fade-in slide-in-from-top-1 font-lg ml-1 text-xs text-red-500">
+          {error}
+        </p>
+      )}
     </div>
   )
 }

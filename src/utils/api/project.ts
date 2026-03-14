@@ -8,8 +8,7 @@ import type {
   ProjectSearchParams,
 } from '@/types/project'
 import api from './api.instance'
-import type { ProjectResponse } from '@/types/admin.project.type'
-import type { PaginatedResponse, ParamsTypes } from '@/types/common.type'
+import type { PaginatedResponse } from '@/types/common.type'
 
 /** 프로젝트 목록 조회 (페이지네이션 + 검색 조건) */
 export const fetchProjects = async (
@@ -48,34 +47,12 @@ export const deleteProject = async (id: string): Promise<DeleteProjectRes> => {
   return data
 }
 
-export const getProjectList = async ({
-  page = 1,
-  limit = 5,
-  search = '',
-  sort = '-createdAt',
-}: ParamsTypes = {}): Promise<PaginatedResponse<ProjectResponse>> => {
-  const { data } = await api.get('/admin/projects', {
-    params: {
-      page,
-      limit,
-      sort,
-      ...(search && { query: search }),
-    },
-  })
-  return data
-}
+/** 내 프로젝트 가져오기 */
 
-export const updateProjectHiddenStatus = async (
-  projectId: string,
-  hiddenYn: boolean
-) => {
-  try {
-    const { data } = await api.patch(`/admin/projects/${projectId}/hidden`, {
-      hiddenYn,
-    })
-    return data
-  } catch (err) {
-    console.error('Error updating project hidden status:', err)
-    throw err // 에러를 다시 던져서 호출한 곳에서 처리할 수 있도록 함
-  }
+export const fetchMyProject = async (
+  page: number
+): Promise<PaginatedResponse<Project>> => {
+  const { data } = await api.get('/project/me', { params: { page } })
+  console.log('fetch :', data)
+  return data
 }

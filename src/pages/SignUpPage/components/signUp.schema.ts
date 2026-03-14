@@ -8,11 +8,11 @@ export const signUpSchema = z
       .pipe(
         z
           .string()
-          .min(2, { message: '이름은 공백 제외 2자 이상 입력해주세요.' })
+          .min(2, { message: '이름은 공백 제외 2자 이상 입력해 주세요.' })
       ),
     phone: z
       .string()
-      .min(1, { message: '휴대폰 번호를 입력해주세요.' })
+      .min(1, { message: '휴대폰 번호를 입력해 주세요.' })
       .regex(/^010-\d{3,4}-\d{4}$/, {
         message: '올바른 휴대폰 번호 형식이 아닙니다.',
       }),
@@ -20,7 +20,7 @@ export const signUpSchema = z
       .string()
       .transform((val) => val.trim())
       .pipe(
-        z.string().min(1, { message: '이메일을 입력해주세요.' }).email({
+        z.string().min(1, { message: '이메일을 입력해 주세요.' }).email({
           message: '올바른 이메일 형식이 아닙니다. (example@email.com)',
         })
       ),
@@ -36,10 +36,10 @@ export const signUpSchema = z
       }),
     confirmPassword: z
       .string()
-      .min(1, { message: '비밀번호 확인을 입력해주세요.' }),
+      .min(1, { message: '비밀번호 확인을 입력해 주세요.' }),
     techStacks: z
       .array(z.string())
-      .min(1, { message: '최소 1개 이상의 기술 스택을 선택해주세요.' }),
+      .min(1, { message: '최소 1개 이상의 기술 스택을 선택해 주세요.' }),
     terms: z.object({
       service: z.boolean().refine((val) => val === true, {
         message: '서비스 이용약관 동의는 필수입니다.',
@@ -49,6 +49,15 @@ export const signUpSchema = z
       }),
       marketing: z.boolean(),
     }),
+    gitUrl: z
+      .string()
+      .max(39, '최대 39자까지 입력 가능합니다.')
+      .regex(
+        /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i,
+        'GitHub 아이디 형식이 올바르지 않습니다.'
+      )
+      .optional()
+      .or(z.literal('')),
   })
   .superRefine(({ password, confirmPassword }, ctx) => {
     if (confirmPassword !== password) {

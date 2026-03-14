@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useCreateBanner, useUpdateBanner } from './useBanners'
-import type { Banner } from '@/utils/api/banner'
+import type { Banner } from '@/utils/api/admin'
 
 // ── Schema ────────────────────────────────────────────────────────
 export const bannerSchema = z.object({

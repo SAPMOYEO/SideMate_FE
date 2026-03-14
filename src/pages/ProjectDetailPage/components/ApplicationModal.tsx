@@ -130,7 +130,7 @@ const ApplicationModal = ({
               <DialogTitle className="text-2xl font-extrabold text-slate-900">
                 프로젝트 지원하기
               </DialogTitle>
-              <p className="text-sm text-slate-500">{projectTitle}</p>
+              <p className="text-left text-sm text-slate-500">{projectTitle}</p>
             </div>
             <button
               type="button"
@@ -149,7 +149,13 @@ const ApplicationModal = ({
             </p>
             <Select value={role} onValueChange={setRole}>
               <SelectTrigger className="h-11 w-full border-slate-200 bg-slate-50">
-                <SelectValue placeholder="모집 역할을 선택해주세요" />
+                <SelectValue
+                  placeholder={
+                    roleOptions.length === 0
+                      ? '모든 역할 모집이 완료됐습니다.'
+                      : '지원 역할을 선택해주세요'
+                  }
+                />
               </SelectTrigger>
               <SelectContent align="start">
                 {roleOptions.map((option) => (

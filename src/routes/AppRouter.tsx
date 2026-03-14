@@ -19,7 +19,13 @@ import ProjectPage from '@/pages/ProjectPage/ProjectPage'
 import ProjectDetailPage from '@/pages/ProjectDetailPage/ProjectDetailPage'
 import ProjectCreatePage from '@/pages/ProjectCreatePage/ProjectCreatePage'
 import PaymentSuccessPage from '@/pages/PaymentSuccessPage/PaymentSuccessPage'
+import FindEmailPage from '@/pages/LoginPage/FindAccount/FindEmailPage'
+import FindPasswordPage from '@/pages/LoginPage/FindAccount/FindPasswordPage'
+import ResetPasswordPage from '@/pages/LoginPage/FindAccount/ResetPasswordPage'
+import OnboardingPage from '@/pages/SignUpPage/components/OnboardingPage'
 import HomePage from '@/pages/Home/HomePage'
+import PaymentHistoryPage from '@/pages/PaymentHistoryPage/PaymentHistoryPage'
+import MyProjectPage from '@/pages/MyPage/MyProjectPage'
 
 export default function AppRouter() {
   return (
@@ -29,8 +35,6 @@ export default function AppRouter() {
         <Route path="/" element={<HomePage />} />
         <Route path="/projects" element={<ProjectPage />} />
         <Route path="/projects/:id" element={<ProjectDetailPage />} />
-        <Route path="/payment" element={<PaymentPage />} />
-        <Route path="/payment-success" element={<PaymentSuccessPage />} />
       </Route>
 
       {/* PublicOnly - 비로그인만 접근 (로그인 상태면 / 로 리다이렉트) */}
@@ -38,15 +42,30 @@ export default function AppRouter() {
         <Route element={<AuthLayout />}>
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/login" element={<LoginPage />} />
+          {/* 이메일 찾기/비밀번호 찾기/비밀번호 재설정 페이지 */}
+          <Route path="/forgot-email" element={<FindEmailPage />} />
+          <Route path="/forgot-password" element={<FindPasswordPage />} />
+          <Route
+            path="/reset-password/:token"
+            element={<ResetPasswordPage />}
+          />
         </Route>
       </Route>
 
       {/* Private - 로그인 필요 (비로그인이면 /login 으로 리다이렉트) */}
       <Route element={<PrivateRoute />}>
+        {/* 구글유저 가입 시 필수정보 받기위해 /onboarding 페이지로 이동 */}
+        <Route element={<AuthLayout />}>
+          <Route path="/onboarding" element={<OnboardingPage />} />
+        </Route>
         <Route element={<AppLayout />}>
           <Route path="/projects/create" element={<ProjectCreatePage />} />
           <Route path="/projects/:id/edit" element={<ProjectCreatePage />} />
           <Route path="/my" element={<MyPage />} />
+          <Route path="/my/project" element={<MyProjectPage />} />
+          <Route path="/payment" element={<PaymentPage />} />
+          <Route path="/payment-success" element={<PaymentSuccessPage />} />
+          <Route path="/payment-history" element={<PaymentHistoryPage />} />
         </Route>
       </Route>
 

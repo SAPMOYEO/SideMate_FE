@@ -1,3 +1,5 @@
+import { CheckCircle2 } from 'lucide-react'
+
 interface Props {
   role: {
     name: string
@@ -13,9 +15,17 @@ const RoleProgress = ({ role }: Props) => {
     <div>
       <div className="mb-1 flex justify-between text-xs text-gray-500">
         <span className="font-medium">{role.name}</span>
-
         <span>
-          {role.current}/{role.total}
+          {role.current >= role.total ? (
+            <span className="font-base flex items-center gap-1 text-emerald-600">
+              <CheckCircle2 className="h-3 w-3 shrink-0 text-emerald-600" />
+              모집 완료
+            </span>
+          ) : (
+            <span className="text-primary rounded-full bg-indigo-50 px-2 py-0.5 font-medium">
+              {role.current} / {role.total}
+            </span>
+          )}
         </span>
       </div>
 

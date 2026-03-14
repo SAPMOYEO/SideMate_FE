@@ -50,6 +50,7 @@ export type ProjectAuthor = Pick<User, '_id' | 'name' | 'email'>
 export interface RecruitRole {
   role: string
   cnt: number
+  currentCnt?: number
 }
 
 export interface ProjectFilter {
@@ -114,7 +115,6 @@ export interface CreateProjectPayload {
   startDate: string
   endDate: string
   requiredTechStack: string[]
-  mandatoryTechStack: string[]
   recruitRoles: CreateProjectRole[]
   totalCnt: number
   deadline: string
@@ -122,6 +122,7 @@ export interface CreateProjectPayload {
   status: string
   gitUrl?: string
   aiFeedbackIds?: string[]
+  tempProjectId?: string
 }
 
 export interface CreateProjectRes {

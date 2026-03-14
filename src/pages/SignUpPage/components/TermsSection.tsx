@@ -4,11 +4,14 @@ import { Checkbox } from '@/components/ui/checkbox'
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { type SignUpFormValues } from './signUp.schema'
+import { TERMS_CONTENT } from '@/constants/terms'
+import { Button } from '@/components/ui/button'
 
 export const TermsSection: React.FC = () => {
   const {
@@ -22,17 +25,23 @@ export const TermsSection: React.FC = () => {
     {
       name: 'terms.service',
       id: 'service',
-      label: '서비스 이용약관 동의 (필수)',
+      label: '서비스 이용약관 동의',
+      content: TERMS_CONTENT.service,
+      required: true,
     },
     {
       name: 'terms.privacy',
       id: 'privacy',
-      label: '개인정보 처리방침 동의 (필수)',
+      label: '개인정보 처리방침 동의',
+      content: TERMS_CONTENT.privacy,
+      required: true,
     },
     {
       name: 'terms.marketing',
       id: 'marketing',
-      label: '이벤트 및 마케팅 정보 수신 (선택)',
+      label: '이벤트 및 마케팅 정보 수신',
+      content: TERMS_CONTENT.marketing,
+      required: false,
     },
   ] as const
 
@@ -57,9 +66,9 @@ export const TermsSection: React.FC = () => {
         />
         <label
           htmlFor="all-terms"
-          className="text-sm font-bold text-slate-900 dark:text-white"
+          className="cursor-pointer text-sm font-bold text-slate-900 dark:text-white"
         >
-          약관 전체 동의하기
+          약관 전체 동의
         </label>
       </div>
 
@@ -76,12 +85,13 @@ export const TermsSection: React.FC = () => {
                 render={({ field }) => (
                   <Checkbox
                     id={item.id}
-                    checked={field.value}
+                    checked={!!field.value}
                     onCheckedChange={field.onChange}
                     className={`size-4 cursor-pointer transition-all ${
+                      item.required &&
                       errors.terms?.[item.id as keyof typeof errors.terms]
                         ? 'border-red-500 ring-2 ring-red-500/20 data-[state=checked]:border-red-500'
-                        : 'border-slate-300 data-[state=checked]:border-zinc-900 data-[state=checked]:bg-zinc-900'
+                        : 'border-slate-300 bg-transparent data-[state=checked]:border-zinc-900 data-[state=checked]:bg-zinc-900'
                     }`}
                   />
                 )}
@@ -91,6 +101,15 @@ export const TermsSection: React.FC = () => {
                 className="cursor-pointer text-xs font-medium text-slate-500 dark:text-slate-400"
               >
                 {item.label}
+                {item.required ? (
+                  <span className="ml-1 text-[10px] font-bold text-red-500">
+                    *
+                  </span>
+                ) : (
+                  <span className="ml-1 text-[10px] text-slate-400">
+                    (선택)
+                  </span>
+                )}
               </label>
             </div>
 
@@ -103,20 +122,36 @@ export const TermsSection: React.FC = () => {
                   보기
                 </button>
               </DialogTrigger>
-              <DialogContent className="max-w-[400px] rounded-lg">
+              <DialogContent className="mx-auto w-[calc(100%-40px)] max-w-[400px] overflow-hidden rounded-lg">
                 <DialogHeader>
                   <DialogTitle className="text-left">{item.label}</DialogTitle>
                 </DialogHeader>
-                <div className="mt-4 max-h-[300px] overflow-y-auto text-xs leading-relaxed text-slate-500 dark:text-slate-400">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
-                  do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                  Ut enim ad minim veniam, quis nostrud exercitation ullamco
-                  laboris nisi ut aliquip ex ea commodo consequat. Duis aute
-                  irure dolor in reprehenderit in voluptate velit esse cillum
-                  dolore eu fugiat nulla pariatur. Excepteur sint occaecat
-                  cupidatat non proident, sunt in culpa qui officia deserunt
-                  mollit anim id est laborum.
+                <div className="mt-4 max-h-[450px] overflow-y-auto text-sm leading-relaxed break-keep whitespace-pre-wrap text-slate-900 dark:text-slate-400">
+                  {item.content}
                 </div>
+                <DialogFooter className="mt-1 flex flex-row gap-2">
+                  <DialogTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="flex-1 border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-700 sm:flex-1"
+                    >
+                      취소
+                    </Button>
+                  </DialogTrigger>
+
+                  <DialogTrigger asChild>
+                    <Button
+                      type="button"
+                      className="flex-1 bg-zinc-900 text-white hover:bg-zinc-800 sm:flex-1"
+                      onClick={() => {
+                        setValue(item.name, true, { shouldValidate: true })
+                      }}
+                    >
+                      동의
+                    </Button>
+                  </DialogTrigger>
+                </DialogFooter>
               </DialogContent>
             </Dialog>
           </div>
@@ -124,7 +159,7 @@ export const TermsSection: React.FC = () => {
       </div>
 
       {(errors.terms?.service || errors.terms?.privacy) && (
-        <p className="animate-in fade-in slide-in-from-top-1 ml-1 text-xs font-bold text-red-500">
+        <p className="animate-in fade-in slide-in-from-top-1 font-lg ml-1 text-xs text-red-500">
           필수 약관에 동의해야 가입이 가능합니다.
         </p>
       )}

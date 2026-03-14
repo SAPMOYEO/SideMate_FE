@@ -3,7 +3,7 @@ import {
   getUserList,
   updateUser,
   type UpdateUserPayload,
-} from '@/utils/api/user'
+} from '@/utils/api/admin'
 
 const ADMIN_USER_BASE_KEY = ['users'] as const
 
