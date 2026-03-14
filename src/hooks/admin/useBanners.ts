@@ -5,7 +5,7 @@ import {
   updateBanner,
   deleteBanner,
   type BannerPayload,
-} from '@/utils/api/banner'
+} from '@/utils/api/admin'
 
 /** 쿼리 키 베이스 — 하위 키 무효화 시 사용 */
 const BANNER_BASE_KEY = ['banners'] as const

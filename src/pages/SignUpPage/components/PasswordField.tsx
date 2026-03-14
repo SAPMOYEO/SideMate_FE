@@ -10,7 +10,8 @@ export const PasswordField: React.FC = () => {
     control,
     watch,
     trigger,
-    formState: { errors },
+    getValues,
+    formState: { errors, touchedFields },
   } = useFormContext<SignUpFormValues>()
 
   const [showPassword, setShowPassword] = useState(false)
@@ -18,13 +19,6 @@ export const PasswordField: React.FC = () => {
   const [isPasswordFocused, setIsPasswordFocused] = useState(false)
 
   const passwordValue = watch('password', '')
-  const confirmPasswordValue = watch('confirmPassword', '')
-
-  React.useEffect(() => {
-    if (confirmPasswordValue) {
-      trigger('confirmPassword')
-    }
-  }, [passwordValue, confirmPasswordValue, trigger])
 
   const passwordRules = [
     { label: '최소 6자 이상', test: (val: string) => val.trim().length >= 6 },
@@ -35,7 +29,7 @@ export const PasswordField: React.FC = () => {
     { label: '숫자 포함', test: (val: string) => /[0-9]/.test(val) },
     {
       label: '특수문자 포함',
-      test: (val: string) => /[!@#$%^&*(),.?":{}|<>]/.test(val),
+      test: (val: string) => /[^a-zA-Z0-9]/.test(val),
     },
     {
       label: '공백 제외',
@@ -51,7 +45,18 @@ export const PasswordField: React.FC = () => {
         </label>
         <div className="relative">
           <Input
-            {...register('password')}
+            {...register('password', {
+              onBlur: () => trigger(['password', 'confirmPassword']),
+              onChange: () =>
+                setTimeout(() => {
+                  const confirmVal = getValues('confirmPassword')
+                  if (confirmVal !== undefined && confirmVal !== '') {
+                    trigger(['password', 'confirmPassword'])
+                  } else {
+                    trigger('password')
+                  }
+                }, 0),
+            })}
             onFocus={() => setIsPasswordFocused(true)}
             type={showPassword ? 'text' : 'password'}
             className={`h-12 pr-10 ${errors.password ? 'border-red-500 focus-visible:ring-red-500/20' : ''}`}
@@ -89,7 +94,10 @@ export const PasswordField: React.FC = () => {
             </div>
           )}
         {errors.password &&
-          passwordRules.every((rule) => rule.test(passwordValue)) && (
+          !(
+            (isPasswordFocused || passwordValue.length > 0) &&
+            !passwordRules.every((rule) => rule.test(passwordValue))
+          ) && (
             <p className="ml-1 text-xs text-red-500">
               {errors.password.message}
             </p>
@@ -108,12 +116,13 @@ export const PasswordField: React.FC = () => {
               <Input
                 {...field}
                 value={field.value ?? ''}
-                onChange={(e) => {
-                  field.onChange(e)
-                  trigger('confirmPassword')
+                onChange={(e) => field.onChange(e)}
+                onBlur={() => {
+                  field.onBlur()
+                  trigger(['password', 'confirmPassword'])
                 }}
                 type={showConfirmPassword ? 'text' : 'password'}
-                className={`h-12 pr-10 ${errors.confirmPassword ? 'border-red-500 focus-visible:ring-red-500/20' : ''}`}
+                className={`h-12 pr-10 ${touchedFields.confirmPassword && errors.confirmPassword ? 'border-red-500' : ''}`}
               />
             )}
           />
@@ -125,7 +134,7 @@ export const PasswordField: React.FC = () => {
             {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>
         </div>
-        {errors.confirmPassword && (
+        {touchedFields.confirmPassword && errors.confirmPassword && (
           <p className="animate-in fade-in slide-in-from-top-1 ml-1 text-xs text-red-500">
             {errors.confirmPassword.message}
           </p>

@@ -116,7 +116,10 @@ export const loginUser = createAsyncThunk(
       return response.data.user
     } catch (error) {
       console.error(error)
-      return rejectWithValue('로그인에 실패했습니다.')
+      const message =
+        (error as { response?: { data?: { message?: string } } }).response?.data
+          ?.message ?? '로그인에 실패했습니다.'
+      return rejectWithValue(message)
     }
   }
 )

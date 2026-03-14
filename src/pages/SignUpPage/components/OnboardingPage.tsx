@@ -16,22 +16,11 @@ import { toast } from 'sonner'
 import { TermsSection } from './TermsSection'
 import { Spinner } from '@/components/ui/spinner'
 import { usePhoneValidation } from '@/hooks/usePhoneValidation'
-import { z } from 'zod'
 import type { User } from '@/features/slices/userSlice'
-
-const onboardingSchema = z.object({
-  email: z.string().email(),
-  name: z.string().min(2),
-  phone: z.string().min(10),
-  techStacks: z.array(z.string()).min(1),
-  terms: z.object({
-    service: z.boolean().refine((v) => v === true),
-    privacy: z.boolean().refine((v) => v === true),
-    marketing: z.boolean().optional(),
-  }),
-})
-
-type OnboardingFormValues = z.infer<typeof onboardingSchema>
+import {
+  onboardingSchema,
+  type OnboardingFormValues,
+} from '@/utils/schemas/user.schema'
 
 const OnboardingPage: React.FC = () => {
   const navigate = useNavigate()
@@ -48,6 +37,11 @@ const OnboardingPage: React.FC = () => {
       name: user?.name || '',
       phone: '',
       techStacks: [],
+      terms: {
+        service: false,
+        privacy: false,
+        marketing: false,
+      },
     },
   })
 
@@ -186,7 +180,7 @@ const OnboardingPage: React.FC = () => {
             className={`shadow-primary/20 mt-2 h-12 w-full font-bold shadow-lg transition-all ${
               isSubmitting || !isValid || !!phoneError
                 ? 'bg-zinc-900 !opacity-100'
-                : 'bg-zinc-900 hover:bg-zinc-800'
+                : 'hover:bg-primary bg-zinc-900'
             }`}
             disabled={isSubmitting}
           >

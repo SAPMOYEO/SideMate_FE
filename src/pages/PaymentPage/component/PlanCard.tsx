@@ -1,7 +1,7 @@
 import { Check } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import type { Plan } from '../plans'
+import type { Plan } from '@/types/payment.type'
 
 interface PlanCardProps {
   plan: Plan

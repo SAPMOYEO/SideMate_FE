@@ -37,7 +37,7 @@ const FilterSidebar = ({
         <button
           type="button"
           onClick={onReset}
-          className="hover:bg-primary-50 rounded px-2 py-1 text-sm text-indigo-500 transition"
+          className="hover:bg-primary-50 cursor-pointer rounded px-2 py-1 text-sm text-indigo-500 transition"
         >
           초기화
         </button>

@@ -8,7 +8,7 @@ import {
 import AutoPlay from 'embla-carousel-autoplay'
 import { useQuery } from '@tanstack/react-query'
 import api from '@/utils/api/api.instance'
-import { useState, useEffect, useId } from 'react'
+import { useState, useRef, useEffect, useId } from 'react'
 
 interface BannerTypes {
   _id: string
@@ -63,10 +63,11 @@ export const BannerCarousel = () => {
       carouselApi.off('reInit', onSelect)
     }
   }, [carouselApi])
+  const autoPlay = useRef(AutoPlay({ delay: 3000, stopOnInteraction: false }))
   return (
     <Carousel
       setApi={setCarouselApi}
-      plugins={[AutoPlay({ delay: 3000, stopOnInteraction: false })]}
+      plugins={[autoPlay.current]}
       className="relative h-[40vh] md:h-[50vh] lg:h-[60vh]"
     >
       <CarouselContent>

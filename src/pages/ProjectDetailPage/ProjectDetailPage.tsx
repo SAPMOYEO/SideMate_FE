@@ -8,14 +8,17 @@ import {
 import { useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
 import { useAppSelector } from '@/hooks'
+import { useQueryClient } from '@tanstack/react-query'
 import {
   useApplications,
   useDeleteApplication,
+  useUpdateApplicationStatus,
 } from '@/hooks/application/useApplication'
 import { useDeleteProject, useProjectById } from '@/hooks/project/useProject'
 import type { Application } from '@/types/application'
 import { formatDate } from '@/utils/formatter'
 import ApplicationModal from './components/ApplicationModal'
+import ProjectApplicantManager from './components/ProjectApplicantManager'
 
 const STATUS_LABEL: Record<string, string> = {
   RECRUITING: '모집 중',
@@ -55,7 +58,11 @@ const getDeadlineText = (deadline?: string) => {
   const diff = Math.ceil((target.getTime() - today.getTime()) / 86400000)
   if (diff < 0) return '마감됨'
   if (diff === 0) return '오늘 마감'
-  return `마감 ${diff}일 전`
+  return (
+    <>
+      마감 <span className="text-primary font-extrabold">{diff}</span>일 전
+    </>
+  )
 }
 
 const ProjectDetailPage = () => {
@@ -72,6 +79,8 @@ const ProjectDetailPage = () => {
     useDeleteProject()
   const { mutateAsync: deleteApplication, isPending: isCancellingApplication } =
     useDeleteApplication()
+  const queryClient = useQueryClient()
+  const { mutateAsync: updateApplicationStatus } = useUpdateApplicationStatus()
   const [isApplicationModalOpen, setIsApplicationModalOpen] = useState(false)
   const [showAllRequiredTechStack, setShowAllRequiredTechStack] =
     useState(false)
@@ -91,12 +100,31 @@ const ProjectDetailPage = () => {
   )
   const appliedTotalCnt = applications.length
 
-  const appliedCntByRole = useMemo(() => {
+  const availableRoleNames = useMemo(() => {
+    if (!project) return []
+    return project.recruitRoles
+      .filter((r) => {
+        const accepted = applications.filter(
+          (app) =>
+            app.role === r.role &&
+            (app.status === 'APPROVED' || app.status === 'ACCEPTED')
+        ).length
+        return accepted < r.cnt
+      })
+      .map((r) => r.role)
+  }, [project, applications])
+
+  const acceptedCntByRole = useMemo(() => {
     const map: Record<string, number> = {}
     applications.forEach((application) => {
       const roleName = application.role?.trim()
       if (!roleName) return
-      map[roleName] = (map[roleName] ?? 0) + 1
+      if (
+        application.status === 'APPROVED' ||
+        application.status === 'ACCEPTED'
+      ) {
+        map[roleName] = (map[roleName] ?? 0) + 1
+      }
     })
     return map
   }, [applications])
@@ -155,7 +183,8 @@ const ProjectDetailPage = () => {
   const statusStyle =
     STATUS_STYLE[project.status] ?? 'bg-gray-100 text-gray-700'
   const deadlineText = getDeadlineText(project.deadline)
-  const authorName = project.author?.name ?? '작성자 정보 없음'
+  const authorName =
+    project?.author?.name || project?.author?.name || '알 수 없음'
   const isOwner = Boolean(
     user?._id && project.author?._id && user._id === project.author._id
   )
@@ -241,6 +270,29 @@ const ProjectDetailPage = () => {
     }
   }
 
+  const handleAccept = async (app: Application) => {
+    try {
+      await updateApplicationStatus({ id: app._id, status: 'APPROVED' })
+      queryClient.invalidateQueries({ queryKey: ['projects'] })
+      queryClient.invalidateQueries({ queryKey: ['project', id] })
+      toast.success('지원을 수락했습니다.')
+    } catch (error) {
+      console.error(error)
+      toast.error('수락 처리 중 오류가 발생했습니다.')
+    }
+  }
+  const handleReject = async (app: Application) => {
+    try {
+      await updateApplicationStatus({ id: app._id, status: 'REJECTED' })
+      queryClient.invalidateQueries({ queryKey: ['projects'] })
+      queryClient.invalidateQueries({ queryKey: ['project', id] })
+      toast.success('지원을 거절했습니다.')
+    } catch (error) {
+      console.error(error)
+      toast.error('거절 처리 중 오류가 발생했습니다.')
+    }
+  }
+
   return (
     <div>
       <div className="mx-auto grid max-w-7xl gap-8 px-4 py-8 md:px-8 lg:grid-cols-[minmax(0,1fr)_320px]">
@@ -255,16 +307,16 @@ const ProjectDetailPage = () => {
               <span className="text-gray-500">{project.category}</span>
             </div>
 
-            <h1 className="text-3xl font-extrabold tracking-tight text-gray-900">
+            <h1 className="pt-3 pb-3 text-3xl font-extrabold tracking-tight text-gray-900">
               {project.title}
             </h1>
 
-            <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
-              <span className="inline-flex items-center gap-2 rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700">
-                <span className="rounded-full bg-white px-2 py-0.5 text-[10px] font-semibold text-indigo-600">
-                  작성자
+            <div className="flex flex-wrap items-center gap-8 border-b pb-8 text-sm text-gray-500">
+              <span className="inline-flex items-center justify-center gap-2 py-1 text-xs font-semibold text-indigo-700">
+                <span className="py-0.5 text-[13px] font-semibold text-zinc-500">
+                  프로젝트 리더:
                 </span>
-                <span>{authorName}</span>
+                <span className="text-[13px]">{authorName}</span>
               </span>
               <span className="inline-flex items-center gap-2">
                 <CalendarDays className="h-4 w-4" />
@@ -274,28 +326,36 @@ const ProjectDetailPage = () => {
           </div>
 
           <div className="space-y-3">
-            <h2 className="text-sm font-semibold text-gray-500">
+            <h2 className="text-sm font-semibold text-zinc-700">
               프로젝트 설명
             </h2>
-            <p className="leading-8 whitespace-pre-line text-gray-700">
+            <p className="leading-8 break-keep whitespace-pre-line text-gray-700">
               {project.description}
             </p>
           </div>
 
           <div className="space-y-3">
-            <h2 className="text-sm font-semibold text-gray-500">
+            <h2 className="text-sm font-semibold text-zinc-700">
               프로젝트 목표
             </h2>
-            <div className="rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700">
-              <div className="flex items-start gap-2">
-                <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-indigo-500" />
-                <p className="whitespace-pre-line">{project.goal}</p>
-              </div>
+            <div className="space-y-2">
+              {(project.goal
+                ? project.goal.split('\n').filter((line) => line.trim())
+                : []
+              ).map((goalItem, index) => (
+                <div
+                  key={index}
+                  className="flex items-start gap-2 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700"
+                >
+                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-indigo-500" />
+                  <p className="break-keep">{goalItem.trim()}</p>
+                </div>
+              ))}
             </div>
           </div>
 
           <div className="space-y-3">
-            <h2 className="text-sm font-semibold text-gray-500">
+            <h2 className="text-sm font-semibold text-zinc-700">
               필수 기술 스택
             </h2>
             <div className="flex flex-wrap items-center gap-2">
@@ -311,7 +371,7 @@ const ProjectDetailPage = () => {
                 <button
                   type="button"
                   onClick={() => setShowAllRequiredTechStack((prev) => !prev)}
-                  className="rounded-md border border-gray-200 bg-white px-2.5 py-1 text-xs font-semibold text-gray-600 transition hover:bg-gray-50"
+                  className="cursor-pointer rounded-md border border-gray-200 bg-white px-2.5 py-1 text-xs font-semibold text-gray-600 transition hover:bg-gray-50"
                 >
                   {showAllRequiredTechStack ? '접기' : '더 보기'}
                 </button>
@@ -346,31 +406,11 @@ const ProjectDetailPage = () => {
                     {project.gitUrl}
                   </a>
                 ) : (
-                  <p>-</p>
+                  <p>추후 공개 예정</p>
                 )}
               </div>
             </div>
           </div>
-
-          {isOwner && (
-            <div className="flex justify-end gap-2 border-t pt-4">
-              <button
-                type="button"
-                onClick={handleEdit}
-                className="rounded-md border border-gray-300 px-3 py-1.5 text-xs font-semibold text-gray-700 transition hover:bg-gray-50"
-              >
-                수정
-              </button>
-              <button
-                type="button"
-                onClick={handleDelete}
-                disabled={isDeleting}
-                className="rounded-md border border-rose-200 px-3 py-1.5 text-xs font-semibold text-rose-600 transition hover:bg-rose-50 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                {isDeleting ? '삭제 중...' : '삭제'}
-              </button>
-            </div>
-          )}
         </section>
 
         <aside className="space-y-5">
@@ -383,12 +423,16 @@ const ProjectDetailPage = () => {
                 </span>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-500">마감일</span>
+                <span className="text-gray-500">지원 마감일</span>
                 <span className="font-semibold text-rose-500">
                   {toDateText(project.deadline)}
                 </span>
               </div>
             </div>
+
+            <p className="mt-3 text-center text-xs text-gray-400">
+              {deadlineText}
+            </p>
 
             {!isOwner &&
               new Date(project.deadline) > new Date() &&
@@ -405,35 +449,69 @@ const ProjectDetailPage = () => {
                 <button
                   type="button"
                   onClick={handleApplyClick}
-                  className="mt-6 w-full rounded-xl bg-indigo-500 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-200 transition hover:bg-indigo-600"
+                  className="mt-6 w-full cursor-pointer rounded-xl bg-indigo-500 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-200 transition hover:bg-indigo-600"
                 >
                   지원하기
                 </button>
               ))}
 
-            <p className="mt-3 text-center text-xs text-gray-400">
-              {deadlineText}
-            </p>
+            {isOwner && (
+              <div className="mt-4 flex justify-end gap-2 border-t pt-5">
+                <button
+                  type="button"
+                  onClick={handleEdit}
+                  className="w-full cursor-pointer rounded-md border border-gray-300 px-3 py-1.5 text-xs font-semibold text-gray-700 transition hover:bg-gray-50"
+                >
+                  수정
+                </button>
+                <button
+                  type="button"
+                  onClick={handleDelete}
+                  disabled={isDeleting}
+                  className="w-full cursor-pointer rounded-md border border-rose-200 px-3 py-1.5 text-xs font-semibold text-rose-600 transition hover:bg-rose-50 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {isDeleting ? '삭제 중...' : '삭제'}
+                </button>
+              </div>
+            )}
           </div>
 
-          <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
-            <h3 className="mb-4 text-sm font-semibold text-gray-700">
-              모집 역할
-            </h3>
-            <div className="space-y-2">
-              {project.recruitRoles.map((role) => (
-                <div
-                  key={role.role}
-                  className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2 text-sm"
-                >
-                  <span className="font-medium text-gray-700">{role.role}</span>
-                  <span className="rounded-md bg-indigo-100 px-2 py-0.5 text-xs font-semibold text-indigo-700">
-                    {appliedCntByRole[role.role] ?? 0} / {role.cnt}
-                  </span>
-                </div>
-              ))}
+          {isOwner ? (
+            <ProjectApplicantManager
+              project={project}
+              applications={applications}
+              onAccept={handleAccept}
+              onReject={handleReject}
+            />
+          ) : (
+            <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
+              <h3 className="mb-4 text-sm font-semibold text-gray-700">
+                모집 역할
+              </h3>
+              <div className="space-y-2">
+                {project.recruitRoles.map((role) => (
+                  <div
+                    key={role.role}
+                    className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2 text-sm"
+                  >
+                    <span className="font-medium text-gray-700">
+                      {role.role}
+                    </span>
+                    {(acceptedCntByRole[role.role] ?? 0) >= role.cnt ? (
+                      <span className="inline-flex items-center gap-1 text-emerald-600">
+                        <CheckCircle2 className="h-4 w-4" />
+                        <span className="text-xs font-semibold">모집 완료</span>
+                      </span>
+                    ) : (
+                      <span className="rounded-md bg-indigo-100 px-2 py-0.5 text-xs font-semibold text-indigo-700">
+                        {acceptedCntByRole[role.role] ?? 0} / {role.cnt}
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </aside>
       </div>
 
@@ -442,7 +520,7 @@ const ProjectDetailPage = () => {
         onOpenChange={setIsApplicationModalOpen}
         projectId={project._id}
         projectTitle={project.title}
-        roles={project.recruitRoles.map((role) => role.role)}
+        roles={availableRoleNames}
         alreadyApplied={hasApplied}
         onApplied={handleAppliedSuccess}
       />

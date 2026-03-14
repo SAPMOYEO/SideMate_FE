@@ -1,0 +1,100 @@
+import { useNavigate } from 'react-router-dom'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import {
+  BarChart2,
+  ChevronDown,
+  ChevronUp,
+  ExternalLink,
+  Users,
+} from 'lucide-react'
+import type { Project } from '@/types/project'
+
+interface Props {
+  project: Project
+  showAIFeedback: boolean
+  showApplicants: boolean
+  applicantCount: number
+  onToggleAIFeedback: () => void
+  onToggleApplicants: () => void
+}
+
+const getDaysLeft = (deadline: string) => {
+  const days = Math.ceil(
+    (new Date(deadline).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+  )
+  if (days < 0) return '마감'
+  if (days === 0) return 'D-Day'
+  return `D-${days}`
+}
+
+const ProjectCardHeader = ({
+  project,
+  showAIFeedback,
+  showApplicants,
+  applicantCount,
+  onToggleAIFeedback,
+  onToggleApplicants,
+}: Props) => {
+  const navigate = useNavigate()
+
+  return (
+    <div className="relative mb-6">
+      <div className="space-y-2 max-[667px]:pr-0">
+        <div className="flex items-center gap-2">
+          <Badge variant="default" className="rounded-md">
+            {project.status}
+          </Badge>
+          {project.deadline && (
+            <>
+              <span className="text-xs font-medium text-slate-500">
+                모집 마감 {getDaysLeft(project.deadline)}
+              </span>
+              <span className="text-slate-300">•</span>
+            </>
+          )}
+          <span className="text-xs font-medium text-slate-500">
+            {project.category}
+          </span>
+        </div>
+        <h3 className="text-xl font-bold text-slate-900 dark:text-white">
+          {project.title}
+        </h3>
+        <p className="line-clamp-2 text-sm text-slate-600 dark:text-slate-400">
+          {project.description}
+        </p>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-2 self-center">
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={() => navigate(`/projects/${project._id}`)}
+        >
+          <ExternalLink className="mr-1 size-4" />
+          상세
+        </Button>
+        <Button variant="secondary" size="sm" onClick={onToggleAIFeedback}>
+          <BarChart2 className="mr-1 size-4" />
+          AI 피드백
+          {showAIFeedback ? (
+            <ChevronUp className="ml-1 size-3" />
+          ) : (
+            <ChevronDown className="ml-1 size-3" />
+          )}
+        </Button>
+        <Button size="sm" onClick={onToggleApplicants}>
+          <Users className="mr-1 size-4" />
+          지원자 ({applicantCount})
+          {showApplicants ? (
+            <ChevronUp className="ml-1 size-3" />
+          ) : (
+            <ChevronDown className="ml-1 size-3" />
+          )}
+        </Button>
+      </div>
+    </div>
+  )
+}
+
+export default ProjectCardHeader
