@@ -170,7 +170,7 @@ const ProjectPage = () => {
           <div>
             <Link
               to="/projects/create"
-              className="bg-primary flex w-[120px] cursor-pointer items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-bold text-white shadow-md shadow-indigo-100 transition-all hover:bg-indigo-600"
+              className="bg-primary flex w-[130px] cursor-pointer items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-bold text-white shadow-md shadow-indigo-100 transition-all hover:bg-indigo-600"
             >
               <Plus size={16} strokeWidth={3} />새 프로젝트
             </Link>

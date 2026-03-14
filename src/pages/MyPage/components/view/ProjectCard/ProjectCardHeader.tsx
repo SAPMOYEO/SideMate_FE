@@ -39,8 +39,8 @@ const ProjectCardHeader = ({
   const navigate = useNavigate()
 
   return (
-    <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
-      <div className="space-y-2">
+    <div className="relative mb-6">
+      <div className="space-y-2 max-[667px]:pr-0">
         <div className="flex items-center gap-2">
           <Badge variant="default" className="rounded-md">
             {project.status}

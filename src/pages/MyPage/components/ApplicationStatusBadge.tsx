@@ -13,17 +13,17 @@ const STATUS_CONFIG: Record<
   APPROVED: {
     label: '승인',
     dotClass: 'bg-emerald-500',
-    className: ' text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400',
+    className: 'text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400',
   },
   PENDING: {
     label: '대기',
     dotClass: 'bg-amber-500',
-    className: ' text-amber-600 dark:bg-amber-900/20 dark:text-amber-400',
+    className: 'text-amber-600 dark:bg-amber-900/20 dark:text-amber-400',
   },
   REJECTED: {
     label: '거절',
     dotClass: 'bg-red-500',
-    className: ' text-red-600 dark:bg-red-900/20 dark:text-red-400',
+    className: 'text-red-600 dark:bg-red-900/20 dark:text-red-400',
   },
 }
 

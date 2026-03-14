@@ -35,7 +35,7 @@ const ProjectCard = ({ project }: { project: Project }) => {
         onToggleApplicants={() => setShowApplicants((prev) => !prev)}
       />
 
-      <AIFeedbackSection show={showAIFeedback} />
+      <AIFeedbackSection show={showAIFeedback} projectId={project._id} />
 
       <ApplicantSection
         show={showApplicants}

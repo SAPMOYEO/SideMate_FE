@@ -54,7 +54,10 @@ export const Header = () => {
     <>
       <header className="border-border-light bg-surface sticky top-0 z-50 flex items-center justify-between border-b px-6 py-4 whitespace-nowrap md:px-10">
         <div className="flex items-center gap-3">
-          <Link to="/" className="w-[120px] md:w-[160px]">
+          <Link
+            to="/"
+            className="flex w-[120px] shrink-0 items-center sm:w-auto"
+          >
             <SideMateLogo />
           </Link>
         </div>
@@ -69,7 +72,7 @@ export const Header = () => {
             </Link>
             <Link
               className="text-text-muted hover:text-text-main flex items-center text-sm font-semibold transition-colors"
-              to="#"
+              to="/my/project?tab=create"
             >
               AI 피드백
             </Link>
@@ -306,7 +309,7 @@ export const Header = () => {
                 프로젝트
               </Link>
               <Link
-                to="#"
+                to="/my/project?tab=create"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="text-text-main hover:text-primary flex items-center text-base font-semibold transition-colors"
               >

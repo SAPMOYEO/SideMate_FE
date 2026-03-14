@@ -17,7 +17,7 @@ const BannerSearchBar = () => {
       {/* 로고 — 모바일에서 축소 */}
       <div className="mb-6 md:mb-8">
         <h1 className="text-2xl font-[900] tracking-tight break-keep text-zinc-300 antialiased drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)] md:text-5xl lg:text-6xl">
-          당신의{' '}
+          당신의
           <span className="animate-pulse text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.5)] [animation-duration:4s]">
             아이디어
           </span>
@@ -27,11 +27,6 @@ const BannerSearchBar = () => {
           전문가들과 함께 사이드 프로젝트를 시작해 보세요.
         </p>
       </div>
-      {/* 설명 — 모바일에서 숨김 */}
-      <p className="mb-6 hidden max-w-2xl text-lg text-slate-200 text-shadow-gray-800 md:mb-10 md:block md:text-xl">
-        당신의 위대한 아이디어를 현실로. 전문가들과 함께 사이드 프로젝트를
-        시작해보세요.
-      </p>
       {/* 검색바 */}
       <div className="w-full max-w-2xl px-8 md:px-4">
         <form className="group relative" onSubmit={handleSubmit}>
