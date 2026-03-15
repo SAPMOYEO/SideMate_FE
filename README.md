@@ -175,54 +175,6 @@ main
 
 <br/>
 
-## 💡 주요 구현 내용 (담당 파트)
-
-### 1. 알림 시스템 풀스택 구현
-
-- **BE**: Notification 모델 설계, REST API 3개 (목록 조회 / 읽음 처리 / 전체 읽음)
-- **FE**: Redux slice로 알림 상태 관리, 30초 폴링으로 실시간성 구현
-- 지원 / 승인·거절 / AI 피드백 완료 시 알림 생성
-- 모바일 팝오버 위치 이슈 → Radix `collisionPadding`으로 해결
-
-### 2. 지원자 타입 시스템 통합
-
-- 컴포넌트마다 분산된 3개의 타입 정의를 `ApplicantDetail` 단일 타입으로 통합
-- `mapApplicationToApplicantDetail()` 유틸 함수로 매핑 로직 중앙화
-- MyPage, ProjectDetailPage 등 여러 컴포넌트에서 동일 타입 공유
-
-### 3. MyPage 지원자 관리
-
-- 지원자 상세 모달 (프로필 이미지, 기술스택, 지원 동기)
-- 승인 / 거절 처리 및 상태 업데이트
-- URL 기반 탭 네비게이션 (`useSearchParams`) — 뒤로가기 버튼에도 탭 유지
-
-### 4. 계정 정지 처리
-
-- 일반 로그인 / Google 소셜 로그인 모두 `isActive` 체크
-- API 인터셉터에서 로그인 요청의 403은 리다이렉트 없이 에러 메시지 표시
-
-### 5. 배포 및 인프라
-
-- Vercel (FE) + Heroku (BE) 배포 환경 구성
-- 환경변수 관리 (Cloudinary, Google OAuth, OpenAI API 등)
-- SPA 라우팅 이슈 → `vercel.json` rewrites로 해결
-
-<br/>
-
-## 🚨 트러블슈팅
-
-### 탭 뒤로가기 버튼 미동작
-
-- **문제**: URL이 바뀌어도 탭이 변경되지 않음
-- **원인**: `defaultValue` (비제어) 사용으로 초기 렌더링 이후 URL 변화를 감지 못함
-- **해결**: `value` + `useSearchParams`로 제어 컴포넌트 전환
-
-### 알림 팝오버 모바일 위치 이탈
-
-- **문제**: 모바일에서 팝오버가 화면 왼쪽으로 밀려남
-- **해결**: Radix Popover의 `collisionPadding={16}` 속성으로 뷰포트 경계 감지
-
-<br/>
 
 ## 🚀 로컬 실행
 
