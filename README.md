@@ -2,7 +2,7 @@
 
 > 사이드 프로젝트를 함께할 팀원을 찾고, AI 피드백으로 프로젝트를 다듬는 협업 매칭 서비스
 
-🔗 **배포 URL** : https://side-mate-fe.vercel.app
+🔗 **배포 URL** : https://sidemate.vercel.app
 
 <br/>
 
