@@ -90,13 +90,6 @@ const AdminLayout = () => {
               </NavLink>
             </nav>
           </div>
-          <div className="border-border bg-muted mt-auto rounded-xl border p-4">
-            <p className="text-muted-foreground text-xs leading-relaxed">
-              마지막 접속 IP
-              <br />
-              192.168.0.1 (2023-11-20)
-            </p>
-          </div>
         </aside>
         <main className="flex-1 overflow-y-auto">
           <Outlet />

@@ -38,9 +38,9 @@ const AdminBanner = () => {
   const banners = data?.data ?? []
   const totalCount = data?.totalCount ?? 0
   const totalPages = data?.totalPages ?? 1
-
-  const activeCount = banners.filter((b) => b.isActive).length
+  const activeCount = data?.activeCount ?? 0
   const inactiveCount = totalCount - activeCount
+  const MAX_ACTIVE = 3
 
   // ── 핸들러 ───────────────────────────────────────────────────
   const handleToggle = (id: string, isActive: boolean) => {
@@ -75,7 +75,13 @@ const AdminBanner = () => {
     isActive: (
       <Switch
         checked={banner.isActive}
+        disabled={!banner.isActive && activeCount >= MAX_ACTIVE}
         onCheckedChange={(checked) => handleToggle(banner._id, checked)}
+        title={
+          !banner.isActive && activeCount >= MAX_ACTIVE
+            ? '활성 배너는 최대 3개까지 가능합니다'
+            : undefined
+        }
       />
     ),
     createdAt: (
@@ -129,7 +135,11 @@ const AdminBanner = () => {
           <div className="bg-border h-4 w-px" />
           <div className="flex items-center gap-1.5">
             <span className="h-2 w-2 rounded-full bg-green-500" />
-            <span className="text-muted-foreground">활성 {activeCount}</span>
+            <span
+              className={`text-sm font-medium ${activeCount >= MAX_ACTIVE ? 'text-orange-500' : 'text-muted-foreground'}`}
+            >
+              활성 {activeCount} / {MAX_ACTIVE}
+            </span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="bg-muted-foreground h-2 w-2 rounded-full" />
