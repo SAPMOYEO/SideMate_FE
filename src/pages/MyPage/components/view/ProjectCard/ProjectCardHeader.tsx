@@ -39,8 +39,8 @@ const ProjectCardHeader = ({
   const navigate = useNavigate()
 
   return (
-    <div className="relative mb-6">
-      <div className="space-y-2 max-[667px]:pr-0">
+    <div className="relative mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+      <div className="min-w-0 flex-1 space-y-2">
         <div className="flex items-center gap-2">
           <Badge variant="default" className="rounded-md">
             {project.status}
@@ -65,7 +65,7 @@ const ProjectCardHeader = ({
         </p>
       </div>
 
-      <div className="flex flex-wrap items-center gap-2 self-center">
+      <div className="flex flex-wrap items-center gap-2 sm:shrink-0 sm:self-center">
         <Button
           variant="secondary"
           size="sm"
