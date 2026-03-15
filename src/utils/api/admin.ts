@@ -19,6 +19,7 @@ export type BannerPayload = Pick<Banner, 'imageUrl' | 'isActive'>
 export interface BannersResponse {
   data: Banner[]
   totalCount: number
+  activeCount: number
   totalPages: number
 }
 
