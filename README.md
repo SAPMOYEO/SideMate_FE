@@ -1,90 +1,243 @@
-# Sidemate Frontend
+# 🤝 SideMate — 개발자 프로젝트 협업 매칭 플랫폼
 
-## 시작하기
+> 사이드 프로젝트를 함께할 팀원을 찾고, AI 피드백으로 프로젝트를 다듬는 협업 매칭 서비스
 
-```bash
-pnpm install
-pnpm dev
+🔗 **배포 URL** : https://side-mate-fe.vercel.app
+
+<br/>
+
+## 📌 프로젝트 소개
+
+SideMate는 개발자들이 사이드 프로젝트 팀원을 구하고, 지원하고, 협업할 수 있는 매칭 플랫폼입니다.
+프로젝트 모집 공고를 올리고 지원자를 관리하며, AI가 모집글을 분석해 개선점을 제안합니다.
+
+| 항목      | 내용                                           |
+| --------- | ---------------------------------------------- |
+| 진행 기간 | 2025.05 ~ 2025.07                              |
+| 인원      | 프론트엔드 3명, 백엔드 1명                     |
+| 담당 역할 | 알림 시스템 (FE/BE), 지원자 관리, MyPage, 배포 |
+
+<br/>
+
+## 🖥️ 주요 기능 및 화면
+
+### 1. 홈 / 프로젝트 탐색
+
+> 최신 프로젝트를 카테고리별로 탐색하고 지원할 수 있습니다.
+
+| 홈 화면                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | 프로젝트 상세                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
+| `스크린샷 추가 예정`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | `스크린샷 추가 예정`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+
+<br/>
+
+### 2. 알림 시스템
+
+> 지원, 승인/거절, AI 피드백 완료 시 실시간 알림을 제공합니다.
+
+| 알림 팝오버                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |
+| `스크린샷 추가 예정`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+
+<br/>
+
+### 3. MyPage — 지원 현황 & 프로젝트 관리
+
+> 내가 지원한 프로젝트 현황과 내가 만든 프로젝트의 지원자를 한눈에 관리합니다.
+
+| 지원한 프로젝트      | 내가 만든 프로젝트   | 지원자 상세 모달     |
+| -------------------- | -------------------- | -------------------- |
+| `스크린샷 추가 예정` | `스크린샷 추가 예정` | `스크린샷 추가 예정` |
+
+<br/>
+
+### 4. AI 피드백
+
+> 프로젝트 모집글을 AI가 분석하여 강점, 약점, 개선 제안을 제공합니다.
+
+| AI 피드백 화면       |
+| -------------------- |
+| `스크린샷 추가 예정` |
+
+<br/>
+
+### 5. 어드민 페이지
+
+> 관리자가 유저 관리, 프로젝트 숨김 처리, 배너 관리를 할 수 있습니다.
+
+| 유저 관리            | 프로젝트 관리        | 배너 관리            |
+| -------------------- | -------------------- | -------------------- |
+| `스크린샷 추가 예정` | `스크린샷 추가 예정` | `스크린샷 추가 예정` |
+
+<br/>
+
+## 🛠️ 기술 스택
+
+### Frontend
+
+| 분류            | 기술                       | 선택 이유                           |
+| --------------- | -------------------------- | ----------------------------------- |
+| Core            | React 19, TypeScript, Vite | 타입 안정성 및 빠른 빌드            |
+| 스타일          | Tailwind CSS v4, shadcn/ui | 빠른 UI 구성, 디자인 시스템 통일    |
+| 서버 상태       | React Query                | 캐싱, 페이지네이션, 자동 리패치     |
+| 클라이언트 상태 | Redux Toolkit              | 유저 정보, 알림 등 전역 상태 관리   |
+| 폼              | react-hook-form + zod      | 선언적 유효성 검사                  |
+| 라우팅          | react-router-dom v7        | 권한별 라우트 가드                  |
+| 이미지 업로드   | Cloudinary                 | 별도 서버 없이 이미지 스토리지 연동 |
+
+### Backend
+
+| 분류    | 기술                |
+| ------- | ------------------- |
+| Runtime | Node.js, Express.js |
+| DB      | MongoDB, Mongoose   |
+| 인증    | JWT, Google OAuth   |
+| AI      | OpenAI API          |
+| 이메일  | Nodemailer          |
+
+### 배포
+
+|          |        |
+| -------- | ------ |
+| Frontend | Vercel |
+| Backend  | Heroku |
+
+<br/>
+
+## 🏗️ 아키텍처
+
+```
+[Client - Vercel]                    [Server - Heroku]
+React + TypeScript                   Node.js + Express
+        │                                    │
+        │  REST API (HTTPS)                  │
+        ├──────────────────────────────────► │
+        │                            MongoDB (Atlas)
+        │                            Cloudinary (이미지)
+        │                            OpenAI API (AI 피드백)
 ```
 
-## 기술 스택
+<br/>
 
-| 분류      | 패키지                               |
-| --------- | ------------------------------------ |
-| Core      | React 19, TypeScript, Vite           |
-| 스타일    | Tailwind CSS v4, shadcn/ui           |
-| 상태 관리 | @tanstack/react-query, Redux Toolkit |
-| 폼        | react-hook-form + zod                |
-| 라우팅    | react-router-dom v7                  |
-
-## 프로젝트 구조
+## 📁 프로젝트 구조
 
 ```
 src/
 ├── components/
-│   ├── ui/          # shadcn 컴포넌트
-│   ├── shared/      # 공통 컴포넌트 (Header 등)
-│   └── icons/       # 아이콘 컴포넌트
-├── features/        # Redux slice, store
-├── hooks/           # 커스텀 훅
-├── layout/          # 레이아웃 컴포넌트 (AppLayout 등)
-├── lib/             # 유틸리티 (cn 등)
-├── pages/           # 페이지 컴포넌트
-├── routes/          # 라우트 설정
-├── index.css        # Tailwind + 테마 변수
-└── main.tsx         # 전역 프로바이더 (BrowserRouter > QueryClientProvider > Redux)
+│   ├── ui/              # shadcn 기본 컴포넌트
+│   ├── shared/          # 공통 컴포넌트 (Header, Footer 등)
+│   └── notifications/   # 알림 팝오버 컴포넌트
+├── features/            # Redux slice (user, notification)
+├── hooks/               # 도메인별 커스텀 훅
+│   ├── project/
+│   ├── admin/
+│   └── application/
+├── pages/               # 페이지 컴포넌트
+├── routes/              # 권한별 라우트 가드
+├── types/               # 공통 TypeScript 타입
+└── utils/               # API 인스턴스, Cloudinary 등
 ```
 
-## 스크립트
+<br/>
+
+## 🤝 협업 방식
+
+### Git 브랜치 전략
+
+```
+main
+ └── dev
+      ├── feature/user
+      ├── feature/project
+      ├── feature/aiFeedback
+      ├── feature/noti
+      ├── feature/admin
+      └── feature/payment
+```
+
+- 기능 단위로 `feature/` 브랜치를 분리해 개발
+- PR을 통해 `dev`로 머지, 배포 시 `main`으로 머지
+
+### 코드 컨벤션
+
+| 도구                | 설정                                                |
+| ------------------- | --------------------------------------------------- |
+| ESLint              | `any` 타입 사용 금지, React Hooks 규칙 강제         |
+| Prettier            | 세미콜론 없음, 싱글쿼트, 탭 2칸                     |
+| Husky + lint-staged | 커밋 전 자동 lint/format 실행                       |
+| Tailwind            | prettier-plugin-tailwindcss로 클래스 순서 자동 정렬 |
+
+<br/>
+
+## 💡 주요 구현 내용 (담당 파트)
+
+### 1. 알림 시스템 풀스택 구현
+
+- **BE**: Notification 모델 설계, REST API 3개 (목록 조회 / 읽음 처리 / 전체 읽음)
+- **FE**: Redux slice로 알림 상태 관리, 30초 폴링으로 실시간성 구현
+- 지원 / 승인·거절 / AI 피드백 완료 시 알림 생성
+- 모바일 팝오버 위치 이슈 → Radix `collisionPadding`으로 해결
+
+### 2. 지원자 타입 시스템 통합
+
+- 컴포넌트마다 분산된 3개의 타입 정의를 `ApplicantDetail` 단일 타입으로 통합
+- `mapApplicationToApplicantDetail()` 유틸 함수로 매핑 로직 중앙화
+- MyPage, ProjectDetailPage 등 여러 컴포넌트에서 동일 타입 공유
+
+### 3. MyPage 지원자 관리
+
+- 지원자 상세 모달 (프로필 이미지, 기술스택, 지원 동기)
+- 승인 / 거절 처리 및 상태 업데이트
+- URL 기반 탭 네비게이션 (`useSearchParams`) — 뒤로가기 버튼에도 탭 유지
+
+### 4. 계정 정지 처리
+
+- 일반 로그인 / Google 소셜 로그인 모두 `isActive` 체크
+- API 인터셉터에서 로그인 요청의 403은 리다이렉트 없이 에러 메시지 표시
+
+### 5. 배포 및 인프라
+
+- Vercel (FE) + Heroku (BE) 배포 환경 구성
+- 환경변수 관리 (Cloudinary, Google OAuth, OpenAI API 등)
+- SPA 라우팅 이슈 → `vercel.json` rewrites로 해결
+
+<br/>
+
+## 🚨 트러블슈팅
+
+### 탭 뒤로가기 버튼 미동작
+
+- **문제**: URL이 바뀌어도 탭이 변경되지 않음
+- **원인**: `defaultValue` (비제어) 사용으로 초기 렌더링 이후 URL 변화를 감지 못함
+- **해결**: `value` + `useSearchParams`로 제어 컴포넌트 전환
+
+### 알림 팝오버 모바일 위치 이탈
+
+- **문제**: 모바일에서 팝오버가 화면 왼쪽으로 밀려남
+- **해결**: Radix Popover의 `collisionPadding={16}` 속성으로 뷰포트 경계 감지
+
+<br/>
+
+## 🚀 로컬 실행
 
 ```bash
-pnpm dev      # 개발 서버
-pnpm build    # 프로덕션 빌드
-pnpm lint     # 린트
+# 의존성 설치
+pnpm install
+
+# 환경변수 설정
+cp .env.example .env
+
+# 개발 서버 실행
+pnpm dev
 ```
 
-## 라우팅 구조
+### 환경변수
 
-권한별 3단계 가드 컴포넌트로 구성.
-
-| 가드              | 파일                         | 설명                                         |
-| ----------------- | ---------------------------- | -------------------------------------------- |
-| `PublicOnlyRoute` | `routes/PublicOnlyRoute.tsx` | 비로그인만 접근, 로그인 시 `/` 리다이렉트    |
-| `PrivateRoute`    | `routes/PrivateRoute.tsx`    | 로그인 필요, 비로그인 시 `/login` 리다이렉트 |
-| `AdminRoute`      | `routes/AdminRoute.tsx`      | 관리자만 접근, 아니면 `/` 리다이렉트         |
-
-| 경로                                            | 접근       | 레이아웃  |
-| ----------------------------------------------- | ---------- | --------- |
-| `/`                                             | Public     | AppLayout |
-| `/projects/:id`                                 | Public     | AppLayout |
-| `/login`, `/register`, `/register/survey`       | PublicOnly | AppLayout |
-| `/projects/create`, `/projects/:id/edit`, `/my` | Private    | AppLayout |
-| `/admin/banner`, `/admin/projects`              | Admin      | 없음      |
-
-> 각 Route의 `element`는 현재 `<div>` 플레이스홀더로 작성되어 있으며, 페이지 작업 시 컴포넌트로 교체.
-> 가드 내 인증 변수(`isLoggedIn`, `isAdmin`)는 Redux 연결 전까지 파일 내 임시 변수로 관리.
-
-## 코드 품질 (ESLint + Husky)
-
-### ESLint 전략
-
-`typescript-eslint recommended` 기반으로 아래 항목은 커밋 차단.
-
-| 위반 항목        | 출처                                               |
-| ---------------- | -------------------------------------------------- |
-| `any` 타입 사용  | ESLint `no-explicit-any`                           |
-| 미사용 변수·함수 | TypeScript `noUnusedLocals` / `noUnusedParameters` |
-| 미사용 import    | TypeScript `noUnusedLocals`                        |
-
-### Husky + lint-staged
-
-`git commit` 시 staged 파일에만 자동으로 린트·포맷 실행.
-
-| 대상              | 실행                            |
-| ----------------- | ------------------------------- |
-| `*.{ts,tsx}`      | eslint --fix → prettier --write |
-| `*.{css,json,md}` | prettier --write                |
-
-### 초기 세팅
-
-`pnpm install` 시 `prepare` 스크립트가 자동 실행되어 훅이 등록됩니다. 별도 작업 불필요.
+```env
+VITE_API_BASE_URL=         # 백엔드 API 주소
+VITE_CLOUDINARY_CLOUD_NAME=
+VITE_CLOUDINARY_UPLOAD_PRESET=
+VITE_GOOGLE_CLIENT_ID=
+```
