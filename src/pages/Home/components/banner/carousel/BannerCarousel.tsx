@@ -70,11 +70,11 @@ export const BannerCarousel = () => {
       plugins={[autoPlay.current]}
       className="relative h-[40vh] md:h-[50vh] lg:h-[60vh]"
     >
-      <CarouselContent>
+      <CarouselContent className="-ml-0 gap-0">
         {data?.banners.map((banner) => (
           <CarouselItem
             key={banner._id}
-            className="h-[40vh] md:h-[50vh] lg:h-[60vh]"
+            className="h-[40vh] pl-0 md:h-[50vh] lg:h-[60vh]"
           >
             <img
               src={banner.imageUrl}
